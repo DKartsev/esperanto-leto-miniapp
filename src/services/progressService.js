@@ -1,0 +1,291 @@
+import { supabase } from './supabaseClient.js'
+import { getCurrentUser } from './authService.js'
+
+/**
+ * Сохранить ответ пользователя
+ * @param {number} chapterId - ID главы
+ * @param {number} sectionId - ID раздела
+ * @param {number} questionId - ID вопроса
+ * @param {boolean} isCorrect - Правильность ответа
+ * @param {string} selectedAnswer - Выбранный ответ
+ * @param {number} timeSpent - Время на ответ (в секундах)
+ * @returns {Promise<Object>} Сохраненный ответ
+ */
+export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, selectedAnswer, timeSpent = 0) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error('Пользователь не авторизован')
+
+    console.log('💾 Сохранение ответа:', { chapterId, sectionId, questionId, isCorrect })
+
+    const { data, error } = await supabase
+      .from('user_progress')
+      .insert([
+        {
+          user_id: user.id,
+          chapter_id: chapterId,
+          section_id: sectionId,
+          question_id: questionId,
+          is_correct: isCorrect,
+          selected_answer: selectedAnswer,
+          time_spent: timeSpent,
+          answered_at: new Date().toISOString()
+        }
+      ])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    console.log('✅ Ответ сохранен успешно')
+    return data
+  } catch (error) {
+    console.error('❌ Ошибка сохранения ответа:', error.message)
+    throw new Error(`Ошибка сохранения ответа: ${error.message}`)
+  }
+}
+
+/**
+ * Получить весь прогресс пользователя
+ * @returns {Promise<Array>} Массив ответов пользователя
+ */
+export async function getUserProgress() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('answered_at', { ascending: false })
+
+    if (error) throw error
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Ошибка получения прогресса:', error.message)
+    return []
+  }
+}
+
+/**
+ * Получить прогресс по конкретной главе
+ * @param {number} chapterId - ID главы
+ * @returns {Promise<Array>} Прогресс по главе
+ */
+export async function getChapterProgress(chapterId) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('chapter_id', chapterId)
+      .order('answered_at', { ascending: false })
+
+    if (error) throw error
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Ошибка получения прогресса главы:', error.message)
+    return []
+  }
+}
+
+/**
+ * Получить прогресс по конкретному разделу
+ * @param {number} chapterId - ID главы
+ * @param {number} sectionId - ID раздела
+ * @returns {Promise<Array>} Прогресс по разделу
+ */
+export async function getSectionProgress(chapterId, sectionId) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('chapter_id', chapterId)
+      .eq('section_id', sectionId)
+      .order('answered_at', { ascending: false })
+
+    if (error) throw error
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Ошибка получения прогресса раздела:', error.message)
+    return []
+  }
+}
+
+/**
+ * Получить статистику пользователя
+ * @returns {Promise<Object>} Статистика пользователя
+ */
+export async function getUserStats() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return getDefaultStats()
+
+    const progress = await getUserProgress()
+    
+    const totalAnswers = progress.length
+    const correctAnswers = progress.filter(p => p.is_correct).length
+    const totalTimeSpent = progress.reduce((sum, p) => sum + (p.time_spent || 0), 0)
+    
+    // Подсчет завершенных глав и разделов
+    const completedSections = new Set()
+    const completedChapters = new Set()
+    
+    progress.forEach(p => {
+      const sectionKey = `${p.chapter_id}-${p.section_id}`
+      completedSections.add(sectionKey)
+      completedChapters.add(p.chapter_id)
+    })
+
+    const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0
+    const averageTimePerQuestion = totalAnswers > 0 ? Math.round(totalTimeSpent / totalAnswers) : 0
+
+    return {
+      totalAnswers,
+      correctAnswers,
+      accuracy,
+      totalTimeSpent,
+      averageTimePerQuestion,
+      completedSections: completedSections.size,
+      completedChapters: completedChapters.size,
+      level: calculateLevel(accuracy, totalAnswers),
+      progress: calculateOverallProgress(completedChapters.size)
+    }
+  } catch (error) {
+    console.error('❌ Ошибка получения статистики:', error.message)
+    return getDefaultStats()
+  }
+}
+
+/**
+ * Сохранить результат теста
+ * @param {Object} testResult - Результат теста
+ * @returns {Promise<Object>} Сохраненный результат
+ */
+export async function saveTestResult(testResult) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error('Пользователь не авторизован')
+
+    const { data, error } = await supabase
+      .from('test_results')
+      .insert([
+        {
+          user_id: user.id,
+          test_type: testResult.testType || 'general',
+          score: testResult.score,
+          total_questions: testResult.totalQuestions,
+          correct_answers: testResult.correctAnswers,
+          time_spent: testResult.timeSpent,
+          section_scores: testResult.sectionScores || {},
+          completed_at: new Date().toISOString()
+        }
+      ])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    console.log('✅ Результат теста сохранен')
+    return data
+  } catch (error) {
+    console.error('❌ Ошибка сохранения результата теста:', error.message)
+    throw new Error(`Ошибка сохранения результата теста: ${error.message}`)
+  }
+}
+
+/**
+ * Получить результаты тестов пользователя
+ * @returns {Promise<Array>} Результаты тестов
+ */
+export async function getUserTestResults() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+      .from('test_results')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('completed_at', { ascending: false })
+
+    if (error) throw error
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Ошибка получения результатов тестов:', error.message)
+    return []
+  }
+}
+
+/**
+ * Сбросить прогресс пользователя
+ * @returns {Promise<void>}
+ */
+export async function resetUserProgress() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error('Пользователь не авторизован')
+
+    // Удаляем все ответы пользователя
+    const { error: progressError } = await supabase
+      .from('user_progress')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (progressError) throw progressError
+
+    // Удаляем результаты тестов
+    const { error: testsError } = await supabase
+      .from('test_results')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (testsError) throw testsError
+
+    console.log('✅ Прогресс пользователя сброшен')
+  } catch (error) {
+    console.error('❌ Ошибка сброса прогресса:', error.message)
+    throw new Error(`Ошибка сброса прогресса: ${error.message}`)
+  }
+}
+
+// Вспомогательные функции
+function getDefaultStats() {
+  return {
+    totalAnswers: 0,
+    correctAnswers: 0,
+    accuracy: 0,
+    totalTimeSpent: 0,
+    averageTimePerQuestion: 0,
+    completedSections: 0,
+    completedChapters: 0,
+    level: 'Начинающий',
+    progress: 0
+  }
+}
+
+function calculateLevel(accuracy, totalAnswers) {
+  if (totalAnswers < 10) return 'Начинающий'
+  if (accuracy >= 90) return 'Эксперт'
+  if (accuracy >= 80) return 'Продвинутый'
+  if (accuracy >= 70) return 'Средний'
+  if (accuracy >= 60) return 'Ученик'
+  return 'Начинающий'
+}
+
+function calculateOverallProgress(completedChapters) {
+  const totalChapters = 14 // Общее количество глав в курсе
+  return Math.round((completedChapters / totalChapters) * 100)
+}

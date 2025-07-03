@@ -1,0 +1,33 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "6N38VWS5BX.org.telegram.Telegram-iOS",
+          "C67CF9S4VU.ph.telegra.Telegraph"
+        ],
+        "components": [
+          {
+            "/": "/webapp/*",
+            "comment": "Telegram WebApp paths"
+          },
+          {
+            "/": "/*",
+            "exclude": true,
+            "comment": "Exclude all other paths"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "6N38VWS5BX.org.telegram.Telegram-iOS"
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "6N38VWS5BX.org.telegram.Telegram-iOS"
+    ]
+  }
+}

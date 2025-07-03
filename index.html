@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Esperanto-Leto" />
+    <title>Esperanto-Leto Telegram WebApp</title>
+    
+    <!-- Telegram WebApp Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
+    
+    <!-- Meta Tags for Universal Links -->
+    <meta name="apple-itunes-app" content="app-id=686449807, app-argument=https://t.me/EsperantoLetoBot/webapp" />
+    <meta name="telegram:channel" content="@EsperantoLetoBot" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Esperanto-Leto - Изучение эсперанто" />
+    <meta property="og:description" content="Полнофункциональное приложение для изучения международного языка эсперанто в Telegram" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:url" content="https://tgminiapp.esperanto-leto.ru" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Esperanto-Leto - Изучение эсперанто" />
+    <meta name="twitter:description" content="Изучайте эсперанто с AI-помощником в Telegram WebApp" />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Esperanto-Leto" />
+    <meta name="apple-mobile-web-app-title" content="Esperanto-Leto" />
+    <meta name="description" content="Изучение эсперанто в Telegram WebApp" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    
+    <!-- Prevent zoom on mobile -->
+    <style>
+      html, body {
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Telegram WebApp specific styles */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--tg-theme-bg-color, #ffffff);
+        color: var(--tg-theme-text-color, #000000);
+        overflow-x: hidden;
+      }
+      
+      /* Safe area support */
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      
+      /* Loading screen */
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      
+      #loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #d1fae5;
+        border-top: 4px solid #059669;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Universal Links Support */
+      .universal-link {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Universal Link Detection -->
+    <div class="universal-link">
+      <a href="https://t.me/EsperantoLetoBot/webapp" id="telegram-link">Open in Telegram</a>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loading">
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <div id="root"></div>
+    
+    <script>
+      // Hide loading screen when React app loads
+      function hideLoadingScreen() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+          loadingElement.classList.add('hidden');
+          window.setTimeout(() => {
+            loadingElement.style.display = 'none';
+          }, 300);
+        }
+      }
+
+      // Universal Links Detection and Handling
+      function detectTelegramWebApp() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isTelegramWebApp = window.Telegram && window.Telegram.WebApp;
+        const hasWebAppParams = urlParams.has('tgWebAppData') || urlParams.has('tgWebAppVersion');
+        
+        return isTelegramWebApp || hasWebAppParams;
+      }
+      
+      // Handle Universal Links
+      function handleUniversalLink() {
+        if (!detectTelegramWebApp()) {
+          // Not in Telegram WebApp, try to open in Telegram
+          const currentUrl = window.location.href;
+          const telegramUrl = `https://t.me/EsperantoLetoBot/webapp?startapp=${encodeURIComponent(currentUrl)}`;
+          
+          // Show option to open in Telegram
+          const shouldRedirect = confirm('Это приложение лучше работает в Telegram. Открыть в Telegram?');
+          if (shouldRedirect) {
+            window.location.href = telegramUrl;
+            return;
+          }
+        }
+      }
+      
+      // Initialize Universal Links
+      handleUniversalLink();
+      
+      // Initialize Telegram WebApp
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        // Configure WebApp
+        tg.ready();
+        tg.expand();
+        
+        // Set header color
+        tg.setHeaderColor('#059669');
+        
+        // Enable closing confirmation
+        tg.enableClosingConfirmation();
+        
+        // Handle theme changes
+        tg.onEvent('themeChanged', function() {
+          document.body.className = 'tg-theme-' + tg.colorScheme;
+        });
+        
+        // Handle viewport changes
+        tg.onEvent('viewportChanged', function() {
+          document.documentElement.style.setProperty('--tg-viewport-height', tg.viewportHeight + 'px');
+          document.documentElement.style.setProperty('--tg-viewport-stable-height', tg.viewportStableHeight + 'px');
+        });
+        
+        console.log('Telegram WebApp initialized:', {
+          version: tg.version,
+          platform: tg.platform,
+          initData: tg.initData
+        });
+      }
+      
+      // Prevent context menu on mobile
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      
+      // Prevent double-tap zoom
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+      
+      // Handle iOS Universal Links
+      if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
+        // Add iOS specific handling
+        document.addEventListener('DOMContentLoaded', function() {
+          // Check if opened from universal link
+          if (window.location.search.includes('utm_source=universal_link')) {
+            console.log('Opened via iOS Universal Link');
+          }
+        });
+      }
+      
+      // Handle Android App Links
+      if (navigator.userAgent.match(/Android/)) {
+        // Add Android specific handling
+        document.addEventListener('DOMContentLoaded', function() {
+          // Check if opened from app link
+          if (window.location.search.includes('utm_source=app_link')) {
+            console.log('Opened via Android App Link');
+          }
+        });
+      }
+
+      // Hide loading screen after a maximum of 3 seconds
+      window.setTimeout(hideLoadingScreen, 3000);
+      
+      // Hide loading screen when DOM is loaded
+      document.addEventListener('DOMContentLoaded', hideLoadingScreen);
+      
+      // Hide loading screen when window is loaded
+      window.addEventListener('load', hideLoadingScreen);
+    </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

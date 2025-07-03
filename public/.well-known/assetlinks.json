@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.telegram.messenger",
+      "sha256_cert_fingerprints": [
+        "40:C7:D4:FC:87:53:06:91:F4:7A:58:59:8A:5A:DF:C3:D3:18:3C:A6:DE:8C:5A:8E:AC:30:1E:19:5B:93:92:13"
+      ]
+    }
+  }
+]

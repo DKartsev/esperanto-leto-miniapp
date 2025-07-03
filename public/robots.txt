@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Telegram WebApp specific
+Allow: /webapp
+Allow: /.well-known/
+
+# Sitemap
+Sitemap: https://tgminiapp.esperanto-leto.ru/sitemap.xml
