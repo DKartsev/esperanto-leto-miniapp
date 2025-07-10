@@ -1,3 +1,4 @@
+/** DEPRECATED: bot now fetches chapters from Supabase */
 /**
  * Esperanto course data for the Telegram bot
  */

@@ -7,7 +7,7 @@ import {
   getConversationHistory 
 } from './utils/userManager.js';
 import { getMainMenuKeyboard } from './utils/keyboard.js';
-import { esperantoChapters, basicPhrases } from './data/esperantoData.js';
+import { basicPhrases } from './data/esperantoData.js';
 
 /**
  * Handle incoming messages
