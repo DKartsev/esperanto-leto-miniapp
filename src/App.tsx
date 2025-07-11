@@ -87,8 +87,8 @@ function App() {
       
       setIsTelegramWebApp(isWebApp);
       
-      // Показываем навигацию если НЕ в Telegram WebApp
-      setShowNavigation(!isWebApp);
+      // Всегда показываем навигацию, даже внутри Telegram WebApp
+      setShowNavigation(true);
       
       if (isWebApp && window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
@@ -278,8 +278,8 @@ function App() {
     if (!showNavigation) return null;
     
     return (
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-emerald-200 shadow-lg z-50 safe-area-inset-bottom">
-        <div className="max-w-md mx-auto">
+      <nav className="navigation-bar fixed-navigation fixed bottom-0 left-0 right-0 bg-white border-t border-emerald-200 shadow-lg z-50 safe-area-inset-bottom">
+        <div className="navigation-container max-w-md mx-auto">
           <div className="flex justify-around items-center h-20 px-4 py-2">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
