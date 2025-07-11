@@ -35,7 +35,7 @@ const TestIntro: React.FC<TestIntroProps> = ({ onStartTest }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto container-centered">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">

@@ -48,6 +48,15 @@
   .progress-fill {
     @apply bg-emerald-600 h-2 rounded-full transition-all duration-300;
   }
+  .container-centered {
+    @apply flex flex-col items-center justify-center w-full px-4;
+  }
+  .card {
+    @apply w-full max-w-xl mx-auto p-5;
+  }
+  .progress-bar {
+    @apply w-full;
+  }
 }
 
 @media (max-width: 640px) {
@@ -104,5 +113,8 @@ body {
 @media (max-width: 768px) {
   .navigation-bar {
     display: flex !important;
+  }
+  .container-centered {
+    @apply flex-col;
   }
 }

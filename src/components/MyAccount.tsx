@@ -50,7 +50,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
     return (
       <>
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center p-6">
-          <div className="max-w-md w-full">
+          <div className="max-w-md w-full container-centered">
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-emerald-200">
               {/* Header */}
               <div className="w-20 h-20 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -264,7 +264,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
               <span className="text-emerald-700">Прогресс курса</span>
               <span className="text-emerald-600 font-semibold">{stats?.progress || 0}%</span>
             </div>
-            <div className="progress-track h-3">
+            <div className="progress-track progress-bar h-3">
               <div
                 className="progress-fill bg-gradient-to-r from-emerald-500 to-green-600"
                 style={{ width: `${stats?.progress || 0}%` }}

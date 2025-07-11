@@ -440,7 +440,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
             </div>
             
             {/* Progress Bar */}
-            <div className="progress-track h-3">
+            <div className="progress-track progress-bar h-3">
               <div
                 className="progress-fill"
                 style={{ width: `${((currentTheoryBlock + 1) / theoryBlocks.length) * 100}%` }}
@@ -451,7 +451,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
 
         {/* Theory Content */}
         <div className="p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto container-centered">
             <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8 mb-6">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -567,7 +567,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
           </div>
           
           {/* Progress Bar */}
-          <div className="progress-track h-3">
+          <div className="progress-track progress-bar h-3">
             <div
               className="progress-fill"
               style={{ width: `${((currentQuestion + 1) / totalQuestions) * 100}%` }}

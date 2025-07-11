@@ -94,7 +94,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
   const recommendedChapter = getNextRecommendedChapter();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 container-centered">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
@@ -119,7 +119,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
             <h2 className="text-lg font-semibold text-emerald-900">Общий прогресс</h2>
             <span className="text-2xl font-bold text-emerald-600">{getOverallProgress()}%</span>
           </div>
-          <div className="progress-track h-3 mb-2">
+          <div className="progress-track progress-bar h-3 mb-2">
             <div
               className="progress-fill bg-gradient-to-r from-emerald-500 to-green-600"
               style={{ width: `${getOverallProgress()}%` }}
@@ -305,7 +305,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
                   <span className="text-sm text-emerald-700">Прогресс</span>
                   <span className="text-sm font-semibold text-emerald-600">{chapter.progress}%</span>
                 </div>
-                <div className="progress-track">
+                <div className="progress-track progress-bar">
                   <div
                     className="progress-fill"
                     style={{ width: `${chapter.progress}%` }}
