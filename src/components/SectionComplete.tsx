@@ -138,7 +138,7 @@ const SectionComplete: React.FC<SectionCompleteProps> = ({
           
           <button
             onClick={onCompleteChapter}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+            className="btn-green w-full flex items-center justify-center space-x-2"
           >
             <span>Завершить главу</span>
             <ArrowRight className="w-5 h-5" />

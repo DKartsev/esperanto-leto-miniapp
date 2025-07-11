@@ -264,9 +264,9 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
               <span className="text-emerald-700">Прогресс курса</span>
               <span className="text-emerald-600 font-semibold">{stats?.progress || 0}%</span>
             </div>
-            <div className="w-full bg-emerald-200 rounded-full h-3">
+            <div className="progress-track h-3">
               <div
-                className="bg-gradient-to-r from-emerald-500 to-green-600 h-3 rounded-full transition-all duration-500"
+                className="progress-fill bg-gradient-to-r from-emerald-500 to-green-600"
                 style={{ width: `${stats?.progress || 0}%` }}
               ></div>
             </div>

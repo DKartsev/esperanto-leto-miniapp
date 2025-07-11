@@ -119,9 +119,9 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
             <h2 className="text-lg font-semibold text-emerald-900">Общий прогресс</h2>
             <span className="text-2xl font-bold text-emerald-600">{getOverallProgress()}%</span>
           </div>
-          <div className="w-full bg-emerald-200 rounded-full h-3 mb-2">
+          <div className="progress-track h-3 mb-2">
             <div
-              className="bg-gradient-to-r from-emerald-500 to-green-600 h-3 rounded-full transition-all duration-500"
+              className="progress-fill bg-gradient-to-r from-emerald-500 to-green-600"
               style={{ width: `${getOverallProgress()}%` }}
             ></div>
           </div>
@@ -150,7 +150,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
             </div>
             <button
               onClick={() => onChapterSelect(recommendedChapter.id)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-2 shadow-lg"
+              className="btn-green flex items-center space-x-2"
             >
               <Play className="w-4 h-4" />
               <span>Начать</span>
@@ -300,31 +300,29 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
               </div>
 
               {/* Progress Bar */}
-              {chapter.progress > 0 && (
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-emerald-700">Прогресс</span>
-                    <span className="text-sm font-semibold text-emerald-600">{chapter.progress}%</span>
-                  </div>
-                  <div className="w-full bg-emerald-200 rounded-full h-2">
-                    <div
-                      className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${chapter.progress}%` }}
-                    ></div>
-                  </div>
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-emerald-700">Прогресс</span>
+                  <span className="text-sm font-semibold text-emerald-600">{chapter.progress}%</span>
                 </div>
-              )}
+                <div className="progress-track">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${chapter.progress}%` }}
+                  ></div>
+                </div>
+              </div>
 
               {/* Action Button */}
               <button
                 onClick={() => onChapterSelect(chapter.id)}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                className={`btn-green w-full ${
                   chapter.isLocked && !hasAdminAccess()
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed hover:scale-100 hover:from-gray-300 hover:to-gray-300'
                     : hasAdminAccess() && chapter.isLocked
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg border-2 border-emerald-400'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg'
+                    ? 'border-2 border-emerald-400'
+                    : ''
                 }`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (
