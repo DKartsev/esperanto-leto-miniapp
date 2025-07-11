@@ -51,7 +51,7 @@ export const TelegramWebAppProvider: React.FC<TelegramWebAppProviderProps> = ({ 
     checkWebApp();
 
     // Check again after a short delay in case the script loads later
-    const timeout = setTimeout(checkWebApp, 100);
+    const timeoutId = window.setTimeout(checkWebApp, 100);
 
     // Listen for back button
     const handleBackButton = () => {
@@ -62,7 +62,7 @@ export const TelegramWebAppProvider: React.FC<TelegramWebAppProviderProps> = ({ 
     window.addEventListener('telegram-back-button', handleBackButton);
 
     return () => {
-      clearTimeout(timeout);
+      window.clearTimeout(timeoutId);
       window.removeEventListener('telegram-back-button', handleBackButton);
     };
   }, []);
