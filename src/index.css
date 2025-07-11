@@ -38,6 +38,24 @@
   animation: draw-checkmark 0.4s ease-in-out 0.1s both;
 }
 
+@layer components {
+  .btn-green {
+    @apply bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 hover:from-emerald-700 hover:to-green-700;
+  }
+  .progress-track {
+    @apply w-full bg-emerald-200 rounded-full h-2;
+  }
+  .progress-fill {
+    @apply bg-emerald-600 h-2 rounded-full transition-all duration-300;
+  }
+}
+
+@media (max-width: 640px) {
+  .btn-green {
+    width: 100%;
+  }
+}
+
 /* Safe area support for navigation */
 .safe-area-inset-bottom {
   padding-bottom: env(safe-area-inset-bottom);

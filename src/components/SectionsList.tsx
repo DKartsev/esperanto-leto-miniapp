@@ -149,9 +149,9 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
                   <span className="text-sm text-emerald-700">Прогресс</span>
                   <span className="text-sm font-semibold text-emerald-600">{section.progress}%</span>
                 </div>
-                <div className="w-full bg-emerald-200 rounded-full h-2">
+                <div className="progress-track">
                   <div
-                    className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                    className="progress-fill"
                     style={{ width: `${section.progress}%` }}
                   ></div>
                 </div>
@@ -159,7 +159,7 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
 
               <button
                 onClick={() => onSectionSelect(section.id)}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                className="btn-green w-full flex items-center justify-center space-x-2"
               >
                 <Play className="w-5 h-5" />
                 <span>Начать изучение</span>

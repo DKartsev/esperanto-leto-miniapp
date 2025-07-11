@@ -134,7 +134,7 @@ const ChapterComplete: React.FC<ChapterCompleteProps> = ({
         <div className="space-y-3">
           <button
             onClick={onNextChapter}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 shadow-lg"
+            className="btn-green w-full flex items-center justify-center space-x-2"
           >
             <span>Перейти к главе {chapterId + 1}</span>
             <ArrowRight className="w-5 h-5" />

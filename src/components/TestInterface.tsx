@@ -251,9 +251,9 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
           </div>
           
           {/* Progress Bar */}
-          <div className="w-full bg-emerald-200 rounded-full h-3 mb-2">
+          <div className="progress-track h-3 mb-2">
             <div
-              className={`h-3 rounded-full transition-all duration-300 ${getSectionColor(currentQuestionData.section)}`}
+              className={`progress-fill ${getSectionColor(currentQuestionData.section)}`}
               style={{ width: `${progress}%` }}
             ></div>
           </div>
@@ -283,7 +283,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
                 <h3 className="font-semibold text-emerald-800 mb-4">Прослушайте аудио:</h3>
                 <button
                   onClick={playAudio}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center space-x-2 mx-auto"
+                  className="btn-green flex items-center space-x-2 mx-auto"
                 >
                   <Volume2 className="w-5 h-5" />
                   <span>Воспроизвести аудио</span>
@@ -346,7 +346,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
                 disabled={!selectedAnswer && !textAnswer}
                 className={`font-semibold py-4 px-8 rounded-lg transition-all duration-200 flex items-center space-x-2 mx-auto ${
                   selectedAnswer || textAnswer
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white transform hover:scale-105'
+                    ? 'btn-green'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
