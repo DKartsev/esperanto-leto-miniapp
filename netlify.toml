@@ -4,3 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20.19.0"
+
+[[redirects]]
+  from = "/images/*"
+  to = "/dist/images/:splat"
+  status = 200
