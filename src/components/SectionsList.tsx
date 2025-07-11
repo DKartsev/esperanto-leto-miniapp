@@ -6,15 +6,18 @@ import useEsperantoData from '../hooks/useEsperantoData';
 interface Section {
   id: number;
   title: string;
+  description: string;
   progress: number;
   duration: string;
   isCompleted: boolean;
+  isLocked?: boolean;
   theory?: {
     title: string;
     content: string;
     examples: string[];
     keyTerms: string[];
   };
+  questionsCount?: number;
 }
 
 interface SectionsListProps {
