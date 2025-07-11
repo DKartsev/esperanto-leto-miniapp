@@ -38,26 +38,51 @@
   animation: draw-checkmark 0.4s ease-in-out 0.1s both;
 }
 
-@layer components {
   .btn-green {
-    @apply bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 hover:from-emerald-700 hover:to-green-700;
+    background-image: linear-gradient(to right, #059669, #16a34a);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 1px 0 rgba(0,0,0,0.05);
+    transition: all 0.2s;
+    transform: scale(1);
+  }
+  .btn-green:hover {
+    background-image: linear-gradient(to right, #047857, #15803d);
+    transform: scale(1.05);
   }
   .progress-track {
-    @apply w-full bg-emerald-200 rounded-full h-2;
+    width: 100%;
+    background-color: #a7f3d0;
+    border-radius: 9999px;
+    height: 0.5rem;
   }
   .progress-fill {
-    @apply bg-emerald-600 h-2 rounded-full transition-all duration-300;
+    background-color: #059669;
+    height: 0.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
   }
   .container-centered {
-    @apply flex flex-col items-center justify-center w-full px-4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
   .card {
-    @apply w-full max-w-xl mx-auto p-5;
+    width: 100%;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.25rem;
   }
   .progress-bar {
-    @apply w-full;
+    width: 100%;
   }
-}
 
 @media (max-width: 640px) {
   .btn-green {
@@ -115,6 +140,6 @@ body {
     display: flex !important;
   }
   .container-centered {
-    @apply flex-col;
+    flex-direction: column;
   }
 }
