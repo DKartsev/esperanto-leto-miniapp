@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { 
   Smartphone, 
   Shield, 
@@ -27,12 +27,12 @@ import SectionsList from './components/SectionsList';
 import QuestionInterface from './components/QuestionInterface';
 import SectionComplete from './components/SectionComplete';
 import ChapterComplete from './components/ChapterComplete';
-import TestIntro from './components/TestIntro';
-import TestInterface from './components/TestInterface';
-import TestResults from './components/TestResults';
-import AIChat from './components/AIChat';
-import MyAccount from './components/MyAccount';
-import AdminPanel from './components/AdminPanel';
+const TestIntro = lazy(() => import('./components/TestIntro'));
+const TestInterface = lazy(() => import('./components/TestInterface'));
+const TestResults = lazy(() => import('./components/TestResults'));
+const AIChat = lazy(() => import('./components/AIChat'));
+const MyAccount = lazy(() => import('./components/MyAccount'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
 import { useAuth } from './components/SupabaseAuthProvider.jsx';
 
 function App() {
@@ -321,10 +321,12 @@ function App() {
   // Render Admin Panel
   if (showAdminPanel) {
     return (
-      <AdminPanel 
-        onClose={() => setShowAdminPanel(false)} 
-        currentUser={profile?.username || ''}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <AdminPanel
+          onClose={() => setShowAdminPanel(false)}
+          currentUser={profile?.username || ''}
+        />
+      </Suspense>
     );
   }
 
@@ -333,7 +335,9 @@ function App() {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-emerald-50 to-green-50">
         <div className={`flex-1 overflow-y-auto ${showNavigation ? 'pb-24' : ''}`}>
-          <MyAccount onBackToHome={() => setActiveTab('home')} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <MyAccount onBackToHome={() => setActiveTab('home')} />
+          </Suspense>
         </div>
         <NavigationBar />
       </div>
@@ -345,7 +349,9 @@ function App() {
     return (
       <div className="h-screen flex flex-col">
         <div className="flex-1 overflow-hidden">
-          <AIChat />
+          <Suspense fallback={<div>Loading...</div>}>
+            <AIChat />
+          </Suspense>
         </div>
         <NavigationBar />
       </div>
@@ -358,7 +364,9 @@ function App() {
       case 'intro':
         return (
           <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
-            <TestIntro onStartTest={handleStartTest} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <TestIntro onStartTest={handleStartTest} />
+            </Suspense>
             <NavigationBar />
           </div>
         );
@@ -366,10 +374,12 @@ function App() {
         return (
           <div className="h-screen flex flex-col">
             <div className="flex-1 overflow-hidden">
-              <TestInterface 
-                onComplete={handleTestComplete} 
-                onBack={handleBackFromTest}
-              />
+              <Suspense fallback={<div>Loading...</div>}>
+                <TestInterface
+                  onComplete={handleTestComplete}
+                  onBack={handleBackFromTest}
+                />
+              </Suspense>
             </div>
             <NavigationBar />
           </div>
@@ -377,11 +387,13 @@ function App() {
       case 'results':
         return (
           <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
-            <TestResults 
-              results={testResults}
-              onSaveResults={handleSaveResults}
-              onRetakeTest={handleRetakeTest}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <TestResults
+                results={testResults}
+                onSaveResults={handleSaveResults}
+                onRetakeTest={handleRetakeTest}
+              />
+            </Suspense>
             <NavigationBar />
           </div>
         );
