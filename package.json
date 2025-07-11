@@ -12,7 +12,7 @@
     "bot:dev": "node --watch src/bot/index.js",
     "start:dev": "concurrently \"npm run dev\" \"npm run bot:dev\" --names \"WebApp,TelegramBot\" --prefix-colors \"cyan,yellow\"",
     "start:prod": "concurrently \"npm run preview\" \"npm run bot\" --names \"WebApp,TelegramBot\" --prefix-colors \"green,blue\"",
-    "start": "npm run build && npm run start:prod",
+    "start": "npm run start:dev",
     "diagnostics": "node src/bot/diagnostics.js"
   },
   "dependencies": {
