@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Use relative paths so the app renders correctly when served from a subfolder
+  base: './',
   plugins: [react()],
   server: {
     host: true,
