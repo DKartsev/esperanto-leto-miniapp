@@ -103,10 +103,13 @@ export async function signOut() {
  */
 export async function getCurrentUser() {
   try {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) throw sessionError
+    if (!session) return null
+
     const { data: { user }, error } = await supabase.auth.getUser()
-    
     if (error) throw error
-    
+
     return user
   } catch (error) {
     console.error('❌ Ошибка получения пользователя:', error.message)
