@@ -11,6 +11,13 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      input: 'index.html',
+      output: {
+        dir: 'dist',
+        format: 'esm',
+      },
+    },
   },
   publicDir: 'public'
 });
