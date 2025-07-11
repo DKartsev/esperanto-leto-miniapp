@@ -42,7 +42,7 @@ export const TelegramWebAppProvider: React.FC<TelegramWebAppProviderProps> = ({ 
       if (telegramWebApp.isAvailable()) {
         setIsAvailable(true);
         setUser(telegramWebApp.getUser());
-        setIsDarkTheme(telegramWebApp.isDarkTheme());
+        setIsDarkTheme(Boolean(telegramWebApp.isDarkTheme()));
         setThemeParams(telegramWebApp.getThemeParams());
       }
     };
