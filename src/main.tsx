@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider.jsx';
+import { patchAbortSignalTimeout } from './utils/patchAbortSignalTimeout';
+
+patchAbortSignalTimeout();
 
 // Hide loading screen when React app mounts
 function hideLoadingScreen() {
