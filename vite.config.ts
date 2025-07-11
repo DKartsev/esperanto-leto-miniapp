@@ -1,6 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const { WEBAPP_URL } = process.env;
+let hmr;
+
+if (WEBAPP_URL) {
+  try {
+    const url = new URL(WEBAPP_URL);
+    hmr = {
+      protocol: url.protocol === 'https:' ? 'wss' : 'ws',
+      host: url.hostname,
+      clientPort: url.protocol === 'https:' ? 443 : url.port || 5173,
+    };
+  } catch {
+    // invalid URL; ignore
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   // Use relative paths so the app renders correctly when served from a subfolder
@@ -9,6 +25,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    hmr,
   },
   build: {
     outDir: 'dist',
