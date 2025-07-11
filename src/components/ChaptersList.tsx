@@ -251,7 +251,12 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
                       </div>
                       <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
-                        <span>{chapter.studentsCount.toLocaleString()} студентов</span>
+                        <span>
+                          {chapter.studentsCount
+                            ? chapter.studentsCount.toLocaleString()
+                            : '0'}{' '}
+                          студентов
+                        </span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <div className="flex">{renderStars(chapter.rating)}</div>
