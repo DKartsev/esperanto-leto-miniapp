@@ -278,8 +278,8 @@ function App() {
     if (!showNavigation) return null;
     
     return (
-      <nav className="navigation-bar fixed-navigation fixed bottom-0 left-0 right-0 bg-white border-t border-emerald-200 shadow-lg z-50 safe-area-inset-bottom">
-        <div className="navigation-container max-w-md mx-auto">
+      <nav className="navigation-bar fixed-navigation safe-area-inset-bottom">
+        <div className="navigation-container max-w-md mx-auto rounded-t-2xl">
           <div className="flex justify-around items-center h-20 px-4 py-2">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
