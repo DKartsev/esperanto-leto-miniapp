@@ -251,7 +251,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
           </div>
           
           {/* Progress Bar */}
-          <div className="progress-track h-3 mb-2">
+          <div className="progress-track progress-bar h-3 mb-2">
             <div
               className={`progress-fill ${getSectionColor(currentQuestionData.section)}`}
               style={{ width: `${progress}%` }}
@@ -265,7 +265,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
 
       {/* Question Content */}
       <div className="p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto container-centered">
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8">
             {/* Reading Passage */}
             {currentQuestionData.passage && (

@@ -40,7 +40,7 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
 
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-6 space-y-4 container-centered">
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={onBackToChapters}
@@ -149,7 +149,7 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
                   <span className="text-sm text-emerald-700">Прогресс</span>
                   <span className="text-sm font-semibold text-emerald-600">{section.progress}%</span>
                 </div>
-                <div className="progress-track">
+                <div className="progress-track progress-bar">
                   <div
                     className="progress-fill"
                     style={{ width: `${section.progress}%` }}
