@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trophy, RotateCcw, Save, Star, TrendingUp, BookOpen, Target } from 'lucide-react';
+import useEsperantoData from '../hooks/useEsperantoData';
 
 interface TestResultsProps {
   results: any;
@@ -36,41 +37,60 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
 
   const cefrLevel = getCEFRLevel(overallScore);
 
+  const { getChapter } = useEsperantoData();
+
   // Generate recommendations
   const getRecommendations = () => {
-    const recommendations = [];
-    
+    const recommendations = [] as Array<{
+      skill: string;
+      chapters: string[];
+      icon: JSX.Element;
+      color: string;
+    }>;
+
     if (sectionScores.reading < 70) {
       recommendations.push({
         skill: 'Понимание прочитанного',
-        chapters: ['Глава 1: Основы чтения', 'Глава 3: Словарный запас'],
+        chapters: [
+          getChapter(1)?.title || 'Глава 1',
+          getChapter(3)?.title || 'Глава 3'
+        ],
         icon: <BookOpen className="w-5 h-5" />,
         color: 'bg-emerald-500'
       });
     }
-    
+
     if (sectionScores.writing < 70) {
       recommendations.push({
         skill: 'Письмо',
-        chapters: ['Глава 2: Грамматика', 'Глава 9: Практические упражнения'],
+        chapters: [
+          getChapter(2)?.title || 'Глава 2',
+          getChapter(9)?.title || 'Глава 9'
+        ],
         icon: <Target className="w-5 h-5" />,
         color: 'bg-green-500'
       });
     }
-    
+
     if (sectionScores.listening < 70) {
       recommendations.push({
         skill: 'Понимание на слух',
-        chapters: ['Глава 4: Произношение', 'Глава 5: Диалоги'],
+        chapters: [
+          getChapter(4)?.title || 'Глава 4',
+          getChapter(5)?.title || 'Глава 5'
+        ],
         icon: <TrendingUp className="w-5 h-5" />,
         color: 'bg-emerald-600'
       });
     }
-    
+
     if (sectionScores.grammar < 70) {
       recommendations.push({
         skill: 'Грамматика',
-        chapters: ['Глава 2: Грамматика', 'Глава 8: История языка'],
+        chapters: [
+          getChapter(2)?.title || 'Глава 2',
+          getChapter(8)?.title || 'Глава 8'
+        ],
         icon: <Star className="w-5 h-5" />,
         color: 'bg-green-600'
       });
