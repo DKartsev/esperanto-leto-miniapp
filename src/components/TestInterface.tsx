@@ -265,7 +265,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
 
       {/* Question Content */}
       <div className="p-6">
-        <div className="max-w-4xl mx-auto container-centered">
+        <div className="max-w-4xl mx-auto container-centered w-full">
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8">
             {/* Reading Passage */}
             {currentQuestionData.passage && (

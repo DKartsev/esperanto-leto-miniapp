@@ -94,9 +94,9 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
   const recommendedChapter = getNextRecommendedChapter();
 
   return (
-    <div className="p-6 space-y-6 container-centered">
+    <div className="p-6 space-y-6 container-centered w-full">
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 w-full">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
         <p className="text-emerald-700 mb-4">Полный курс изучения международного языка эсперанто</p>
         
@@ -138,7 +138,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6 mb-6">
+        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6 mb-6 w-full">
           <div className="flex items-center space-x-2 mb-3">
             <TrendingUp className="w-5 h-5 text-emerald-600" />
             <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
@@ -160,7 +160,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-4 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-4 mb-6 w-full">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-emerald-800">Сложность:</span>
@@ -198,7 +198,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
       </div>
 
       {/* Chapters Grid */}
-      <div className="grid gap-6">
+      <div className="grid gap-6 w-full">
         {filteredChapters.map((chapter) => (
           <div
             key={chapter.id}
@@ -348,7 +348,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
       </div>
 
       {/* Learning Tips */}
-      <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 w-full">
         <div className="flex items-center space-x-2 mb-3">
           <Award className="w-5 h-5 text-emerald-600" />
           <h3 className="text-lg font-semibold text-emerald-900">
