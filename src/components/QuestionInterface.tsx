@@ -451,7 +451,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
 
         {/* Theory Content */}
         <div className="p-6">
-          <div className="max-w-4xl mx-auto container-centered">
+          <div className="max-w-4xl mx-auto container-centered w-full">
             <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8 mb-6">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">

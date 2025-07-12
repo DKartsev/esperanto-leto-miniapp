@@ -35,7 +35,7 @@ const TestIntro: React.FC<TestIntroProps> = ({ onStartTest }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 p-6">
-      <div className="max-w-4xl mx-auto container-centered">
+      <div className="max-w-4xl mx-auto container-centered w-full">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -51,7 +51,7 @@ const TestIntro: React.FC<TestIntroProps> = ({ onStartTest }) => {
 
         {/* Test Info */}
         <div className="bg-white rounded-xl shadow-lg border border-emerald-200 p-8 mb-8">
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="grid md:grid-cols-3 gap-6 mb-8 w-full">
             <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
               <div className="text-3xl font-bold text-emerald-600 mb-2">40</div>
               <div className="text-sm text-emerald-700 font-medium">Вопросов</div>
@@ -73,7 +73,7 @@ const TestIntro: React.FC<TestIntroProps> = ({ onStartTest }) => {
             Структура теста
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="grid md:grid-cols-2 gap-4 mb-8 w-full">
             {testSections.map((section, index) => (
               <div key={index} className="flex items-center space-x-4 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
                 <div className={`w-12 h-12 ${section.color} rounded-full flex items-center justify-center text-white shadow-lg`}>

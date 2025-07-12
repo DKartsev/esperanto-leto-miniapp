@@ -40,8 +40,8 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
 
 
   return (
-    <div className="p-6 space-y-4 container-centered">
-      <div className="flex items-center space-x-4 mb-6">
+    <div className="p-6 space-y-4 container-centered w-full">
+      <div className="flex items-center space-x-4 mb-6 w-full">
         <button
           onClick={onBackToChapters}
           className="p-2 hover:bg-emerald-100 rounded-lg transition-colors"
@@ -56,7 +56,7 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
         </div>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 w-full">
         {sections.map((section) => (
           <div
             key={section.id}
@@ -170,7 +170,7 @@ const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect,
       </div>
 
       {/* Study Tips */}
-      <div className="bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-xl p-6 mt-8">
+      <div className="bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-xl p-6 mt-8 w-full">
         <div className="flex items-center space-x-2 mb-3">
           <Book className="w-5 h-5 text-blue-600" />
           <h3 className="text-lg font-semibold text-blue-900">Рекомендации по изучению</h3>

@@ -109,7 +109,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 p-6">
-      <div className="max-w-4xl mx-auto container-centered">
+      <div className="max-w-4xl mx-auto container-centered w-full">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-24 h-24 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -135,7 +135,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 w-full">
             <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
               <div className="text-2xl font-bold text-emerald-900 mb-1">
                 {results.totalQuestions || 40}
