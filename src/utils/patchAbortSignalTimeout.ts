@@ -3,14 +3,10 @@ export function patchAbortSignalTimeout(): void {
     return;
   }
 
-  try {
-    // Test existing implementation in case it throws
-    if (typeof (AbortSignal as any).timeout === 'function') {
-      (AbortSignal as any).timeout(0);
-      return;
-    }
-  } catch {
-    // fall through to polyfill
+  const anyAbortSignal = AbortSignal as any;
+  if (typeof anyAbortSignal.timeout === 'function') {
+    // Environment already supports AbortSignal.timeout
+    return;
   }
 
   // Polyfill AbortSignal.timeout for incompatible environments
