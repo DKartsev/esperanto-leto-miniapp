@@ -11,7 +11,7 @@ import {
   getSectionsKeyboard,
   getWebAppKeyboard
 } from './utils/keyboard.js';
-import { fetchChapters, fetchChapter } from './courseService.js';
+import { esperantoChapters } from './data/esperantoData.js';
 import { 
   getUserState, 
   updateUserState, 
@@ -229,7 +229,7 @@ export function handleWebAppCommand(bot, msg) {
  * @param {TelegramBot} bot - The bot instance
  * @param {Object} msg - The message object
  */
-export async function handleChaptersCommand(bot, msg) {
+export function handleChaptersCommand(bot, msg) {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   
@@ -246,15 +246,13 @@ export async function handleChaptersCommand(bot, msg) {
       currentSection: null
     });
     
-    // Получаем главы из базы данных
-    const chapters = await fetchChapters();
-
-    const message = formatChapterList(chapters);
+    // Format chapter list message
+    const message = formatChapterList(esperantoChapters);
     
     // Send message with chapters keyboard
     bot.sendMessage(chatId, message, {
       parse_mode: 'Markdown',
-      reply_markup: getChaptersKeyboard(chapters)
+      reply_markup: getChaptersKeyboard(esperantoChapters)
     }).then(() => {
       logger.info(`User ${userId} requested chapters list`);
       console.log(`✅ Список глав отправлен пользователю ${userId}`);
@@ -516,7 +514,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
  * @param {Object} msg - The message object
  * @param {number} chapterId - Selected chapter ID
  */
-export async function handleChapterSelection(bot, msg, chapterId) {
+export function handleChapterSelection(bot, msg, chapterId) {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   
@@ -526,7 +524,8 @@ export async function handleChapterSelection(bot, msg, chapterId) {
     // Убеждаемся, что пользователь инициализирован
     getUserState(userId);
     
-    const chapter = await fetchChapter(chapterId);
+    // Find selected chapter
+    const chapter = esperantoChapters.find(ch => ch.id === chapterId);
     
     if (!chapter) {
       console.log(`❌ Глава ${chapterId} не найдена`);
@@ -587,7 +586,7 @@ export async function handleChapterSelection(bot, msg, chapterId) {
  * @param {number} chapterId - Chapter ID
  * @param {number} sectionId - Selected section ID
  */
-export async function handleSectionSelection(bot, msg, chapterId, sectionId) {
+export function handleSectionSelection(bot, msg, chapterId, sectionId) {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   
@@ -598,7 +597,7 @@ export async function handleSectionSelection(bot, msg, chapterId, sectionId) {
     getUserState(userId);
     
     // Find selected chapter and section
-    const chapter = await fetchChapter(chapterId);
+    const chapter = esperantoChapters.find(ch => ch.id === chapterId);
     
     if (!chapter) {
       console.log(`❌ Глава ${chapterId} не найдена`);
@@ -606,7 +605,7 @@ export async function handleSectionSelection(bot, msg, chapterId, sectionId) {
       return;
     }
     
-    const section = chapter.sections?.find(s => s.id === sectionId);
+    const section = chapter.sections.find(s => s.id === sectionId);
     
     if (!section) {
       console.log(`❌ Раздел ${sectionId} не найден в главе ${chapterId}`);

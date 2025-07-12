@@ -1,47 +1,19 @@
 // Хук для работы с данными эсперанто
 
 import { useState, useEffect, useMemo } from 'react';
-import {
-  fetchCourseData,
-  Chapter,
-  Section,
-  Question,
-  TheoryBlock
-} from '../services/courseService.ts';
-// Local utilities for progress calculations
-export interface LearningProgress {
-  chapterId: number;
-  sectionId: number;
-  completedQuestions: number[];
-  score: number;
-  timeSpent: number;
-  lastAccessed: Date;
-}
-
-const calculateSectionProgress = (
-  section: Section | undefined,
-  completedQuestions: number[]
-): number => {
-  if (!section) return 0;
-  const totalQuestions = section.questions ? section.questions.length : 0;
-  const completed = completedQuestions.length;
-  return totalQuestions > 0 ? Math.round((completed / totalQuestions) * 100) : 0;
-};
-
-const getRecommendedNextSection = (
-  chapters: Chapter[],
-  currentChapter: number,
-  currentSection: number
-): { chapterId: number; sectionId: number } | null => {
-  const chapter = chapters.find(ch => ch.id === currentChapter);
-  if (!chapter) return null;
-  if (chapter.sections && currentSection < chapter.sections.length) {
-    return { chapterId: currentChapter, sectionId: currentSection + 1 };
-  }
-  const next = chapters.find(ch => ch.id === currentChapter + 1);
-  if (next) return { chapterId: currentChapter + 1, sectionId: 1 };
-  return null;
-};
+import esperantoData, { 
+  Chapter, 
+  Section, 
+  Question, 
+  TheoryBlock,
+  LearningProgress,
+  getChapterById,
+  getSectionById,
+  getQuestionsBySection,
+  getTheoryBySection,
+  calculateSectionProgress,
+  getRecommendedNextSection
+} from '../data/esperantoData';
 
 // Интерфейс для состояния обучения
 interface LearningState {
@@ -54,7 +26,6 @@ interface LearningState {
 
 // Хук для управления данными курса
 export const useEsperantoData = () => {
-  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [learningState, setLearningState] = useState<LearningState>(() => {
     // Загружаем состояние из localStorage
     const saved = localStorage.getItem('esperanto-learning-state');
@@ -81,22 +52,12 @@ export const useEsperantoData = () => {
     localStorage.setItem('esperanto-learning-state', JSON.stringify(learningState));
   }, [learningState]);
 
-  // Загрузка данных курса из Supabase
-  useEffect(() => {
-    fetchCourseData()
-      .then(data => setChapters(data))
-      .catch(err => console.error('Failed to load course data', err));
-  }, []);
-
   // Вычисляем общий прогресс
   const totalProgress = useMemo(() => {
-    const totalSections = chapters.reduce(
-      (total, chapter) => total + (chapter.sections ? chapter.sections.length : 0),
-      0
-    );
+    const totalSections = esperantoData.reduce((total, chapter) => total + chapter.sections.length, 0);
     const completedCount = learningState.completedSections.length;
-    return totalSections > 0 ? Math.round((completedCount / totalSections) * 100) : 0;
-  }, [learningState.completedSections, chapters]);
+    return Math.round((completedCount / totalSections) * 100);
+  }, [learningState.completedSections]);
 
   // Обновляем общий прогресс
   useEffect(() => {
@@ -105,24 +66,19 @@ export const useEsperantoData = () => {
 
   // Функции для работы с данными
   const getChapter = (id: number): Chapter | undefined => {
-    return chapters.find(ch => ch.id === id);
+    return getChapterById(id);
   };
 
   const getSection = (chapterId: number, sectionId: number): Section | undefined => {
-    return chapters
-      .find(ch => ch.id === chapterId)?.sections?.find(sec => sec.id === sectionId);
+    return getSectionById(chapterId, sectionId);
   };
 
   const getQuestions = (chapterId: number, sectionId: number): Question[] => {
-    return (
-      getSection(chapterId, sectionId)?.questions || []
-    );
+    return getQuestionsBySection(chapterId, sectionId);
   };
 
   const getTheory = (chapterId: number, sectionId: number): TheoryBlock[] => {
-    return (
-      getSection(chapterId, sectionId)?.theory_blocks || []
-    );
+    return getTheoryBySection(chapterId, sectionId);
   };
 
   // Функции для управления прогрессом
@@ -181,15 +137,16 @@ export const useEsperantoData = () => {
   };
 
   const isChapterCompleted = (chapterId: number): boolean => {
-    const chapter = getChapter(chapterId);
+    const chapter = getChapterById(chapterId);
     if (!chapter) return false;
-    return (chapter.sections || []).every(section =>
+
+    return chapter.sections.every(section => 
       isSectionCompleted(chapterId, section.id)
     );
   };
 
   const getNextRecommendedSection = () => {
-    return getRecommendedNextSection(chapters, learningState.currentChapter, learningState.currentSection);
+    return getRecommendedNextSection(learningState.currentChapter, learningState.currentSection);
   };
 
   const setCurrentPosition = (chapterId: number, sectionId: number) => {
@@ -202,13 +159,14 @@ export const useEsperantoData = () => {
 
   // Функции для статистики
   const getChapterProgress = (chapterId: number): number => {
-    const chapter = getChapter(chapterId);
+    const chapter = getChapterById(chapterId);
     if (!chapter) return 0;
-    const completedSections = (chapter.sections || []).filter(section =>
+
+    const completedSections = chapter.sections.filter(section => 
       isSectionCompleted(chapterId, section.id)
     ).length;
-    const total = chapter.sections ? chapter.sections.length : 0;
-    return total > 0 ? Math.round((completedSections / total) * 100) : 0;
+
+    return Math.round((completedSections / chapter.sections.length) * 100);
   };
 
   const getTotalTimeSpent = (): number => {
@@ -238,7 +196,7 @@ export const useEsperantoData = () => {
 
   return {
     // Данные
-    chapters,
+    chapters: esperantoData,
     learningState,
     
     // Функции получения данных

@@ -1,4 +1,3 @@
-// DEPRECATED: Course data is now loaded from Supabase. This file remains for admin tooling.
 // Структурированные данные для образовательной платформы изучения эсперанто
 
 export interface Question {
