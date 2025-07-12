@@ -262,3 +262,147 @@ body {
   background: #1a5e3f;
   transform: scale(0.95);
 }
+.ai-helper-button {
+  background: #ff8c00;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.ai-helper-button:hover {
+  background: #e07b00;
+  transform: scale(1.05);
+}
+
+.ai-helper-button:active {
+  background: #c66900;
+  transform: scale(0.95);
+}
+
+.test-start-button {
+  background: #ff6347;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.test-start-button:hover {
+  background: #e0533d;
+  transform: scale(1.05);
+}
+
+.test-start-button:active {
+  background: #d04a2a;
+  transform: scale(0.95);
+}
+
+.show-answers-button {
+  background: transparent;
+  color: #34d399;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 2px solid #34d399;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.show-answers-button:hover {
+  background: #ecfdf5;
+  transform: scale(1.05);
+}
+
+.show-answers-button:active {
+  background: #d0f8d6;
+  transform: scale(0.95);
+}
+
+.back-button {
+  background: transparent;
+  color: #059669;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 2px solid #059669;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background: #ecfdf5;
+  transform: scale(1.05);
+}
+
+.back-button:active {
+  background: #d0f8d6;
+  transform: scale(0.95);
+}
+
+.save-button {
+  background: #ffb74d;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background: #ff9e3b;
+  transform: scale(1.05);
+}
+
+.save-button:active {
+  background: #ff6a0d;
+  transform: scale(0.95);
+}
+
+.delete-button {
+  background: #f44336;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background: #d32f2f;
+  transform: scale(1.05);
+}
+
+.delete-button:active {
+  background: #b71c1c;
+  transform: scale(0.95);
+}
+
+.submit-button {
+  background: #4caf50;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background: #388e3c;
+  transform: scale(1.05);
+}
+
+.submit-button:active {
+  background: #2c6b2f;
+  transform: scale(0.95);
+}
