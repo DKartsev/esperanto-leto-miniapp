@@ -12,8 +12,8 @@ export async function signUp(email, password, username) {
     console.log('📝 Регистрация пользователя:', { email, username })
     
     // Регистрируем пользователя в Supabase Auth
-    const { data, error } = await supabase.auth.signUp({ 
-      email, 
+    const { data, error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
         data: {
@@ -22,18 +22,29 @@ export async function signUp(email, password, username) {
         }
       }
     })
-    
+
     if (error) throw error
 
-    const userId = data.user?.id
+    // Если подтверждение email отключено, сессия создается автоматически. В противном
+    // случае она может быть null. Для вставки в таблицу с включенной RLS
+    // необходима действующая сессия, иначе политика auth.uid() не пропустит запрос.
+    let session = data.session
+    if (!session) {
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({ email, password })
+      if (signInError) throw signInError
+      session = signInData.session
+    }
+
+    const userId = session?.user?.id || data.user?.id
     if (!userId) throw new Error('Не удалось получить ID пользователя')
 
-    // Создаём профиль пользователя
+    // Создаём профиль пользователя после появления сессии, чтобы удовлетворить RLS
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([
-        { 
-          id: userId, 
+        {
+          id: userId,
           username: username,
           email: email,
           created_at: new Date().toISOString(),
