@@ -202,7 +202,7 @@ body {
 }
 
 .register-button {
-  background: #ff7f50;
+  background: #059669;
   color: white;
   padding: 14px 28px;
   border-radius: 10px;
@@ -213,12 +213,12 @@ body {
 }
 
 .register-button:hover {
-  background: #ff6a3d;
+  background: #34d399;
   transform: scale(1.05);
 }
 
 .register-button:active {
-  background: #ff4c1b;
+  background: #2d7e57;
   transform: scale(0.95);
 }
 
