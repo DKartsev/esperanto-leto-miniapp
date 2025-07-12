@@ -155,4 +155,110 @@ body {
   .container-centered {
     flex-direction: column;
   }
+}/* Enhanced button styles */
+.start-button {
+  background: #059669;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.start-button:hover {
+  background: #34d399;
+  transform: scale(1.1);
+}
+
+.start-button:active {
+  background: #2d7e57;
+  transform: scale(0.95);
+}
+
+.nav-button {
+  background: #f0fdf4;
+  color: #059669;
+  padding: 12px 24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-button:hover {
+  background: #34d399;
+  transform: scale(1.05);
+}
+
+.nav-button:active {
+  background: #2d7e57;
+  transform: scale(0.95);
+}
+
+.register-button {
+  background: #ff7f50;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.register-button:hover {
+  background: #ff6a3d;
+  transform: scale(1.05);
+}
+
+.register-button:active {
+  background: #ff4c1b;
+  transform: scale(0.95);
+}
+
+.continue-button {
+  background: transparent;
+  color: #059669;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 2px solid #059669;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.continue-button:hover {
+  background: #ecfdf5;
+  transform: scale(1.05);
+}
+
+.continue-button:active {
+  background: #d0f8d6;
+  transform: scale(0.95);
+}
+
+.test-button {
+  background: #34d399;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.test-button:hover {
+  background: #2d7e57;
+  transform: scale(1.05);
+}
+
+.test-button:active {
+  background: #1a5e3f;
+  transform: scale(0.95);
 }

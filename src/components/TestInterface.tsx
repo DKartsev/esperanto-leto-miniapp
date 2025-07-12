@@ -283,7 +283,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
                 <h3 className="font-semibold text-emerald-800 mb-4">Прослушайте аудио:</h3>
                 <button
                   onClick={playAudio}
-                  className="btn-green flex items-center space-x-2 mx-auto"
+                  className="test-button flex items-center space-x-2 mx-auto"
                 >
                   <Volume2 className="w-5 h-5" />
                   <span>Воспроизвести аудио</span>
@@ -346,7 +346,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
                 disabled={!selectedAnswer && !textAnswer}
                 className={`font-semibold py-4 px-8 rounded-lg transition-all duration-200 flex items-center space-x-2 mx-auto ${
                   selectedAnswer || textAnswer
-                    ? 'btn-green'
+                    ? 'test-button'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >

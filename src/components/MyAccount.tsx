@@ -68,7 +68,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
               <div className="mb-6">
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
+                  className="register-button w-full flex items-center justify-center space-x-3"
                 >
                   <User className="w-6 h-6" />
                   <span>Зарегистрироваться</span>
@@ -110,7 +110,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
               {/* Back Button */}
               <button
                 onClick={onBackToHome}
-                className="mt-8 w-full text-emerald-600 hover:text-emerald-800 font-medium py-2 transition-colors"
+                className="continue-button mt-8 w-full"
               >
                 Продолжить без регистрации
               </button>

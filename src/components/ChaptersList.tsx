@@ -150,7 +150,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
             </div>
             <button
               onClick={() => onChapterSelect(recommendedChapter.id)}
-              className="btn-green flex items-center space-x-2"
+              className="start-button flex items-center space-x-2"
             >
               <Play className="w-4 h-4" />
               <span>Начать</span>
@@ -317,7 +317,7 @@ const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUse
               <button
                 onClick={() => onChapterSelect(chapter.id)}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`btn-green w-full ${
+                className={`start-button w-full ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed hover:scale-100 hover:from-gray-300 hover:to-gray-300'
                     : hasAdminAccess() && chapter.isLocked
