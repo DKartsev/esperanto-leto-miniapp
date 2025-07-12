@@ -5,7 +5,7 @@ const AIChat: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-emerald-50 to-green-50">
+    <div className="flex flex-col h-full app-gradient">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-emerald-200 p-4 flex-shrink-0">
         <div className="flex items-center justify-between">

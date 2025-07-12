@@ -108,7 +108,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 p-6">
+    <div className="min-h-screen app-gradient p-6">
       <div className="max-w-4xl mx-auto container-centered w-full">
         {/* Header */}
         <div className="text-center mb-8">

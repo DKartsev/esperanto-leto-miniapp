@@ -38,31 +38,37 @@
   animation: draw-checkmark 0.4s ease-in-out 0.1s both;
 }
 
+/* Light green gradient background for pages */
+.app-gradient {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+}
+
   .btn-green {
     background-image: linear-gradient(to right, #059669, #16a34a);
     color: #ffffff;
     font-weight: 600;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 1px 0 rgba(0,0,0,0.05);
-    transition: all 0.2s;
+    transition: transform 0.3s ease, background-color 0.3s ease;
     transform: scale(1);
   }
   .btn-green:hover {
-    background-image: linear-gradient(to right, #047857, #15803d);
-    transform: scale(1.1);
+    background-image: linear-gradient(to right, #34d399, #059669);
+    transform: scale(1.05);
   }
   .progress-track {
     width: 100%;
-    background-color: #a7f3d0;
-    border-radius: 9999px;
-    height: 0.5rem;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    height: 10px;
+    overflow: hidden;
   }
   .progress-fill {
     background-color: #059669;
-    height: 0.5rem;
-    border-radius: 9999px;
-    transition: all 0.3s;
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
   }
   .container-centered {
     display: flex;
@@ -82,6 +88,8 @@
     margin-left: auto;
     margin-right: auto;
     padding: 1.25rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   .progress-bar {
     width: 100%;
