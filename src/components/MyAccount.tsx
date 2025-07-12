@@ -36,7 +36,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center">
+      <div className="min-h-screen app-gradient flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-emerald-700">Загрузка...</p>
@@ -49,7 +49,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
   if (!isAuthenticated) {
     return (
       <>
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center p-6">
+        <div className="min-h-screen app-gradient flex items-center justify-center p-6">
           <div className="max-w-md w-full container-centered">
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-emerald-200">
               {/* Header */}
@@ -130,7 +130,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
 
   // Authenticated User Dashboard
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50">
+    <div className="min-h-screen app-gradient">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-emerald-200">
         <div className="p-6">

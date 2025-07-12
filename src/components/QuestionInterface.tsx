@@ -417,7 +417,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     const currentTheory = theoryBlocks[currentTheoryBlock];
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100">
+      <div className="min-h-screen app-gradient">
         {/* Header */}
         <div className="bg-white shadow-sm border-b border-emerald-200 sticky top-0 z-10">
           <div className="p-4">
@@ -538,7 +538,7 @@ const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100">
+    <div className="min-h-screen app-gradient">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-emerald-200 sticky top-0 z-10">
         <div className="p-4">

@@ -221,7 +221,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => 
   const progress = ((currentQuestion + 1) / 40) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 pb-24">
+    <div className="min-h-screen app-gradient pb-24">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-emerald-200 sticky top-0 z-10">
         <div className="p-4">

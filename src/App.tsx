@@ -331,7 +331,7 @@ function App() {
   // Render My Account interface
   if (activeTab === 'account') {
     return (
-      <div className="h-screen flex flex-col bg-gradient-to-br from-emerald-50 to-green-50">
+      <div className="h-screen flex flex-col app-gradient">
         <div className={`flex-1 overflow-y-auto ${showNavigation ? 'pb-24' : ''}`}>
           <MyAccount onBackToHome={() => setActiveTab('home')} />
         </div>
@@ -357,7 +357,7 @@ function App() {
     switch (testView) {
       case 'intro':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
+          <div className={`min-h-screen app-gradient ${showNavigation ? 'pb-24' : ''}`}>
             <TestIntro onStartTest={handleStartTest} />
             <NavigationBar />
           </div>
@@ -376,7 +376,7 @@ function App() {
         );
       case 'results':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
+          <div className={`min-h-screen app-gradient ${showNavigation ? 'pb-24' : ''}`}>
             <TestResults 
               results={testResults}
               onSaveResults={handleSaveResults}
@@ -393,7 +393,7 @@ function App() {
     switch (currentView) {
       case 'chapters':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
+          <div className={`min-h-screen app-gradient ${showNavigation ? 'pb-24' : ''}`}>
             <ChaptersList 
               onChapterSelect={handleChapterSelect} 
               currentUser={profile?.username}
@@ -403,7 +403,7 @@ function App() {
         );
       case 'sections':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
+          <div className={`min-h-screen app-gradient ${showNavigation ? 'pb-24' : ''}`}>
             <SectionsList 
               chapterId={selectedChapter!} 
               onSectionSelect={handleSectionSelect}
@@ -444,7 +444,7 @@ function App() {
 
   // Original landing page content for other tabs (Account)
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
+    <div className={`min-h-screen app-gradient ${showNavigation ? 'pb-24' : ''}`}>
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b border-emerald-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -657,7 +657,7 @@ function App() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gradient-to-br from-emerald-50 to-green-50">
+      <section className="py-24 app-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-emerald-900 mb-4">
