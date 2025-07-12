@@ -233,7 +233,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={onSaveResults}
-            className="flex-1 btn-green flex items-center justify-center space-x-2"
+            className="flex-1 test-button flex items-center justify-center space-x-2"
           >
             <Save className="w-5 h-5" />
             <span>Сохранить результаты</span>
@@ -241,7 +241,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRet
           
           <button
             onClick={onRetakeTest}
-            className="flex-1 btn-green flex items-center justify-center space-x-2"
+            className="flex-1 test-button flex items-center justify-center space-x-2"
           >
             <RotateCcw className="w-5 h-5" />
             <span>Пройти тест заново</span>

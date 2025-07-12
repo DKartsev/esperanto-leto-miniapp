@@ -289,10 +289,8 @@ function App() {
                 <button
                   key={item.id}
                   onClick={() => handleTabClick(item.id)}
-                  className={`group flex flex-col items-center justify-center flex-1 py-2 px-2 transition-all duration-200 transform min-h-[60px] relative ${
-                    isActive
-                      ? 'text-emerald-600 scale-105'
-                      : 'text-gray-500 hover:text-emerald-600 active:scale-95'
+                  className={`nav-button group flex-col flex-1 min-h-[60px] relative ${
+                    isActive ? 'scale-105' : ''
                   }`}
                 >
                   <IconComponent
@@ -524,9 +522,9 @@ function App() {
               )}
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <button 
+                <button
                   onClick={() => handleTabClick('home')}
-                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                  className="start-button flex items-center justify-center space-x-2"
                 >
                   <Download className="w-5 h-5" />
                   <span>{isTelegramWebApp ? 'Начать изучение' : 'Открыть в Telegram'}</span>
