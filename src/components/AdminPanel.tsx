@@ -10,13 +10,18 @@ import {
   Save, 
   X, 
   Search,
+  Filter,
   Download,
+  Upload,
   Eye,
   Shield,
   AlertTriangle,
   CheckCircle,
+  Clock,
   TrendingUp,
-  FileText
+  Database,
+  FileText,
+  HelpCircle
 } from 'lucide-react';
 import DataExporter from './DataExporter';
 import esperantoData, { Chapter, Section, Question, TheoryBlock } from '../data/esperantoData';
