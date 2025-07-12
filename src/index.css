@@ -50,7 +50,7 @@
   }
   .btn-green:hover {
     background-image: linear-gradient(to right, #047857, #15803d);
-    transform: scale(1.05);
+    transform: scale(1.1);
   }
   .progress-track {
     width: 100%;
