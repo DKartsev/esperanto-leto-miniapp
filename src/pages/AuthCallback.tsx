@@ -1,55 +1,45 @@
-import { useEffect, useState, type FC } from 'react';
-import { supabase } from '../services/supabaseClient.js';
+import { useEffect, useState } from 'react'
+import { supabase } from '../services/supabaseClient.js'
 
-const AuthCallback: FC = () => {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+const AuthCallback = () => {
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
 
   useEffect(() => {
     const handleAuth = async () => {
-      const hash = window.location.hash;
-      const query = new URLSearchParams(hash.substring(1));
-      const access_token = query.get('access_token');
-      const refresh_token = query.get('refresh_token');
+      const hash = window.location.hash
+      const query = new URLSearchParams(hash.substring(1))
+      const access_token = query.get('access_token')
+      const refresh_token = query.get('refresh_token')
 
-      if (!access_token || !refresh_token) {
-        setStatus('error');
-        return;
-      }
-
-      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-      if (error) {
-        console.error('Auth callback error:', error);
-        setStatus('error');
-        return;
-      }
-
-      setStatus('success');
-      setTimeout(() => {
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
-          window.Telegram.WebApp.close();
+      if (access_token && refresh_token) {
+        const { error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        })
+        if (error) {
+          console.error(error)
+          setStatus('error')
         } else {
-          window.location.replace('/');
+          setStatus('success')
+          if (window.Telegram?.WebApp?.close) {
+            window.Telegram.WebApp.close()
+          }
         }
-      }, 1500);
-    };
+      } else {
+        setStatus('error')
+      }
+    }
 
-    handleAuth();
-  }, []);
-
-  let message = 'Вход...';
-  if (status === 'success') message = 'Вход выполнен успешно';
-  if (status === 'error') message = 'Ошибка авторизации';
+    handleAuth()
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center">
-      <div className="text-center">
-        {status === 'loading' && (
-          <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        )}
-        <p className="text-emerald-700">{message}</p>
-      </div>
+    <div className="h-screen flex items-center justify-center">
+      {status === 'loading' && <p>⏳ Входим...</p>}
+      {status === 'success' && <p className="text-emerald-600 font-bold">✅ Вход выполнен</p>}
+      {status === 'error' && <p className="text-red-500">❌ Ошибка авторизации</p>}
     </div>
-  );
-};
+  )
+}
 
 export default AuthCallback;
