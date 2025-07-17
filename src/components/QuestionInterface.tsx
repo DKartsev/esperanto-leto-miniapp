@@ -1,22 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { HelpCircle, Eye, ArrowRight, X, Book, ChevronDown } from 'lucide-react';
+import { useState, type FC } from 'react';
+import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 
-interface Question {
-  id: number;
-  type: 'multiple-choice' | 'text-input' | 'true-false';
-  question: string;
-  options?: string[];
-  correctAnswer: string;
-  explanation: string;
-  hints: string[];
-}
-
-interface TheoryBlock {
-  title: string;
-  content: string;
-  examples: string[];
-  keyTerms: string[];
-}
 
 interface QuestionInterfaceProps {
   chapterId: number;
@@ -25,7 +9,7 @@ interface QuestionInterfaceProps {
   onBackToSections: () => void;
 }
 
-const QuestionInterface: React.FC<QuestionInterfaceProps> = ({ 
+const QuestionInterface: FC<QuestionInterfaceProps> = ({
   chapterId, 
   sectionId, 
   onComplete, 

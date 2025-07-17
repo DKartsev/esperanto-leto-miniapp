@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 
@@ -24,7 +24,7 @@ interface ChaptersListProps {
   currentUser?: string | null | undefined;
 }
 
-const ChaptersList: React.FC<ChaptersListProps> = ({ onChapterSelect, currentUser = '' }) => {
+const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = '' }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
 

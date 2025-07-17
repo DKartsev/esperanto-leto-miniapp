@@ -97,7 +97,7 @@ npm run diagnostics
 
 #### Аутентификация
 ```javascript
-import { useAuth } from './src/components/SupabaseAuthProvider.jsx'
+import { useAuth } from './src/components/SupabaseAuthProvider'
 
 function MyComponent() {
   const { user, signIn, signUp, signOut, loading } = useAuth()

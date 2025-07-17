@@ -11,7 +11,6 @@ import esperantoData, {
   getSectionById,
   getQuestionsBySection,
   getTheoryBySection,
-  calculateSectionProgress,
   getRecommendedNextSection
 } from '../data/esperantoData';
 

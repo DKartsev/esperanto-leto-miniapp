@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { useState, type FC } from 'react';
 import { User, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
-import { useAuth } from './SupabaseAuthProvider.jsx';
+import { useAuth } from './SupabaseAuthProvider';
 import MagicLinkLogin from './MagicLinkLogin';
 
 interface MyAccountProps {
   onBackToHome: () => void;
 }
 
-const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
+const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const { user, profile, stats, loading, signOut, isAuthenticated } = useAuth();
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
 

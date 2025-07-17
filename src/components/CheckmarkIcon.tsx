@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 
 interface CheckmarkIconProps {
   size?: number;
@@ -6,7 +6,7 @@ interface CheckmarkIconProps {
   animated?: boolean;
 }
 
-const CheckmarkIcon: React.FC<CheckmarkIconProps> = ({ 
+const CheckmarkIcon: FC<CheckmarkIconProps> = ({
   size = 32, 
   className = '', 
   animated = true 

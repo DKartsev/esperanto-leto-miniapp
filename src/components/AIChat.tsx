@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Bot, MessageCircle, Settings, AlertCircle, Wrench } from 'lucide-react';
+import { useState, type FC } from 'react';
+import { Bot, Settings, AlertCircle, Wrench } from 'lucide-react';
 
-const AIChat: React.FC = () => {
+const AIChat: FC = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   return (

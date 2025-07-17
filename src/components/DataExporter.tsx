@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FC } from 'react';
 import { Download, FileText, Database, Search, BarChart3 } from 'lucide-react';
 import { 
   extractCourseData, 
@@ -10,7 +10,7 @@ import {
 } from '../utils/dataExtractor';
 import esperantoData from '../data/esperantoData';
 
-const DataExporter: React.FC = () => {
+const DataExporter: FC = () => {
   const [exportType, setExportType] = useState<'json' | 'csv' | 'report' | 'search'>('json');
   const [isExporting, setIsExporting] = useState(false);
 

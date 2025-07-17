@@ -1,11 +1,11 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Play, Clock, BookOpen, Headphones, PenTool, FileText } from 'lucide-react';
 
 interface TestIntroProps {
   onStartTest: () => void;
 }
 
-const TestIntro: React.FC<TestIntroProps> = ({ onStartTest }) => {
+const TestIntro: FC<TestIntroProps> = ({ onStartTest }) => {
   const testSections = [
     {
       icon: <BookOpen className="w-6 h-6" />,

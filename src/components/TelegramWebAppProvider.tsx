@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, type FC } from 'react';
 import { telegramWebApp } from '../services/telegramWebApp';
 
 interface TelegramWebAppContextType {
@@ -30,9 +30,9 @@ interface TelegramWebAppProviderProps {
   children: React.ReactNode;
 }
 
-export const TelegramWebAppProvider: React.FC<TelegramWebAppProviderProps> = ({ children }) => {
+export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ children }) => {
   const [isAvailable, setIsAvailable] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [themeParams, setThemeParams] = useState({});
 

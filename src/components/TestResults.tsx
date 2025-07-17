@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Trophy, RotateCcw, Save, Star, TrendingUp, BookOpen, Target } from 'lucide-react';
 
 interface TestResultsProps {
@@ -7,7 +7,7 @@ interface TestResultsProps {
   onRetakeTest: () => void;
 }
 
-const TestResults: React.FC<TestResultsProps> = ({ results, onSaveResults, onRetakeTest }) => {
+const TestResults: FC<TestResultsProps> = ({ results, onSaveResults, onRetakeTest }) => {
   // Calculate section scores
   const calculateSectionScore = (sectionAnswers: any[]) => {
     if (!sectionAnswers || sectionAnswers.length === 0) return 0;

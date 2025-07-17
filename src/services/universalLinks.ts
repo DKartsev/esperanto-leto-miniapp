@@ -85,7 +85,7 @@ class UniversalLinksService {
 
   private checkIfTelegramInstalled(): boolean {
     // This is a simplified check - in reality, you'd need more sophisticated detection
-    return window.Telegram && window.Telegram.WebApp;
+    return !!(window.Telegram && window.Telegram.WebApp);
   }
 
   private showInstallPrompt(platform: 'ios' | 'android') {

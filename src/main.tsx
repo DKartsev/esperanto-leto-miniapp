@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { SupabaseAuthProvider } from './components/SupabaseAuthProvider.jsx';
+import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import AuthCallback from './components/AuthCallback';
 
 // Hide loading screen when React app mounts
