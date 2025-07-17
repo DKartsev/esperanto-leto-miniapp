@@ -1,6 +1,26 @@
-import React, { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { X, Mail, Lock, User, Eye, EyeOff, Loader } from 'lucide-react'
-import { useAuth } from './SupabaseAuthProvider.jsx'
+import { useAuth } from './SupabaseAuthProvider'
+
+interface AuthModalProps {
+  isOpen: boolean
+  onClose: () => void
+  defaultMode?: 'signin' | 'signup'
+}
+
+interface FormData {
+  email: string
+  password: string
+  username: string
+  confirmPassword: string
+}
+
+interface FormErrors {
+  email?: string
+  password?: string
+  username?: string
+  confirmPassword?: string
+}
 
 /**
  * Модальное окно для аутентификации
@@ -9,16 +29,16 @@ import { useAuth } from './SupabaseAuthProvider.jsx'
  * @param {Function} props.onClose - Функция закрытия модального окна
  * @param {string} props.defaultMode - Режим по умолчанию ('signin' или 'signup')
  */
-export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }) {
-  const [mode, setMode] = useState(defaultMode)
+export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) {
+  const [mode, setMode] = useState<'signin' | 'signup'>(defaultMode)
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
     username: '',
     confirmPassword: ''
   })
-  const [formErrors, setFormErrors] = useState({})
+  const [formErrors, setFormErrors] = useState<FormErrors>({})
   
   const { signIn, signUp, loading, error, clearError } = useAuth()
 
@@ -31,7 +51,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }) {
   }
 
   // Обработка изменения полей формы
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     // Очищаем ошибку для этого поля
@@ -46,8 +66,8 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }) {
   }
 
   // Валидация формы
-  const validateForm = () => {
-    const errors = {}
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {}
 
     // Проверка email
     if (!formData.email) {
@@ -83,7 +103,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }) {
   }
 
   // Обработка отправки формы
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (!validateForm()) return

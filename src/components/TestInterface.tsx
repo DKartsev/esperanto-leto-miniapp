@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { Volume2, ArrowRight, Clock, X } from 'lucide-react';
 
 interface Question {
@@ -17,7 +17,7 @@ interface TestInterfaceProps {
   onBack?: () => void; // Добавляем пропс для возврата
 }
 
-const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
+const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [textAnswer, setTextAnswer] = useState('');

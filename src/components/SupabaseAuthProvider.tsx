@@ -1,15 +1,16 @@
-import React, { createContext, useContext } from 'react'
-import useAuthHook from '../hooks/useAuth.js'
+import { createContext, useContext, type ReactNode } from 'react'
+import useAuthHook from '../hooks/useSupabaseAuth.js'
 
 // Создаем контекст для аутентификации
-const SupabaseAuthContext = createContext(null)
+// Using `any` here since the hook is implemented in JavaScript
+const SupabaseAuthContext = createContext<any>(null)
 
 /**
  * Провайдер аутентификации Supabase
  * @param {Object} props - Пропсы компонента
  * @param {React.ReactNode} props.children - Дочерние компоненты
  */
-export function SupabaseAuthProvider({ children }) {
+export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuthHook()
 
   return (
@@ -23,7 +24,7 @@ export function SupabaseAuthProvider({ children }) {
  * Хук для использования контекста аутентификации
  * @returns {Object} Объект с методами и состоянием аутентификации
  */
-export function useAuth() {
+export function useAuth(): any {
   const context = useContext(SupabaseAuthContext)
   
   if (!context) {

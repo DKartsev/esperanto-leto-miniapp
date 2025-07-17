@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Trophy, Star, Clock, ArrowRight, Medal, Target } from 'lucide-react';
 
 interface ChapterCompleteProps {
@@ -7,7 +7,7 @@ interface ChapterCompleteProps {
   onBackToChapters: () => void;
 }
 
-const ChapterComplete: React.FC<ChapterCompleteProps> = ({
+const ChapterComplete: FC<ChapterCompleteProps> = ({
   chapterId,
   onNextChapter,
   onBackToChapters

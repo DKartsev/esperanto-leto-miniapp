@@ -1,30 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { 
-  Settings, 
-  Users, 
-  BookOpen, 
-  BarChart3, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
+  Settings,
+  Users,
+  BookOpen,
+  BarChart3,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
   Search,
-  Filter,
   Download,
-  Upload,
   Eye,
   Shield,
   AlertTriangle,
   CheckCircle,
-  Clock,
-  TrendingUp,
-  Database,
-  FileText,
-  HelpCircle
+  TrendingUp
 } from 'lucide-react';
 import DataExporter from './DataExporter';
-import esperantoData, { Chapter, Section, Question, TheoryBlock } from '../data/esperantoData';
+import esperantoData, { Chapter, Section } from '../data/esperantoData';
 
 interface AdminUser {
   id: string;
@@ -61,16 +55,14 @@ interface AdminPanelProps {
   currentUser: string;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, currentUser }) => {
+const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
   const [activeTab, setActiveTab] = useState<'content' | 'users' | 'analytics' | 'settings'>('content');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   // Content Management State
   const [chapters, setChapters] = useState<Chapter[]>(esperantoData);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
-  const [selectedSection, setSelectedSection] = useState<Section | null>(null);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -109,7 +101,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, currentUser }) => {
   };
 
   const loadSystemData = async () => {
-    setLoading(true);
     try {
       // Load mock data - in real app this would come from backend
       await loadUsers();
@@ -118,7 +109,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, currentUser }) => {
     } catch (error) {
       console.error('Error loading system data:', error);
     } finally {
-      setLoading(false);
+      // noop
     }
   };
 

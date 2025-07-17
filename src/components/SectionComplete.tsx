@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { CheckCircle, XCircle, RotateCcw, ArrowRight, Trophy, Clock } from 'lucide-react';
 
 interface SectionResults {
@@ -16,7 +16,7 @@ interface SectionCompleteProps {
   onCompleteChapter: () => void;
 }
 
-const SectionComplete: React.FC<SectionCompleteProps> = ({
+const SectionComplete: FC<SectionCompleteProps> = ({
   results,
   chapterId,
   sectionId,

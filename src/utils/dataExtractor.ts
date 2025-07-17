@@ -1,6 +1,6 @@
 // Утилиты для извлечения и организации данных
 
-import { Chapter, Section, Question, TheoryBlock } from '../data/esperantoData';
+import { Chapter } from '../data/esperantoData';
 
 // Интерфейс для экспорта данных
 export interface ExportedData {

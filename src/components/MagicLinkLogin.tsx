@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import { X, Mail, Loader } from 'lucide-react'
 import { supabase } from '../services/supabaseClient.js'
 
@@ -7,7 +7,7 @@ interface MagicLinkLoginProps {
   onClose: () => void
 }
 
-const MagicLinkLogin: React.FC<MagicLinkLoginProps> = ({ isOpen, onClose }) => {
+const MagicLinkLogin: FC<MagicLinkLoginProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

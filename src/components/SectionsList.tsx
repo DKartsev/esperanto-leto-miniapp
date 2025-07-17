@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Play, Clock, Book, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, type FC } from 'react';
+import { Play, Clock, Book, ChevronDown } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 
 interface Section {
@@ -22,7 +22,7 @@ interface SectionsListProps {
   onBackToChapters: () => void;
 }
 
-const SectionsList: React.FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
+const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
   const [expandedTheory, setExpandedTheory] = useState<number | null>(null);
 
   // Define sections for different chapters

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect, type FC } from 'react';
 import { supabase } from '../services/supabaseClient.js';
 
-const AuthCallback: React.FC = () => {
+const AuthCallback: FC = () => {
   useEffect(() => {
     const handleAuth = async () => {
       try {

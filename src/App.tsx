@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Smartphone, 
   Shield, 
   Zap, 
   ArrowUpDown, 
@@ -33,7 +32,7 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
-import { useAuth } from './components/SupabaseAuthProvider.jsx';
+import { useAuth } from './components/SupabaseAuthProvider';
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
@@ -53,7 +52,7 @@ function App() {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Get auth data from Supabase
-  const { user, profile } = useAuth();
+  const { profile } = useAuth();
 
   // Telegram WebApp detection - более точная проверка
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
