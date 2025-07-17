@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider.jsx';
+import AuthCallback from './components/AuthCallback';
 
 // Hide loading screen when React app mounts
 function hideLoadingScreen() {
@@ -16,11 +17,12 @@ function hideLoadingScreen() {
 }
 
 const root = createRoot(document.getElementById('root')!);
+const isAuthCallback = window.location.pathname === '/auth/callback';
 
 root.render(
   <StrictMode>
     <SupabaseAuthProvider>
-      <App />
+      {isAuthCallback ? <AuthCallback /> : <App />}
     </SupabaseAuthProvider>
   </StrictMode>
 );
