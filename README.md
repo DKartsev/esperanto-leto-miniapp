@@ -13,7 +13,7 @@ npm install
 Создайте файл `.env` в корне проекта на основе `.env.example`:
 ```env
 # Telegram Bot
-TELEGRAM_BOT_TOKEN=8018730758:AAGRlA6ekrHPgsI5u28mPZJ3secL3cBXTMo
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 BOT_USERNAME=EsperantoLetoBot
 WEBAPP_URL=https://tgminiapp.esperanto-leto.ru
 
@@ -251,7 +251,7 @@ https://tgminiapp.esperanto-leto.ru?mode=test
 
 ```env
 # Telegram Bot
-TELEGRAM_BOT_TOKEN=8018730758:AAGRlA6ekrHPgsI5u28mPZJ3secL3cBXTMo
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 BOT_USERNAME=EsperantoLetoBot
 
 # WebApp URL (ОБЯЗАТЕЛЬНО HTTPS!)
