@@ -1,10 +1,11 @@
 import type { FC } from 'react';
+import type { QuestionResultItem } from './QuestionInterface';
 import { CheckCircle, XCircle, RotateCcw, ArrowRight, Trophy, Clock } from 'lucide-react';
 
 interface SectionResults {
   totalQuestions: number;
   correctAnswers: number;
-  incorrectAnswers: any[];
+  incorrectAnswers: QuestionResultItem[];
   totalHintsUsed: number;
 }
 

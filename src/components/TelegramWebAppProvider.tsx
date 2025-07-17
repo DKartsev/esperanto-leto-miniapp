@@ -3,14 +3,14 @@ import { telegramWebApp } from '../services/telegramWebApp';
 
 interface TelegramWebAppContextType {
   isAvailable: boolean;
-  user: any;
+  user: unknown;
   isDarkTheme: boolean;
-  themeParams: any;
-  sendData: (data: any) => void;
+  themeParams: Record<string, unknown>;
+  sendData: (data: unknown) => void;
   showAlert: (message: string) => Promise<void>;
   showConfirm: (message: string) => Promise<boolean>;
   hapticFeedback: (type: 'impact' | 'notification' | 'selection', style?: string) => void;
-  setMainButton: (params: any) => void;
+  setMainButton: (params: Record<string, unknown>) => void;
   hideMainButton: () => void;
   showBackButton: () => void;
   hideBackButton: () => void;
@@ -32,9 +32,9 @@ interface TelegramWebAppProviderProps {
 
 export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ children }) => {
   const [isAvailable, setIsAvailable] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const [themeParams, setThemeParams] = useState({});
+  const [themeParams, setThemeParams] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
     // Check if Telegram WebApp is available

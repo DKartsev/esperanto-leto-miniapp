@@ -1,15 +1,16 @@
 import type { FC } from 'react';
 import { Trophy, RotateCcw, Save, Star, TrendingUp, BookOpen, Target } from 'lucide-react';
+import type { TestResults as TestResultsData, TestAnswer } from './TestInterface';
 
 interface TestResultsProps {
-  results: any;
+  results: TestResultsData;
   onSaveResults: () => void;
   onRetakeTest: () => void;
 }
 
 const TestResults: FC<TestResultsProps> = ({ results, onSaveResults, onRetakeTest }) => {
   // Calculate section scores
-  const calculateSectionScore = (sectionAnswers: any[]) => {
+  const calculateSectionScore = (sectionAnswers: TestAnswer[]) => {
     if (!sectionAnswers || sectionAnswers.length === 0) return 0;
     const correct = sectionAnswers.filter(a => a.isCorrect).length;
     return Math.round((correct / sectionAnswers.length) * 100);
@@ -124,13 +125,13 @@ const TestResults: FC<TestResultsProps> = ({ results, onSaveResults, onRetakeTes
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
               <div className="text-2xl font-bold text-green-600 mb-1">
-                {results.answers?.filter((a: any) => a.isCorrect).length || 0}
+                {results.answers?.filter((a: TestAnswer) => a.isCorrect).length || 0}
               </div>
               <div className="text-sm text-green-700">Правильно</div>
             </div>
             <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
               <div className="text-2xl font-bold text-red-600 mb-1">
-                {results.answers?.filter((a: any) => !a.isCorrect).length || 0}
+                {results.answers?.filter((a: TestAnswer) => !a.isCorrect).length || 0}
               </div>
               <div className="text-sm text-red-700">Неправильно</div>
             </div>

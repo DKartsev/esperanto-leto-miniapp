@@ -75,14 +75,9 @@ class OpenAIService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private validateResponse(response: any): boolean {
-    return (
-      response &&
-      response.choices &&
-      response.choices.length > 0 &&
-      response.choices[0].message &&
-      response.choices[0].message.content
-    );
+  private validateResponse(response: unknown): boolean {
+    const res = response as { choices?: { message?: { content?: string } }[] };
+    return Boolean(res?.choices?.[0]?.message?.content);
   }
 
   private sanitizeInput(input: string): string {
@@ -209,13 +204,13 @@ class OpenAIService {
           };
         }
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`❌ OpenAI API attempt ${attempt} failed:`, error);
 
         // Handle specific error types
-        if (error.status === 429) {
+        if ((error as { status?: number }).status === 429) {
           // Check if it's a quota exceeded error vs rate limit
-          const errorMessage = error.message || '';
+          const errorMessage = (error as { message?: string }).message || '';
           if (errorMessage.includes('quota') || errorMessage.includes('billing')) {
             throw new Error('Превышена квота OpenAI API. Проверьте план подписки и биллинг на platform.openai.com');
           } else {
@@ -312,11 +307,15 @@ class OpenAIService {
       });
 
       return this.validateResponse(response);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('OpenAI connection test failed:', error);
       
       // Don't throw quota errors during connection test
-      if (error.status === 429 && (error.message?.includes('quota') || error.message?.includes('billing'))) {
+      if (
+        (error as { status?: number; message?: string }).status === 429 &&
+        ((error as { message?: string }).message?.includes('quota') ||
+          (error as { message?: string }).message?.includes('billing'))
+      ) {
         console.warn('Connection test skipped due to quota limits');
         return false;
       }
