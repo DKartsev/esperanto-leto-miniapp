@@ -25,14 +25,11 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({ isOpen, onClose }) => {
 
     try {
       setLoading(true)
-      const redirectTo =
-        window.location.hostname === 'localhost'
-          ? 'http://localhost:3000/auth/callback'
-          : 'https://tgminiapp.esperanto-leto.ru/auth/callback'
-
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: redirectTo }
+        options: {
+          emailRedirectTo: 'https://tgminiapp.esperanto-leto.ru/auth/callback',
+        },
       })
       if (signInError) throw signInError
       setSuccess(true)
