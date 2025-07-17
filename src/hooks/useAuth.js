@@ -13,7 +13,7 @@ import { getUserStats } from '../services/progressService.js'
  * Хук для работы с аутентификацией Supabase
  * @returns {Object} Объект с состоянием аутентификации и методами
  */
-export function useSupabaseAuth() {
+export function useAuth() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [stats, setStats] = useState(null)
@@ -180,4 +180,4 @@ export function useSupabaseAuth() {
   }
 }
 
-export default useSupabaseAuth
+export default useAuth
