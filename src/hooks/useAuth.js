@@ -40,14 +40,11 @@ export default function useAuth() {
       setError(null)
       setEmailSent(false)
 
-      const redirectTo =
-        window.location.hostname === 'localhost'
-          ? 'http://localhost:3000/auth/callback'
-          : 'https://tgminiapp.esperanto-leto.ru/auth/callback'
-
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: redirectTo }
+        options: {
+          emailRedirectTo: 'https://tgminiapp.esperanto-leto.ru/auth/callback'
+        }
       })
 
       if (error) throw error
