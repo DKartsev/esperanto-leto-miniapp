@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { User, Shield, LogOut, Settings, Trophy, Clock, BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
+import { User, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
 import { useAuth } from './SupabaseAuthProvider.jsx';
-import AuthModal from './AuthModal.jsx';
+import MagicLinkLogin from './MagicLinkLogin';
 
 interface MyAccountProps {
   onBackToHome: () => void;
@@ -9,7 +9,7 @@ interface MyAccountProps {
 
 const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
   const { user, profile, stats, loading, signOut, isAuthenticated } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -67,7 +67,7 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
               {/* Register Button */}
               <div className="mb-6">
                 <button
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={() => setShowMagicLinkModal(true)}
                   className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
                 >
                   <User className="w-6 h-6" />
@@ -118,11 +118,10 @@ const MyAccount: React.FC<MyAccountProps> = ({ onBackToHome }) => {
           </div>
         </div>
 
-        {/* Auth Modal */}
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          defaultMode="signup"
+        {/* Magic Link Login */}
+        <MagicLinkLogin
+          isOpen={showMagicLinkModal}
+          onClose={() => setShowMagicLinkModal(false)}
         />
       </>
     );
