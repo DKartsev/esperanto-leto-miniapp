@@ -12,8 +12,27 @@ interface Question {
   passage?: string;
 }
 
+export interface TestAnswer {
+  questionId: number;
+  section: Question['section'];
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+}
+
+export interface TestResults {
+  totalQuestions: number;
+  answers: TestAnswer[];
+  sectionResults: Record<
+    'reading' | 'writing' | 'listening' | 'grammar',
+    TestAnswer[]
+  >;
+  timeSpent: number;
+}
+
 interface TestInterfaceProps {
-  onComplete: (results: any) => void;
+  onComplete: (results: TestResults) => void;
   onBack?: () => void; // Добавляем пропс для возврата
 }
 
@@ -21,7 +40,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [textAnswer, setTextAnswer] = useState('');
-  const [answers, setAnswers] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<TestAnswer[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes in seconds
 
   const questions: Question[] = [

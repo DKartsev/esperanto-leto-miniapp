@@ -211,9 +211,9 @@ class TelegramWebAppService {
     this.webApp?.MainButton.hide();
   }
 
-  sendData(data: any) {
+  sendData(data: unknown) {
     if (!this.webApp) return;
-    
+
     this.webApp.sendData(JSON.stringify(data));
   }
 
@@ -243,10 +243,14 @@ class TelegramWebAppService {
 
     switch (type) {
       case 'impact':
-        this.webApp.HapticFeedback.impactOccurred(style as any || 'medium');
+        this.webApp.HapticFeedback.impactOccurred(
+          (style as 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') || 'medium'
+        );
         break;
       case 'notification':
-        this.webApp.HapticFeedback.notificationOccurred(style as any || 'success');
+        this.webApp.HapticFeedback.notificationOccurred(
+          (style as 'error' | 'success' | 'warning') || 'success'
+        );
         break;
       case 'selection':
         this.webApp.HapticFeedback.selectionChanged();

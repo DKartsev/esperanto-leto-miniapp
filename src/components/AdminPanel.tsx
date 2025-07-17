@@ -1,4 +1,5 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, useEffect, useCallback, type FC } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { 
   Settings,
   Users,
@@ -55,15 +56,21 @@ interface AdminPanelProps {
   currentUser: string;
 }
 
+type EditingItem =
+  | { type: 'chapter'; data: Chapter | null }
+  | { type: 'section'; data: Section | null; chapterId: number };
+
+type AdminTab = 'content' | 'users' | 'analytics' | 'settings';
+
 const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'content' | 'users' | 'analytics' | 'settings'>('content');
+  const [activeTab, setActiveTab] = useState<AdminTab>('content');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState('');
 
   // Content Management State
   const [chapters, setChapters] = useState<Chapter[]>(esperantoData);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -82,13 +89,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
     completionRate: 0
   });
 
-  useEffect(() => {
-    // Check if current user has admin privileges
-    checkAdminAccess();
-    loadSystemData();
-  }, []);
-
-  const checkAdminAccess = () => {
+  const checkAdminAccess = useCallback(() => {
     // In a real application, this would check against a backend
     const adminUsers = ['admin5050', 'admin', 'administrator'];
     if (adminUsers.includes(currentUser.toLowerCase())) {
@@ -98,9 +99,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
       setAuthError('У вас нет прав администратора для доступа к этой панели.');
       console.log(`❌ Admin access denied for user: ${currentUser}`);
     }
-  };
+  }, [currentUser]);
 
-  const loadSystemData = async () => {
+  const loadSystemData = useCallback(async () => {
     try {
       // Load mock data - in real app this would come from backend
       await loadUsers();
@@ -111,7 +112,13 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
     } finally {
       // noop
     }
-  };
+  }, [chapters, users]);
+
+  useEffect(() => {
+    // Check if current user has admin privileges
+    checkAdminAccess();
+    loadSystemData();
+  }, [checkAdminAccess, loadSystemData]);
 
   const loadUsers = async () => {
     // Mock user data - in real app this would come from backend
@@ -213,7 +220,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
     }
   };
 
-  const handleSaveChapter = (chapterData: any) => {
+  const handleSaveChapter = (chapterData: Partial<Chapter>) => {
     if (editingItem?.data) {
       // Edit existing chapter
       setChapters(prev => prev.map(ch => 
@@ -246,7 +253,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
     setShowAddModal(true);
   };
 
-  const handleSaveSection = (sectionData: any) => {
+  const handleSaveSection = (sectionData: Partial<Section>) => {
     const chapterId = editingItem?.chapterId;
     if (!chapterId) return;
 
@@ -355,17 +362,19 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-gray-200">
-          {[
-            { id: 'content', label: 'Управление контентом', icon: BookOpen },
-            { id: 'users', label: 'Пользователи', icon: Users },
-            { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
-            { id: 'settings', label: 'Настройки', icon: Settings }
-          ].map((tab) => {
+          {(
+            [
+              { id: 'content', label: 'Управление контентом', icon: BookOpen },
+              { id: 'users', label: 'Пользователи', icon: Users },
+              { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
+              { id: 'settings', label: 'Настройки', icon: Settings }
+            ] as { id: AdminTab; label: string; icon: LucideIcon }[]
+          ).map((tab) => {
             const IconComponent = tab.icon;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'text-emerald-600 border-b-2 border-emerald-600'

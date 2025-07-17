@@ -23,11 +23,11 @@ import {
 // Import components
 import ChaptersList from './components/ChaptersList';
 import SectionsList from './components/SectionsList';
-import QuestionInterface from './components/QuestionInterface';
+import QuestionInterface, { type QuestionResults } from './components/QuestionInterface';
 import SectionComplete from './components/SectionComplete';
 import ChapterComplete from './components/ChapterComplete';
 import TestIntro from './components/TestIntro';
-import TestInterface from './components/TestInterface';
+import TestInterface, { type TestResults as FullTestResults } from './components/TestInterface';
 import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
@@ -42,11 +42,11 @@ function App() {
   const [currentView, setCurrentView] = useState<'chapters' | 'sections' | 'questions' | 'section-complete' | 'chapter-complete'>('chapters');
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
-  const [sectionResults, setSectionResults] = useState<any>(null);
+  const [sectionResults, setSectionResults] = useState<QuestionResults | null>(null);
 
   // Test interface state
   const [testView, setTestView] = useState<'intro' | 'test' | 'results'>('intro');
-  const [testResults, setTestResults] = useState<any>(null);
+  const [testResults, setTestResults] = useState<FullTestResults | null>(null);
 
   // Admin panel state
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -56,7 +56,7 @@ function App() {
 
   // Telegram WebApp detection - более точная проверка
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
-  const [telegramUser, setTelegramUser] = useState<any>(null);
+  const [telegramUser, setTelegramUser] = useState<unknown>(null);
   const [showNavigation, setShowNavigation] = useState(true);
 
   useEffect(() => {
@@ -213,7 +213,7 @@ function App() {
     setCurrentView('questions');
   };
 
-  const handleQuestionComplete = (results: any) => {
+  const handleQuestionComplete = (results: QuestionResults) => {
     setSectionResults(results);
     setCurrentView('section-complete');
   };
@@ -250,7 +250,7 @@ function App() {
     setTestView('test');
   };
 
-  const handleTestComplete = (results: any) => {
+  const handleTestComplete = (results: FullTestResults) => {
     setTestResults(results);
     setTestView('results');
   };
@@ -598,7 +598,7 @@ function App() {
                           <div key={item.symbol} className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                             <div className="flex items-center space-x-3">
                               <div className={`w-10 h-10 ${item.color} rounded-full flex items-center justify-center text-white font-bold shadow-sm`}>
-                                {isTelegramWebApp ? (item as any).icon : item.icon}
+                                {isTelegramWebApp ? (item as { icon: string }).icon : item.icon}
                               </div>
                               <div>
                                 <p className="font-semibold text-emerald-900">{item.name}</p>
@@ -607,7 +607,7 @@ function App() {
                             </div>
                             <div className="text-right">
                               <p className="font-semibold text-emerald-900">
-                                {isTelegramWebApp ? (item as any).progress : 
+                                {isTelegramWebApp ? (item as { progress: string }).progress :
                                  index === 0 ? "4 920.42 RUB" : 
                                  index === 1 ? "0.99 USDT" : "0.0 " + item.symbol}
                               </p>

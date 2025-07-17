@@ -162,7 +162,7 @@ export const createSearchIndex = (chapters: Chapter[]) => {
 };
 
 // Функция для экспорта в JSON
-export const exportToJSON = (data: any): string => {
+export const exportToJSON = (data: unknown): string => {
   return JSON.stringify(data, null, 2);
 };
 

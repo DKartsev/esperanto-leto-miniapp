@@ -2,10 +2,26 @@ import { useState, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 
 
+interface QuestionResultItem {
+  questionId: number;
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  hintsUsed: number;
+}
+
+interface QuestionResults {
+  totalQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: QuestionResultItem[];
+  totalHintsUsed: number;
+}
+
 interface QuestionInterfaceProps {
   chapterId: number;
   sectionId: number;
-  onComplete: (results: any) => void;
+  onComplete: (results: QuestionResults) => void;
   onBackToSections: () => void;
 }
 
@@ -21,7 +37,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const [answers, setAnswers] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<QuestionResultItem[]>([]);
   const [showTheory, setShowTheory] = useState(true);
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
 
