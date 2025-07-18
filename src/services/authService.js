@@ -187,6 +187,48 @@ export async function updateUserProfile(userId, updates) {
 }
 
 /**
+ * Ensure the user has a profile record in `profiles` table
+ * @param {Object} user - Supabase user object
+ */
+export async function ensureUserProfile(user) {
+  if (!user?.id) return
+  try {
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError
+
+    if (!existingProfile) {
+      const { error: insertError } = await supabase.from('profiles').insert([
+        {
+          id: user.id,
+          username:
+            user.user_metadata?.username ||
+            user.email?.split('@')[0] ||
+            'Без имени',
+          email: user.email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ])
+
+      if (insertError) {
+        console.error('❌ Ошибка при создании профиля:', insertError)
+      } else {
+        console.log('✅ Профиль создан для нового пользователя.')
+      }
+    } else {
+      console.log('👤 Профиль уже существует.')
+    }
+  } catch (err) {
+    console.error('❌ Ошибка при проверке/создании профиля:', err)
+  }
+}
+
+/**
  * Подписка на изменения аутентификации
  * @param {Function} callback - Функция обратного вызова
  * @returns {Object} Объект подписки
