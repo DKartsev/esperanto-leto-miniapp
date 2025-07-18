@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { 
-  getCurrentUser, 
-  getUserProfile, 
+import {
+  getUserProfile,
   onAuthStateChange,
   signIn as authSignIn,
   signUp as authSignUp,
   signOut as authSignOut
 } from '../services/authService.js'
+import { supabase } from '../services/supabaseClient.js'
 import { getUserStats } from '../services/progressService.js'
 
 /**
@@ -57,7 +57,12 @@ export function useSupabaseAuth() {
 
     const initAuth = async () => {
       try {
-        const currentUser = await getCurrentUser()
+        const { data: { session }, error } = await supabase.auth.getSession()
+
+        if (error) throw error
+
+        const currentUser = session?.user || null
+
         if (mounted) {
           await loadUserData(currentUser)
         }
