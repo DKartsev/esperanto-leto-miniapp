@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
-import { fetchTheoryBlocks, fetchQuestionsWithAnswers } from '../services/courseService.js'
+import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
 
 
 interface QuestionResultItem {
@@ -41,8 +41,8 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [answers, setAnswers] = useState<QuestionResultItem[]>([]);
   const [showTheory, setShowTheory] = useState(true);
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
-  const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; content: string }>>([])
-  const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[] }>>([])
+  const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>>([])
+  const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[]; difficulty: string }>>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -51,18 +51,34 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
       setLoading(true)
       try {
         const theory = await fetchTheoryBlocks(sectionId)
-        const qData = await fetchQuestionsWithAnswers(sectionId)
-        const formatted = (qData as Array<{ id: number; text: string; hint: string | null; answers: Array<{ id: number; text: string; is_correct: boolean }> }>).map(q => ({
+        const qData = await fetchQuestions(sectionId)
+        const formatted = (qData as Array<{
+          id: number
+          type: string
+          question: string
+          options: string[]
+          correct_answer: string
+          explanation: string
+          hints: string[]
+          difficulty: string
+        }>).map(q => ({
           id: q.id,
-          type: 'multiple-choice',
-          question: q.text,
-          options: q.answers ? q.answers.map(a => a.text) : [],
-          correctAnswer: q.answers ? (q.answers.find(a => a.is_correct)?.text || '') : '',
-          explanation: '',
-          hints: q.hint ? [q.hint] : []
+          type: q.type,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correct_answer,
+          explanation: q.explanation,
+          hints: q.hints,
+          difficulty: q.difficulty
         }))
-        setTheoryBlocks(theory as Array<{ id: number; content: string }>)
+        setTheoryBlocks(theory as Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>)
         setQuestions(formatted)
+        if ((theory as []).length === 0) {
+          console.warn('Данные не найдены в theory_blocks для section', sectionId)
+        }
+        if (formatted.length === 0) {
+          console.warn('Данные не найдены в questions для section', sectionId)
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Ошибка загрузки'
         setError(message)
@@ -85,7 +101,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   }
 
   if (questions.length === 0) {
-    return <div className="p-6">Нет данных</div>
+    return <div className="p-6">Данные не найдены</div>
   }
 
   const getChapterTitle = (chapterId: number): string => {
@@ -228,9 +244,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
               </div>
 
               <div className="prose prose-emerald max-w-none">
-                <p className="text-emerald-800 text-lg leading-relaxed mb-6">
-                  {currentTheory.content}
-                </p>
+                <div className="text-emerald-800 text-lg leading-relaxed mb-6 space-y-4">
+                  {currentTheory.content.split('\n').map((line, idx) => (
+                    <p key={idx}>{line}</p>
+                  ))}
+                </div>
 
                 {/* Examples */}
                 <div className="mb-6">
@@ -248,7 +266,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
                 <div className="mb-8">
                   <h3 className="text-xl font-semibold text-emerald-900 mb-4">Ключевые термины:</h3>
                   <div className="flex flex-wrap gap-3">
-                    {currentTheory.keyTerms.map((term, index) => (
+                    {currentTheory.key_terms.map((term, index) => (
                       <span key={index} className="bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-medium">
                         {term}
                       </span>
