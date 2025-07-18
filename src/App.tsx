@@ -35,6 +35,7 @@ import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService.js';
+import { updateChapterProgress } from './services/progressService.ts';
 import { supabase } from './services/supabaseClient.js';
 import { isAdmin } from './utils/adminUtils.js';
 
@@ -308,6 +309,7 @@ function App() {
           },
           { onConflict: 'user_id,section_id' }
         );
+        await updateChapterProgress(user_id, selectedChapter);
         await refreshStats();
       } catch (err) {
         console.error('Error saving progress', err);
