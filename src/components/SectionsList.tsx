@@ -1,8 +1,9 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Clock, Book, ChevronDown } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
-import { fetchSections } from '../services/courseService.js'
-import { getSectionProgressPercent } from '../services/progressService'
+import { fetchSections } from '../services/courseService.js';
+import { getSectionProgressPercent } from '../services/progressService';
+import { supabase } from '../services/supabaseClient.js';
 
 interface Section {
   id: number;
@@ -29,6 +30,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   const [sections, setSections] = useState<Section[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [progressBySectionId, setProgressBySectionId] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -51,6 +53,22 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
         }
 
         setSections(processed)
+
+        const user_id = localStorage.getItem('user_id')
+        if (user_id) {
+          const { data: progressData } = await supabase
+            .from('user_progress')
+            .select('section_id, accuracy, completed')
+            .eq('user_id', user_id)
+
+          if (progressData) {
+            const map: Record<number, { accuracy: number; completed: boolean }> = {}
+            progressData.forEach((row: any) => {
+              map[row.section_id] = { accuracy: row.accuracy, completed: row.completed }
+            })
+            setProgressBySectionId(map)
+          }
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Ошибка загрузки'
         setError(message)
@@ -211,6 +229,28 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                     style={{ width: `${section.progress}%` }}
                   ></div>
                 </div>
+                {progressBySectionId[section.id] && (
+                  <div
+                    style={{
+                      height: '8px',
+                      width: '100%',
+                      backgroundColor: '#EEE',
+                      borderRadius: '4px',
+                      marginTop: '8px'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${progressBySectionId[section.id].accuracy}%`,
+                        height: '100%',
+                        backgroundColor:
+                          progressBySectionId[section.id].accuracy >= 70 ? '#4CAF50' : '#D0D0D0',
+                        borderRadius: '4px',
+                        transition: 'width 0.3s'
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <button
