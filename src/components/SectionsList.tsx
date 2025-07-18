@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Clock, Book, ChevronDown } from 'lucide-react';
+import { Play, Clock, Book, ChevronDown, Check } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchSections } from '../services/courseService.js';
 import { getSectionProgressPercent } from '../services/progressService';
@@ -230,26 +230,22 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                   ></div>
                 </div>
                 {progressBySectionId[section.id] && (
-                  <div
-                    style={{
-                      height: '8px',
-                      width: '100%',
-                      backgroundColor: '#EEE',
-                      borderRadius: '4px',
-                      marginTop: '8px'
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${progressBySectionId[section.id].accuracy}%`,
-                        height: '100%',
-                        backgroundColor:
-                          progressBySectionId[section.id].accuracy >= 70 ? '#4CAF50' : '#D0D0D0',
-                        borderRadius: '4px',
-                        transition: 'width 0.3s'
-                      }}
-                    />
-                  </div>
+                  <>
+                    <div className="h-2 w-full bg-neutral-200 rounded mt-2">
+                      <div
+                        className={`h-full rounded transition-all duration-300 ${
+                          progressBySectionId[section.id].accuracy >= 70 ? 'bg-green-500' : 'bg-gray-300'
+                        }`}
+                        style={{ width: `${progressBySectionId[section.id].accuracy}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600 mt-1">
+                      <span>{progressBySectionId[section.id].accuracy}% верно</span>
+                      {progressBySectionId[section.id].completed && (
+                        <Check className="w-4 h-4 text-green-600 ml-2" />
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
 
