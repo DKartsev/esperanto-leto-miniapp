@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { v5 as uuidv5 } from 'uuid';
 import { useAuth } from './SupabaseAuthProvider';
-import { useTelegramWebApp } from './TelegramWebAppProvider';
 import { supabase } from '../services/supabaseClient.js';
 import { isAdmin } from '../utils/adminUtils.js';
 
@@ -38,8 +37,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(profile?.username || '');
   const [loginLoading, setLoginLoading] = useState(false);
-  const [tgUsername, setTgUsername] = useState<string | null>(null);
-  const { openTelegramLink } = useTelegramWebApp();
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -76,29 +74,30 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
   const handleTelegramLogin = async () => {
-    const tg = window.Telegram?.WebApp;
-    const userData = tg?.initDataUnsafe?.user;
-    if (!userData) {
-      openTelegramLink('https://t.me/EsperantoLetoBot/webapp');
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (!tgUser) {
+      console.warn('Пользователь Telegram не найден');
+      setLoginError('Пользователь Telegram не найден');
       return;
     }
 
     setLoginLoading(true);
-    const username = userData.username || `${userData.first_name}${userData.last_name || ''}`;
-    const userUUID = uuidv5(userData.id.toString(), TELEGRAM_NAMESPACE);
+    const userUUID = uuidv5(tgUser.id.toString(), TELEGRAM_NAMESPACE);
+    const username = tgUser.username || `${tgUser.first_name}${tgUser.last_name || ''}`;
+    const email = `${tgUser.username || tgUser.id}@telegram.fake`;
 
     const { error } = await supabase.rpc('create_user_from_telegram', {
       uid: userUUID,
       username,
-      email: `${userData.username || userData.id}@telegram.fake`
+      email
     });
 
     if (error) {
       console.error('Ошибка создания профиля:', error);
+      setLoginError('Ошибка создания профиля');
     } else {
       localStorage.setItem('user_id', userUUID);
-      setTgUsername(username);
-      onBackToHome();
+      navigate('/account');
     }
     setLoginLoading(false);
   };
@@ -153,18 +152,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 Вы авторизуетесь через Telegram для сохранения прогресса и рекомендаций
               </p>
 
-              <div className="mb-6">
-                <button
-                  onClick={handleTelegramLogin}
-                  disabled={loginLoading}
-                  className="w-full mt-4 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition"
-                >
-                  <span>Начать через Telegram</span>
-                </button>
-              </div>
-
-              {tgUsername && (
-                <p className="text-emerald-700 mb-4">Вы вошли как @{tgUsername}</p>
+              {loginLoading && (
+                <div className="mb-6">
+                  <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-emerald-700">Вход через Telegram...</p>
+                </div>
+              )}
+              {loginError && (
+                <p className="text-red-600 mb-4">{loginError}</p>
               )}
 
               {/* Security Info */}
