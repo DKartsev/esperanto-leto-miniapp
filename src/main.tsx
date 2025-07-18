@@ -25,16 +25,18 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <TelegramWebAppProvider>
-        <SupabaseAuthProvider>
+      {/* SupabaseAuthProvider should wrap TelegramWebAppProvider so that */}
+      {/* the Telegram provider can access authentication context */}
+      <SupabaseAuthProvider>
+        <TelegramWebAppProvider>
           <TelegramLoginRedirect />
           <Routes>
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/admin-panel" element={<AdminPanelPage />} />
             <Route path="/*" element={<App />} />
           </Routes>
-        </SupabaseAuthProvider>
-      </TelegramWebAppProvider>
+        </TelegramWebAppProvider>
+      </SupabaseAuthProvider>
     </BrowserRouter>
   </StrictMode>
 );
