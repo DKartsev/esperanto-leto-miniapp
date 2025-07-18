@@ -22,6 +22,13 @@ interface MyAccountProps {
   onBackToHome: () => void;
 }
 
+interface ChapterStats {
+  totalTime: number;
+  averageAccuracy: number;
+  completedChapters: number;
+  totalChapters: number;
+}
+
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const {
     user,
@@ -38,6 +45,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [newUsername, setNewUsername] = useState(profile?.username || '');
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [chapterStats, setChapterStats] = useState<ChapterStats | null>(null);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -107,6 +115,55 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       handleTelegramLogin();
     }
   }, [isAuthenticated, telegramUser]);
+
+  useEffect(() => {
+    const loadChapterStats = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from('user_chapter_progress')
+        .select('chapter_id, total_time, average_accuracy, completed')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Ошибка загрузки прогресса глав:', error);
+        return;
+      }
+
+      let totalTime = 0;
+      let avgAccuracy = 0;
+      let completed = 0;
+
+      if (data && data.length > 0) {
+        totalTime = data.reduce(
+          (sum, row) => sum + (row.total_time ?? 0),
+          0
+        );
+        avgAccuracy = Math.round(
+          data.reduce((sum, row) => sum + (row.average_accuracy ?? 0), 0) /
+            data.length
+        );
+        completed = data.filter((row) => row.completed).length;
+      }
+
+      const { count: chaptersCount, error: chaptersError } = await supabase
+        .from('chapters')
+        .select('id', { count: 'exact', head: true });
+
+      if (chaptersError) {
+        console.error('Ошибка получения количества глав:', chaptersError);
+      }
+
+      setChapterStats({
+        totalTime,
+        averageAccuracy: avgAccuracy,
+        completedChapters: completed,
+        totalChapters: chaptersCount ?? 0
+      });
+    };
+
+    loadChapterStats();
+  }, [user]);
 
   const navigateRef = useRef(false);
 
@@ -433,6 +490,47 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 <li key={idx} className="text-yellow-700">{a.achievement_type}</li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {chapterStats && (
+          <div className="bg-emerald-50 text-emerald-700 p-6 rounded-xl shadow-sm mb-6">
+            <h2 className="text-lg font-semibold mb-4">Статистика обучения</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white rounded-full shadow">
+                  <Clock className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-900">
+                    {formatTime(chapterStats.totalTime)}
+                  </div>
+                  <div className="text-sm">Время обучения</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white rounded-full shadow">
+                  <Trophy className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-900">
+                    {chapterStats.averageAccuracy}%
+                  </div>
+                  <div className="text-sm">Средняя точность</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white rounded-full shadow">
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="font-bold text-emerald-900">
+                    {chapterStats.completedChapters}/{chapterStats.totalChapters}
+                  </div>
+                  <div className="text-sm">Глав завершено</div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
