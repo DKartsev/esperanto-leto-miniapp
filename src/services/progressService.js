@@ -14,7 +14,10 @@ import { getCurrentUser } from './authService.js'
 export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, selectedAnswer, timeSpent = 0) {
   try {
     const user = await getCurrentUser()
-    if (!user) throw new Error('Пользователь не авторизован')
+    if (!user) {
+      console.warn('User not authenticated, skipping save')
+      return null
+    }
 
     console.log('💾 Сохранение ответа:', { chapterId, sectionId, questionId, isCorrect })
 

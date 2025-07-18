@@ -34,7 +34,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   onComplete,
   onBackToSections
 }) => {
-  const { refreshStats } = useAuth()
+  const { refreshStats, isAuthenticated } = useAuth()
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
@@ -146,6 +146,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     }
 
     setAnswers(prev => [...prev, newAnswer])
+
+    if (!isAuthenticated) {
+      console.warn('Answer not saved: user is not authenticated')
+      return
+    }
 
     try {
       await saveAnswer(
