@@ -39,17 +39,17 @@ export async function updateChapterProgress(user_id: string, chapter_id: number)
     )
     const totalTime = progressData.reduce((sum: number, row: any) => sum + row.time_spent, 0)
 
-    await supabase
-      .from('user_chapter_progress')
-      .upsert(
-        {
-          user_id,
-          chapter_id,
-          completed: true,
-          average_accuracy: avgAccuracy,
-          total_time: totalTime
-        },
-        { onConflict: ['user_id', 'chapter_id'] }
-      )
+      await supabase
+        .from('user_chapter_progress')
+        .upsert(
+          {
+            user_id,
+            chapter_id,
+            completed: true,
+            average_accuracy: avgAccuracy,
+            total_time: totalTime
+          },
+          { onConflict: 'user_id, chapter_id' }
+        )
   }
 }

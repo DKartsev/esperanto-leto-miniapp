@@ -307,7 +307,7 @@ function App() {
             time_spent: timeSpent,
             completed: accuracy >= 70
           },
-          { onConflict: ['user_id', 'section_id'] }
+          { onConflict: 'user_id, section_id' }
         );
         await updateChapterProgress(user_id, selectedChapter);
         await refreshStats();
