@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
 import { useAuth } from './SupabaseAuthProvider';
 import MagicLinkLogin from './MagicLinkLogin';
@@ -13,6 +14,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const { user, profile, stats, achievements, loading, signOut, isAuthenticated } = useAuth();
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -268,9 +270,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 <div className="text-emerald-100">Отчеты и статистика</div>
               </div>
             </div>
-            <p className="text-emerald-100 text-sm mt-4">
-              💡 Используйте кнопку "Админ" в навигации для доступа к административной панели
-            </p>
+            <button
+              onClick={() => navigate('/admin-panel')}
+              className="mt-4 inline-flex items-center px-4 py-2 bg-white bg-opacity-20 rounded-lg text-sm font-semibold text-white hover:bg-opacity-30 transition-colors"
+            >
+              Открыть админ-панель
+            </button>
           </div>
         )}
 
