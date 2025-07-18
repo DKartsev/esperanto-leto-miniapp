@@ -410,7 +410,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   <div className="flex items-center text-xs text-gray-600 mt-1">
                     <span>{chapterProgress[chapter.id].average_accuracy}% верно</span>
                     {chapterProgress[chapter.id].completed && (
-                      <Check className="w-4 h-4 text-green-600 ml-2" title="Глава завершена" />
+                      <Check className="w-4 h-4 text-green-600 ml-2" />
                     )}
                   </div>
                 </>
