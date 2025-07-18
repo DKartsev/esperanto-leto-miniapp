@@ -130,6 +130,12 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (window.location.pathname === '/account') {
+      setActiveTab('account');
+    }
+  }, []);
+
   const features = [
     {
       icon: <Shield className="w-8 h-8" />,
