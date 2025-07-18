@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js'
+export * from './progressService.js'
 
 export async function updateChapterProgress(user_id: string, chapter_id: number): Promise<void> {
   const { data: allSections } = await supabase
@@ -48,7 +49,7 @@ export async function updateChapterProgress(user_id: string, chapter_id: number)
           average_accuracy: avgAccuracy,
           total_time: totalTime
         },
-        { onConflict: ['user_id', 'chapter_id'].join(',') }
+        { onConflict: ['user_id', 'chapter_id'] as any }
       )
   }
 }
