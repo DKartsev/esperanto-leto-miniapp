@@ -5,6 +5,7 @@ import App from './App.tsx';
 import AdminPanelPage from './pages/AdminPanelPage';
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
+import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
 import AuthCallback from './pages/AuthCallback';
 
 // Hide loading screen when React app mounts
@@ -23,13 +24,15 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <SupabaseAuthProvider>
-        <Routes>
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/admin-panel" element={<AdminPanelPage />} />
-          <Route path="/*" element={<App />} />
-        </Routes>
-      </SupabaseAuthProvider>
+      <TelegramWebAppProvider>
+        <SupabaseAuthProvider>
+          <Routes>
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/admin-panel" element={<AdminPanelPage />} />
+            <Route path="/*" element={<App />} />
+          </Routes>
+        </SupabaseAuthProvider>
+      </TelegramWebAppProvider>
     </BrowserRouter>
   </StrictMode>
 );
