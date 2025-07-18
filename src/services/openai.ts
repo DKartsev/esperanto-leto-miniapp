@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+const env = import.meta.env as any;
 
 // Rate limiting configuration
 interface RateLimitConfig {
@@ -27,7 +28,7 @@ class OpenAIService {
   private initializeClient() {
     try {
       // Validate environment variables
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+      const apiKey = env.VITE_OPENAI_API_KEY;
       
       if (!apiKey || apiKey === 'your_openai_api_key_here' || apiKey === 'your_openai_api_key') {
         console.warn('OpenAI API key is not configured properly');
@@ -35,7 +36,7 @@ class OpenAIService {
       }
 
       // Get organization ID if provided and not empty
-      const orgId = import.meta.env.VITE_OPENAI_ORG_ID;
+      const orgId = env.VITE_OPENAI_ORG_ID;
       const organizationId = orgId && orgId.trim() !== '' && orgId !== 'YOUR_ORG_ID' ? orgId : undefined;
 
       // Initialize OpenAI client
@@ -161,10 +162,10 @@ class OpenAIService {
         console.log(`🤖 Sending request to OpenAI (attempt ${attempt}/${this.maxRetries})`);
         
         const completion = await this.client.chat.completions.create({
-          model: import.meta.env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo',
+          model: env.VITE_OPENAI_MODEL || 'gpt-3.5-turbo',
           messages,
-          max_tokens: parseInt(import.meta.env.VITE_OPENAI_MAX_TOKENS || '500'),
-          temperature: parseFloat(import.meta.env.VITE_OPENAI_TEMPERATURE || '0.7'),
+          max_tokens: parseInt(env.VITE_OPENAI_MAX_TOKENS || '500'),
+          temperature: parseFloat(env.VITE_OPENAI_TEMPERATURE || '0.7'),
           response_format: { type: 'json_object' },
           user: `esperanto-learner-${Date.now()}` // Unique user identifier
         });
@@ -223,15 +224,15 @@ class OpenAIService {
           }
         }
 
-        if (error.status === 401) {
+        if ((error as any).status === 401) {
           throw new Error('Ошибка авторизации API. Проверьте правильность API ключа в настройках.');
         }
 
-        if (error.status === 403) {
+        if ((error as any).status === 403) {
           throw new Error('Доступ запрещен. Проверьте права API ключа или активируйте биллинг.');
         }
 
-        if (error.status >= 500) {
+        if ((error as any).status >= 500) {
           if (attempt < this.maxRetries) {
             console.log(`🔄 Server error, retrying in ${this.retryDelay * attempt}ms`);
             await this.delay(this.retryDelay * attempt);
@@ -241,7 +242,7 @@ class OpenAIService {
         }
 
         // Network errors
-        if (error.code === 'NETWORK_ERROR' || error.message.includes('fetch')) {
+        if ((error as any).code === 'NETWORK_ERROR' || (error as any).message.includes('fetch')) {
           if (attempt < this.maxRetries) {
             console.log(`🌐 Network error, retrying in ${this.retryDelay * attempt}ms`);
             await this.delay(this.retryDelay * attempt);
@@ -252,9 +253,9 @@ class OpenAIService {
 
         // Final attempt failed
         if (attempt === this.maxRetries) {
-          throw new Error(
-            error.message || 'Произошла неизвестная ошибка при обращении к AI'
-          );
+            throw new Error(
+              (error as any).message || 'Произошла неизвестная ошибка при обращении к AI'
+            );
         }
       }
     }
@@ -287,7 +288,7 @@ class OpenAIService {
 
   // Check if service is properly configured
   isConfigured(): boolean {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const apiKey = env.VITE_OPENAI_API_KEY;
     return !!(this.client && apiKey && apiKey !== 'your_openai_api_key_here' && apiKey !== 'your_openai_api_key');
   }
 

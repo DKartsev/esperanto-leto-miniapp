@@ -225,16 +225,16 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
   const handleSaveChapter = (chapterData: Partial<Chapter>) => {
     if (editingItem?.data) {
       // Edit existing chapter
-      setChapters(prev => prev.map(ch => 
-        ch.id === editingItem.data.id ? { ...ch, ...chapterData } : ch
+      setChapters(prev => prev.map(ch =>
+        ch.id === editingItem!.data!.id ? { ...ch, ...chapterData } : ch
       ));
     } else {
       // Add new chapter
-      const newChapter: Chapter = {
+      const newChapter = {
         id: Math.max(...chapters.map(ch => ch.id)) + 1,
         ...chapterData,
         sections: []
-      };
+      } as Chapter;
       setChapters(prev => [...prev, newChapter]);
     }
     setShowAddModal(false);
@@ -256,7 +256,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
   };
 
   const handleSaveSection = (sectionData: Partial<Section>) => {
-    const chapterId = editingItem?.chapterId;
+    const chapterId = (editingItem as any)?.chapterId;
     if (!chapterId) return;
 
     setChapters(prev => prev.map(chapter => {
@@ -265,18 +265,18 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
           // Edit existing section
           return {
             ...chapter,
-            sections: chapter.sections.map(section =>
-              section.id === editingItem.data.id ? { ...section, ...sectionData } : section
-            )
+              sections: chapter.sections.map(section =>
+                section.id === editingItem!.data!.id ? { ...section, ...sectionData } : section
+              )
           };
         } else {
           // Add new section
-          const newSection: Section = {
+          const newSection = {
             id: Math.max(...chapter.sections.map(s => s.id), 0) + 1,
             ...sectionData,
             theoryBlocks: [],
             questions: []
-          };
+          } as Section;
           return {
             ...chapter,
             sections: [...chapter.sections, newSection]

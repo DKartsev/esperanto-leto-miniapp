@@ -59,7 +59,7 @@ function App() {
 
   // Telegram WebApp detection - более точная проверка
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
-  const [telegramUser, setTelegramUser] = useState<unknown>(null);
+  const [telegramUser, setTelegramUser] = useState<any>(null);
   const [showNavigation, setShowNavigation] = useState(true);
 
   useEffect(() => {
@@ -175,7 +175,8 @@ function App() {
 
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
-    return isAdmin(profile?.username, profile?.email);
+    const user = profile as any;
+    return isAdmin(user?.username, user?.email);
   };
 
   // Базовые элементы навигации
@@ -195,9 +196,11 @@ function App() {
     if (tabId === 'admin') {
       if (hasAdminAccess()) {
         setShowAdminPanel(true);
-        console.log(`🔐 Открытие административной панели для пользователя: ${profile?.username}`);
+        const user = profile as any;
+        console.log(`🔐 Открытие административной панели для пользователя: ${user?.username}`);
       } else {
-        console.log(`❌ Отказ в доступе к административной панели для пользователя: ${profile?.username}`);
+        const user = profile as any;
+        console.log(`❌ Отказ в доступе к административной панели для пользователя: ${user?.username}`);
         alert('У вас нет прав доступа к административной панели.');
       }
       return;
@@ -226,13 +229,13 @@ function App() {
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
-        const { achievements } = await saveTestResults(
+        const { achievements } = await (saveTestResults(
           selectedChapter,
           selectedSection,
           results.correctAnswers,
           results.totalQuestions,
           0
-        );
+        ) as any);
         setEarnedAchievements(achievements);
         await refreshStats();
       } catch (err) {
@@ -344,9 +347,10 @@ function App() {
   // Render Admin Panel
   if (showAdminPanel) {
     return (
-      <AdminPanel 
-        onClose={() => setShowAdminPanel(false)} 
-        currentUser={profile?.username || ''}
+      <AdminPanel
+        onClose={() => setShowAdminPanel(false)}
+        currentUser={(profile as any)?.username || ''}
+        currentEmail={(profile as any)?.email || ''}
       />
     );
   }
@@ -400,8 +404,8 @@ function App() {
       case 'results':
         return (
           <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
-            <TestResults 
-              results={testResults}
+            <TestResults
+              results={testResults!}
               onSaveResults={handleSaveResults}
               onRetakeTest={handleRetakeTest}
             />
@@ -417,9 +421,9 @@ function App() {
       case 'chapters':
         return (
           <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
-            <ChaptersList 
-              onChapterSelect={handleChapterSelect} 
-              currentUser={profile?.username}
+            <ChaptersList
+              onChapterSelect={handleChapterSelect}
+              currentUser={(profile as any)?.username}
             />
             <NavigationBar />
           </div>
@@ -447,7 +451,7 @@ function App() {
       case 'section-complete':
         return (
           <SectionComplete
-            results={sectionResults}
+            results={sectionResults!}
             chapterId={selectedChapter!}
             sectionId={selectedSection!}
             achievements={earnedAchievements}

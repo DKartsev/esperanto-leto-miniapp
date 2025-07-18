@@ -27,7 +27,7 @@ const SupabaseAuthContext = createContext<AuthContextValue | null>(null)
  * @param {React.ReactNode} props.children - Дочерние компоненты
  */
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
-  const auth = useAuthHook()
+  const auth = useAuthHook() as unknown as AuthContextValue
 
   return (
     <SupabaseAuthContext.Provider value={auth}>

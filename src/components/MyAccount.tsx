@@ -32,7 +32,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     signOut,
     isAuthenticated,
     updateProfile
-  } = useAuth();
+  } = useAuth() as any;
   const navigate = useNavigate();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(profile?.username || '');
@@ -398,7 +398,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
               Достижения
             </h2>
             <ul className="list-disc pl-5 space-y-1">
-              {achievements.map((a, idx) => (
+              {achievements.map((a: any, idx: number) => (
                 <li key={idx} className="text-yellow-700">{a.achievement_type}</li>
               ))}
             </ul>
