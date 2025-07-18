@@ -1,6 +1,6 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
+import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle, Pencil, X, Check } from 'lucide-react';
 import { useAuth } from './SupabaseAuthProvider';
 import MagicLinkLogin from './MagicLinkLogin';
 import LoginByEmail from './LoginByEmail';
@@ -11,10 +11,16 @@ interface MyAccountProps {
 }
 
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
-  const { user, profile, stats, achievements, loading, signOut, isAuthenticated } = useAuth();
+  const { user, profile, stats, achievements, loading, signOut, isAuthenticated, updateProfile } = useAuth();
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState(profile?.username || '');
+
+  useEffect(() => {
+    setNewUsername(profile?.username || '');
+  }, [profile]);
 
   const handleLogout = async () => {
     try {
@@ -23,6 +29,25 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     } catch (error) {
       console.error('❌ Ошибка выхода:', error);
     }
+  };
+
+  const handleUsernameSave = async () => {
+    try {
+      if (!newUsername || newUsername === profile?.username) {
+        setIsEditingUsername(false);
+        return;
+      }
+
+      await updateProfile({ username: newUsername });
+      setIsEditingUsername(false);
+    } catch (error) {
+      console.error('Ошибка обновления имени пользователя:', error);
+    }
+  };
+
+  const handleUsernameCancel = () => {
+    setNewUsername(profile?.username || '');
+    setIsEditingUsername(false);
   };
 
   const formatTime = (minutes: number): string => {
@@ -162,12 +187,35 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 <User className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-emerald-900">
-                  {profile?.username || user?.email?.split('@')[0] || 'Пользователь'}
-                </h1>
-                <p className="text-emerald-700">
-                  {user?.email}
-                </p>
+                {isEditingUsername ? (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      className="border rounded-lg px-2 py-1 text-sm"
+                    />
+                    <button onClick={handleUsernameSave} className="text-emerald-600">
+                      <Check className="w-5 h-5" />
+                    </button>
+                    <button onClick={handleUsernameCancel} className="text-red-600">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <h1 className="text-2xl font-bold text-emerald-900">
+                      {profile?.username || user?.email?.split('@')[0] || 'Пользователь'}
+                    </h1>
+                    <button
+                      onClick={() => setIsEditingUsername(true)}
+                      className="text-emerald-600 hover:text-emerald-800"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                <p className="text-emerald-700">{user?.email}</p>
                 <div className="flex items-center space-x-2 mt-1">
                   <span className="text-sm text-emerald-600 font-medium">
                     {stats?.level || 'Начинающий'}
