@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   getUserProfile,
+  updateUserProfile as authUpdateUserProfile,
   onAuthStateChange,
   signIn as authSignIn,
   signUp as authSignUp,
@@ -164,6 +165,23 @@ export function useSupabaseAuth() {
     }
   }
 
+  const updateProfile = async (updates) => {
+    if (!user) return null
+    try {
+      setLoading(true)
+      setError(null)
+
+      const updated = await authUpdateUserProfile(user.id, updates)
+      setProfile(updated)
+      return updated
+    } catch (err) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Обновление статистики
   const refreshStats = async () => {
     if (!user) return
@@ -198,6 +216,7 @@ export function useSupabaseAuth() {
     signIn,
     signUp,
     signOut,
+    updateProfile,
     refreshStats,
     
     // Утилиты
