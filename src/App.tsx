@@ -34,6 +34,7 @@ import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService.js';
+import { isAdmin } from './utils/adminUtils.js';
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
@@ -168,7 +169,7 @@ function App() {
 
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
-    return profile?.username?.toLowerCase() === 'admin5050';
+    return isAdmin(profile?.username, profile?.email);
   };
 
   // Базовые элементы навигации

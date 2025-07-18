@@ -2,9 +2,9 @@ import { useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Mail, Loader } from 'lucide-react'
 import { supabase } from '../services/supabaseClient.js'
+import { ADMIN_EMAIL } from '../utils/adminUtils.js'
 
 const EMAIL_REDIRECT = 'https://tgminiapp.esperanto-leto.ru/auth/callback'
-const ADMIN_EMAIL = 'admin5050@gmail.com'
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin'
 
 export interface MagicLinkLoginProps {

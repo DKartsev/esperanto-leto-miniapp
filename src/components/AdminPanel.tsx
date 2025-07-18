@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import DataExporter from './DataExporter';
 import esperantoData, { Chapter, Section } from '../data/esperantoData';
+import { isAdmin } from '../utils/adminUtils.js';
 
 interface AdminUser {
   id: string;
@@ -54,6 +55,7 @@ interface SystemStats {
 interface AdminPanelProps {
   onClose: () => void;
   currentUser: string;
+  currentEmail: string;
 }
 
 type EditingItem =
@@ -62,7 +64,7 @@ type EditingItem =
 
 type AdminTab = 'content' | 'users' | 'analytics' | 'settings';
 
-const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
+const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('content');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -90,16 +92,14 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
   });
 
   const checkAdminAccess = useCallback(() => {
-    // In a real application, this would check against a backend
-    const adminUsers = ['admin5050', 'admin', 'administrator'];
-    if (adminUsers.includes(currentUser.toLowerCase())) {
+    if (isAdmin(currentUser, currentEmail)) {
       setIsAuthorized(true);
-      console.log(`✅ Admin access granted for user: ${currentUser}`);
+      console.log(`✅ Admin access granted for user: ${currentUser || currentEmail}`);
     } else {
       setAuthError('У вас нет прав администратора для доступа к этой панели.');
-      console.log(`❌ Admin access denied for user: ${currentUser}`);
+      console.log(`❌ Admin access denied for user: ${currentUser || currentEmail}`);
     }
-  }, [currentUser]);
+  }, [currentUser, currentEmail]);
 
   const loadSystemData = useCallback(async () => {
     try {
@@ -216,7 +216,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
   const handleDeleteChapter = (chapterId: number) => {
     if (confirm('Вы уверены, что хотите удалить эту главу? Это действие нельзя отменить.')) {
       setChapters(prev => prev.filter(ch => ch.id !== chapterId));
-      console.log(`Chapter ${chapterId} deleted by admin ${currentUser}`);
+      console.log(
+        `Chapter ${chapterId} deleted by admin ${currentUser || currentEmail}`
+      );
     }
   };
 
@@ -300,7 +302,9 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
           ? { ...user, totalProgress: 0, chaptersCompleted: 0, testsCompleted: 0, currentChapter: 1, currentSection: 1 }
           : user
       ));
-      console.log(`User progress reset for ${userId} by admin ${currentUser}`);
+      console.log(
+        `User progress reset for ${userId} by admin ${currentUser || currentEmail}`
+      );
     }
   };
 
@@ -349,7 +353,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser }) => {
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-600">
-              Администратор: <span className="font-semibold text-emerald-600">{currentUser}</span>
+              Администратор: <span className="font-semibold text-emerald-600">{currentUser || currentEmail}</span>
             </div>
             <button
               onClick={onClose}
