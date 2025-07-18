@@ -46,7 +46,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const handleLogout = async () => {
     try {
       await signOut();
-      console.log('🚪 Пользователь вышел из системы');
     } catch (error) {
       console.error('❌ Ошибка выхода:', error);
     }
@@ -137,7 +136,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
   // Initial Login Screen
   if (!isAuthenticated) {
-    if (telegramUser) {
+    if (loginLoading) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center">
           <div className="text-center">
