@@ -92,9 +92,21 @@ export function useSupabaseAuth() {
       }
     })
 
+    const handleStorage = async (e) => {
+      if (e.key === 'supabase_session_updated') {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (mounted) {
+          await loadUserData(session?.user || null)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+
     return () => {
       mounted = false
       subscription?.unsubscribe()
+      window.removeEventListener('storage', handleStorage)
     }
   }, [])
 
