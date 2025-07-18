@@ -93,7 +93,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="w-full max-w-md mx-auto px-4 space-y-4">
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={onBackToChapters}
@@ -111,10 +111,8 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
 
       <div className="grid gap-4">
         {sections.map((section) => (
-          <div
-            key={section.id}
-            className="bg-gradient-to-r from-emerald-50 to-green-100 border border-emerald-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
-          >
+          <div key={section.id} className="w-full max-w-md mx-auto px-4">
+            <div className="bg-white rounded-xl shadow-md p-4 mb-4">
             {/* Theory Block */}
             {section.theory && (
               <div className="border-b border-emerald-200">
@@ -212,13 +210,14 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
 
               <button
                 onClick={() => onSectionSelect(section.id)}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                className="w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow"
               >
                 <Play className="w-5 h-5" />
                 <span>Начать изучение</span>
               </button>
             </div>
           </div>
+        </div>
         ))}
       </div>
 
