@@ -542,9 +542,9 @@ function App() {
               )}
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <button 
+                <button
                   onClick={() => handleTabClick('home')}
-                  className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                  className="bg-green-600 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 ease-in-out text-white px-8 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center space-x-2 shadow"
                 >
                   <Download className="w-5 h-5" />
                   <span>{isTelegramWebApp ? 'Начать изучение' : 'Открыть в Telegram'}</span>
@@ -784,9 +784,9 @@ function App() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
+            <button
               onClick={() => handleTabClick('home')}
-              className="bg-white text-emerald-600 px-8 py-4 rounded-2xl font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+              className="bg-green-600 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 ease-in-out text-white px-8 py-4 rounded-2xl font-semibold text-lg flex items-center space-x-2 shadow"
             >
               <MessageCircle className="w-5 h-5" />
               <span>
