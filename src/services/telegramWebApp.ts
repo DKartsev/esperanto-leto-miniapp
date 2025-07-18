@@ -73,6 +73,7 @@ interface TelegramWebApp {
   sendData(data: string): void;
   openLink(url: string): void;
   openTelegramLink(url: string): void;
+  openTelegramLink(url: string): void;
   showPopup(params: {
     title?: string;
     message: string;
@@ -264,6 +265,14 @@ class TelegramWebAppService {
 
   openLink(url: string) {
     this.webApp?.openLink(url);
+  }
+
+  openTelegramLink(url: string) {
+    if (this.webApp) {
+      this.webApp.openTelegramLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
   }
 
   // Theme utilities
