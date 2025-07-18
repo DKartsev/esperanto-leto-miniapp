@@ -4,7 +4,7 @@ import { useAuth } from '../components/SupabaseAuthProvider';
 
 const AdminPanelPage = () => {
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile } = useAuth() as any;
   return (
     <AdminPanel
       onClose={() => navigate('/')}

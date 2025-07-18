@@ -5,7 +5,7 @@ import { saveProgress } from '../services/progressService.js'
 import { useAuth } from './SupabaseAuthProvider'
 
 
-interface QuestionResultItem {
+export interface QuestionResultItem {
   questionId: number;
   question: string;
   selectedAnswer: string;
@@ -14,7 +14,7 @@ interface QuestionResultItem {
   hintsUsed: number;
 }
 
-interface QuestionResults {
+export interface QuestionResults {
   totalQuestions: number;
   correctAnswers: number;
   incorrectAnswers: QuestionResultItem[];

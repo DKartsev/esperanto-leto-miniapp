@@ -86,7 +86,7 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
     showAlert: telegramWebApp.showAlert.bind(telegramWebApp),
     showConfirm: telegramWebApp.showConfirm.bind(telegramWebApp),
     hapticFeedback: telegramWebApp.hapticFeedback.bind(telegramWebApp),
-    setMainButton: telegramWebApp.setMainButton.bind(telegramWebApp),
+    setMainButton: telegramWebApp.setMainButton.bind(telegramWebApp) as any,
     hideMainButton: telegramWebApp.hideMainButton.bind(telegramWebApp),
     showBackButton: telegramWebApp.showBackButton.bind(telegramWebApp),
     hideBackButton: telegramWebApp.hideBackButton.bind(telegramWebApp),
