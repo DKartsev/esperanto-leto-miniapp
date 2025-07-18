@@ -82,6 +82,55 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
   const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
+  async function loadChapterStats() {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) return;
+
+    const { data: chapters, error } = await supabase
+      .from('user_chapter_progress')
+      .select('average_accuracy, total_time, completed')
+      .eq('user_id', user_id);
+
+    if (error) {
+      console.error('Ошибка загрузки прогресса глав:', error);
+      return;
+    }
+
+    let totalTime = 0;
+    let averageAccuracy = 0;
+    let completedChapters = 0;
+
+    if (chapters && chapters.length > 0) {
+      totalTime = chapters.reduce((sum, row) => sum + row.total_time, 0);
+      averageAccuracy = Math.round(
+        chapters.reduce((sum, row) => sum + row.average_accuracy, 0) /
+          chapters.length
+      );
+      completedChapters = chapters.filter((row) => row.completed).length;
+    }
+
+    const { count: totalChapters, error: chaptersError } = await supabase
+      .from('chapters')
+      .select('id', { count: 'exact', head: true });
+
+    if (chaptersError) {
+      console.error('Ошибка получения количества глав:', chaptersError);
+    }
+
+    const totalCh = totalChapters ?? 0;
+    const progress = totalCh
+      ? Math.round((completedChapters / totalCh) * 100)
+      : 0;
+
+    setChapterStats({
+      totalTime: Math.round(totalTime / 60),
+      averageAccuracy,
+      completedChapters,
+      totalChapters: totalCh,
+      progress
+    });
+  }
+
   const handleTelegramLogin = async () => {
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (!tgUser) {
@@ -106,6 +155,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       setLoginError('Ошибка создания профиля');
     } else {
       localStorage.setItem('user_id', userUUID);
+      await loadChapterStats();
     }
     setLoginLoading(false);
   };
@@ -119,57 +169,10 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   }, [isAuthenticated, telegramUser]);
 
   useEffect(() => {
-    const loadChapterStats = async () => {
-      const user_id = localStorage.getItem('user_id');
-      if (!user_id) return;
-
-      const { data: chapters, error } = await supabase
-        .from('user_chapter_progress')
-        .select('average_accuracy, total_time, completed')
-        .eq('user_id', user_id);
-
-      if (error) {
-        console.error('Ошибка загрузки прогресса глав:', error);
-        return;
-      }
-
-      let totalTime = 0;
-      let averageAccuracy = 0;
-      let completedChapters = 0;
-      
-      if (chapters && chapters.length > 0) {
-        totalTime = chapters.reduce((sum, row) => sum + row.total_time, 0);
-        averageAccuracy = Math.round(
-          chapters.reduce((sum, row) => sum + row.average_accuracy, 0) /
-            chapters.length
-        );
-        completedChapters = chapters.filter((row) => row.completed).length;
-      }
-
-      const { count: totalChapters, error: chaptersError } = await supabase
-        .from('chapters')
-        .select('id', { count: 'exact', head: true });
-
-      if (chaptersError) {
-        console.error('Ошибка получения количества глав:', chaptersError);
-      }
-
-      const totalCh = totalChapters ?? 0;
-      const progress = totalCh
-        ? Math.round((completedChapters / totalCh) * 100)
-        : 0;
-
-      setChapterStats({
-        totalTime: Math.round(totalTime / 60),
-        averageAccuracy,
-        completedChapters,
-        totalChapters: totalCh,
-        progress
-      });
-    };
-
-    loadChapterStats();
-  }, []);
+    if (isAuthenticated) {
+      loadChapterStats();
+    }
+  }, [isAuthenticated]);
 
   const navigateRef = useRef(false);
 
