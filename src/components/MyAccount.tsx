@@ -9,6 +9,7 @@ import {
   Clock,
   BookOpen,
   CheckCircle,
+  TrendingUp,
   Pencil,
   X,
   Check
@@ -27,6 +28,7 @@ interface ChapterStats {
   averageAccuracy: number;
   completedChapters: number;
   totalChapters: number;
+  progress: number;
 }
 
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
@@ -134,7 +136,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       let totalTime = 0;
       let averageAccuracy = 0;
       let completedChapters = 0;
-
+      
       if (chapters && chapters.length > 0) {
         totalTime = chapters.reduce((sum, row) => sum + row.total_time, 0);
         averageAccuracy = Math.round(
@@ -152,11 +154,17 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
         console.error('Ошибка получения количества глав:', chaptersError);
       }
 
+      const totalCh = totalChapters ?? 0;
+      const progress = totalCh
+        ? Math.round((completedChapters / totalCh) * 100)
+        : 0;
+
       setChapterStats({
-        totalTime,
+        totalTime: Math.round(totalTime / 60),
         averageAccuracy,
         completedChapters,
-        totalChapters: totalChapters ?? 0
+        totalChapters: totalCh,
+        progress
       });
     };
 
@@ -367,6 +375,10 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                       <span>Средняя точность: {chapterStats.averageAccuracy}%</span>
                     </div>
                     <div className="flex items-center">
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      <span>Общий прогресс: {chapterStats.progress}%</span>
+                    </div>
+                    <div className="flex items-center">
                       <CheckCircle className="w-4 h-4 mr-1" />
                       <span>
                         Пройдено глав: {chapterStats.completedChapters} из {chapterStats.totalChapters}
@@ -468,33 +480,27 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
         )}
 
         {/* Progress Overview */}
-        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-emerald-900 mb-4">
-            Общий прогресс
-          </h2>
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-emerald-700">Прогресс курса</span>
-              <span className="text-emerald-600 font-semibold">{stats?.progress || 0}%</span>
+        {chapterStats && (
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4">Общий прогресс</h2>
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-emerald-700">Прогресс курса</span>
+                <span className="text-emerald-600 font-semibold">{chapterStats.progress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className={`h-3 rounded-full transition-all duration-500 ${chapterStats.progress > 70 ? 'bg-green-500' : 'bg-gray-400'}`}
+                  style={{ width: `${chapterStats.progress}%` }}
+                ></div>
+              </div>
             </div>
-            <div className="w-full bg-emerald-200 rounded-full h-3">
-              <div
-                className="bg-gradient-to-r from-emerald-500 to-green-600 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${stats?.progress || 0}%` }}
-              ></div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-emerald-600">Всего ответов:</span>
-              <span className="ml-2 font-semibold">{stats?.totalAnswers || 0}</span>
-            </div>
-            <div>
-              <span className="text-emerald-600">Правильных:</span>
-              <span className="ml-2 font-semibold">{stats?.correctAnswers || 0}</span>
+            <div className="space-y-1 text-sm text-emerald-700">
+              <div>Средняя точность: {chapterStats.averageAccuracy}%</div>
+              <div>Общее время обучения: {chapterStats.totalTime} минут</div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Achievements */}
         {achievements && achievements.length > 0 && (
