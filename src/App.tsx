@@ -35,7 +35,7 @@ import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService.js';
-import { updateChapterProgress } from './services/progressService.ts';
+import { updateChapterProgress } from './services/progressService';
 import { supabase } from './services/supabaseClient.js';
 import { isAdmin } from './utils/adminUtils.js';
 
