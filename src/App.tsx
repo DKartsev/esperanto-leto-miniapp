@@ -35,6 +35,7 @@ import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService.js';
+import { supabase } from './services/supabaseClient.js';
 import { isAdmin } from './utils/adminUtils.js';
 
 function App() {
@@ -280,8 +281,33 @@ function App() {
     setTestView('test');
   };
 
-  const handleTestComplete = (results: FullTestResults) => {
+  const handleTestComplete = async (results: FullTestResults) => {
     setTestResults(results);
+
+    const correct = results.answers?.filter(a => a.isCorrect).length || 0;
+    const total = results.totalQuestions || 1;
+    const accuracy = Math.round((correct / total) * 100);
+    const timeSpent = results.timeSpent || 0;
+    const user_id = localStorage.getItem('user_id');
+
+    if (user_id) {
+      try {
+        await supabase.from('user_progress').upsert(
+          {
+            user_id,
+            chapter_id: 0,
+            section_id: 0,
+            accuracy,
+            time_spent: timeSpent,
+            completed: accuracy >= 70
+          },
+          { onConflict: 'user_id,section_id' }
+        );
+      } catch (err) {
+        console.error('Error saving progress', err);
+      }
+    }
+
     setTestView('results');
   };
 
