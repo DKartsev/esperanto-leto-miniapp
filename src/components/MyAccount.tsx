@@ -40,7 +40,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     loading,
     signOut,
     isAuthenticated,
-    updateProfile
+    updateProfile,
+    refreshStats
   } = useAuth() as any;
   const navigate = useNavigate();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -158,6 +159,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       await loadChapterStats();
     }
     setLoginLoading(false);
+    await refreshStats();
   };
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -169,9 +171,57 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   }, [isAuthenticated, telegramUser]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadChapterStats();
-    }
+    const fetchStats = async () => {
+      if (!isAuthenticated) return;
+      const user_id = localStorage.getItem('user_id');
+      if (!user_id) return;
+
+      const { data: chapters, error } = await supabase
+        .from('user_chapter_progress')
+        .select('average_accuracy, total_time, completed')
+        .eq('user_id', user_id);
+
+      if (error) {
+        console.error('Ошибка загрузки прогресса глав:', error);
+        return;
+      }
+
+      let totalTime = 0;
+      let averageAccuracy = 0;
+      let completedChapters = 0;
+
+      if (chapters && chapters.length > 0) {
+        totalTime = chapters.reduce((sum, row) => sum + row.total_time, 0);
+        averageAccuracy = Math.round(
+          chapters.reduce((sum, row) => sum + row.average_accuracy, 0) /
+            chapters.length
+        );
+        completedChapters = chapters.filter(row => row.completed).length;
+      }
+
+      const { count: totalChapters, error: chaptersError } = await supabase
+        .from('chapters')
+        .select('id', { count: 'exact', head: true });
+
+      if (chaptersError) {
+        console.error('Ошибка получения количества глав:', chaptersError);
+      }
+
+      const totalCh = totalChapters ?? 0;
+      const progress = totalCh
+        ? Math.round((completedChapters / totalCh) * 100)
+        : 0;
+
+      setChapterStats({
+        totalTime: Math.round(totalTime / 60),
+        averageAccuracy,
+        completedChapters,
+        totalChapters: totalCh,
+        progress
+      });
+    };
+
+    fetchStats();
   }, [isAuthenticated]);
 
   const navigateRef = useRef(false);
@@ -501,6 +551,29 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
             <div className="space-y-1 text-sm text-emerald-700">
               <div>Средняя точность: {chapterStats.averageAccuracy}%</div>
               <div>Общее время обучения: {chapterStats.totalTime} минут</div>
+            </div>
+          </div>
+        )}
+
+        {chapterStats && (
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-emerald-700">
+              <div className="flex items-center space-x-2">
+                <BookOpen className="w-5 h-5" />
+                <span>Всего глав: {chapterStats.totalChapters}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Пройдено глав: {chapterStats.completedChapters}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Trophy className="w-5 h-5" />
+                <span>Средняя точность: {chapterStats.averageAccuracy}%</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-5 h-5" />
+                <span>Общее время: {formatTime(chapterStats.totalTime)}</span>
+              </div>
             </div>
           </div>
         )}
