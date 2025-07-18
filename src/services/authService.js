@@ -116,13 +116,15 @@ export async function signOut() {
  * @returns {Promise<Object|null>} Данные пользователя или null
  */
 export async function getCurrentUser() {
+  const storedId = localStorage.getItem('user_id')
+  if (storedId) {
+    return { id: storedId }
+  }
+
   try {
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error) {
-      // When no active session is found Supabase returns an error
-      // with message "Auth session missing!". In this case we simply
-      // return null to indicate that the user is not authenticated.
       if (error.message && error.message.includes('Auth session missing')) {
         return null
       }
