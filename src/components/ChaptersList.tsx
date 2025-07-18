@@ -202,7 +202,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </div>
               <button
                 onClick={() => onChapterSelect(recommendedChapter.id)}
-                className="w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow"
+                className="w-full h-12 px-4 py-2 rounded-xl flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 ease-in-out text-white font-semibold shadow"
               >
                 <Play className="w-4 h-4" />
                 <span>Начать</span>
@@ -367,12 +367,12 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               <button
                 onClick={() => onChapterSelect(chapter.id)}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold shadow transition-colors duration-200 ${
+                className={`w-full h-12 px-4 py-2 rounded-xl flex items-center justify-center gap-2 font-semibold shadow transition-all duration-300 ease-in-out ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : hasAdminAccess() && chapter.isLocked
-                    ? 'bg-green-600 hover:bg-green-700 text-white border-2 border-emerald-400'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                    ? 'bg-green-600 text-white border-2 border-emerald-400 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg'
+                    : 'bg-green-600 text-white hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg'
                 }`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (

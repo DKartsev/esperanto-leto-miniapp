@@ -210,7 +210,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
 
               <button
                 onClick={() => onSectionSelect(section.id)}
-                className="w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow"
+                className="w-full h-12 px-4 py-2 rounded-xl flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 ease-in-out text-white font-semibold shadow"
               >
                 <Play className="w-5 h-5" />
                 <span>Начать изучение</span>
