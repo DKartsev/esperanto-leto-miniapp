@@ -1,7 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
-import { saveAnswer } from '../services/progressService.js'
+import { saveProgress } from '../services/progressService.js'
 import { useAuth } from './SupabaseAuthProvider'
 
 
@@ -153,12 +153,12 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     }
 
     try {
-      await saveAnswer(
+      await saveProgress(
         chapterId,
         sectionId,
         currentQuestionData.id,
-        correct,
         answer,
+        correct,
         0
       )
       await refreshStats()

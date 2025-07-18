@@ -9,7 +9,7 @@ interface MyAccountProps {
 }
 
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
-  const { user, profile, stats, loading, signOut, isAuthenticated } = useAuth();
+  const { user, profile, stats, achievements, loading, signOut, isAuthenticated } = useAuth();
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -301,6 +301,21 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
             </div>
           </div>
         </div>
+
+        {/* Achievements */}
+        {achievements && achievements.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-yellow-200 p-6 mb-6">
+            <h2 className="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
+              <Trophy className="w-5 h-5 mr-2" />
+              Достижения
+            </h2>
+            <ul className="list-disc pl-5 space-y-1">
+              {achievements.map((a, idx) => (
+                <li key={idx} className="text-yellow-700">{a.achievement_type}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Recent Activity */}
         <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">

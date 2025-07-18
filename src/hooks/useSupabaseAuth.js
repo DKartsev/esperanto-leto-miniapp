@@ -7,7 +7,7 @@ import {
   signOut as authSignOut
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
-import { getUserStats } from '../services/progressService.js'
+import { getUserStats, getUserAchievements } from '../services/progressService.js'
 
 /**
  * Хук для работы с аутентификацией Supabase
@@ -17,6 +17,7 @@ export function useSupabaseAuth() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [stats, setStats] = useState(null)
+  const [achievements, setAchievements] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -34,15 +35,17 @@ export function useSupabaseAuth() {
       setLoading(true)
       setError(null)
 
-      // Загружаем профиль и статистику параллельно
-      const [userProfile, userStats] = await Promise.all([
+      // Загружаем профиль, статистику и достижения параллельно
+      const [userProfile, userStats, userAchievements] = await Promise.all([
         getUserProfile(currentUser.id),
-        getUserStats()
+        getUserStats(),
+        getUserAchievements()
       ])
 
       setUser(currentUser)
       setProfile(userProfile)
       setStats(userStats)
+      setAchievements(userAchievements)
     } catch (err) {
       console.error('Ошибка загрузки данных пользователя:', err)
       setError(err.message)
@@ -166,8 +169,12 @@ export function useSupabaseAuth() {
     if (!user) return
 
     try {
-      const userStats = await getUserStats()
+      const [userStats, userAchievements] = await Promise.all([
+        getUserStats(),
+        getUserAchievements()
+      ])
       setStats(userStats)
+      setAchievements(userAchievements)
     } catch (err) {
       console.error('Ошибка обновления статистики:', err)
     }
@@ -182,6 +189,7 @@ export function useSupabaseAuth() {
     user,
     profile,
     stats,
+    achievements,
     loading: isLoading,
     error,
     isAuthenticated,

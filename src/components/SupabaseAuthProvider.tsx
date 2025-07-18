@@ -6,6 +6,7 @@ export interface AuthContextValue {
   user: unknown
   profile: unknown
   stats: unknown
+  achievements: unknown[]
   loading: boolean
   error: string | null
   isAuthenticated: boolean
