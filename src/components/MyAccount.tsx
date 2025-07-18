@@ -1,9 +1,21 @@
 import { useState, useEffect, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle, Pencil, X, Check } from 'lucide-react';
+import {
+  User,
+  Shield,
+  LogOut,
+  Settings,
+  Trophy,
+  Clock,
+  BookOpen,
+  CheckCircle,
+  Pencil,
+  X,
+  Check
+} from 'lucide-react';
+import { v5 as uuidv5 } from 'uuid';
 import { useAuth } from './SupabaseAuthProvider';
-import MagicLinkLogin from './MagicLinkLogin';
-import LoginByEmail from './LoginByEmail';
+import { supabase } from '../services/supabaseClient.js';
 import { isAdmin } from '../utils/adminUtils.js';
 
 interface MyAccountProps {
@@ -11,12 +23,21 @@ interface MyAccountProps {
 }
 
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
-  const { user, profile, stats, achievements, loading, signOut, isAuthenticated, updateProfile } = useAuth();
-  const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const {
+    user,
+    profile,
+    stats,
+    achievements,
+    loading,
+    signOut,
+    isAuthenticated,
+    updateProfile
+  } = useAuth();
   const navigate = useNavigate();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(profile?.username || '');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [tgUsername, setTgUsername] = useState<string | null>(null);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -49,6 +70,42 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     setNewUsername(profile?.username || '');
     setIsEditingUsername(false);
   };
+
+  const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
+  const handleTelegramLogin = async () => {
+    const tg = window.Telegram?.WebApp;
+    const userData = tg?.initDataUnsafe?.user;
+    if (!userData) {
+      alert('Ошибка: Telegram не предоставил пользователя');
+      return;
+    }
+
+    setLoginLoading(true);
+    const username = userData.username || `${userData.first_name}${userData.last_name || ''}`;
+    const userUUID = uuidv5(userData.id.toString(), TELEGRAM_NAMESPACE);
+
+    const { error } = await supabase.rpc('create_user_from_telegram', {
+      uid: userUUID,
+      username,
+      email: `${userData.username || userData.id}@telegram.fake`
+    });
+
+    if (error) {
+      console.error('Ошибка создания профиля:', error);
+    } else {
+      localStorage.setItem('user_id', userUUID);
+      setTgUsername(username);
+      onBackToHome();
+    }
+    setLoginLoading(false);
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+      handleTelegramLogin();
+    }
+  }, []);
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -91,30 +148,22 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 Добро пожаловать!
               </h1>
               <p className="text-emerald-700 mb-8">
-                Зарегистрируйтесь или войдите в систему, чтобы сохранить свой прогресс и получить персональные рекомендации
+                Вы авторизуетесь через Telegram для сохранения прогресса и рекомендаций
               </p>
 
-              {/* Register Button */}
-              <div className="mb-4">
+              <div className="mb-6">
                 <button
-                  onClick={() => setShowMagicLinkModal(true)}
+                  onClick={handleTelegramLogin}
+                  disabled={loginLoading}
                   className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
                 >
-                  <User className="w-6 h-6" />
-                  <span>Зарегистрироваться</span>
+                  <span>Начать через Telegram</span>
                 </button>
               </div>
 
-              {/* Login Button */}
-              <div className="mb-6">
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="w-full border border-emerald-500 text-emerald-600 font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 hover:bg-emerald-50 shadow-lg flex items-center justify-center space-x-3"
-                >
-                  <LogIn className="w-6 h-6" />
-                  <span>Войти</span>
-                </button>
-              </div>
+              {tgUsername && (
+                <p className="text-emerald-700 mb-4">Вы вошли как @{tgUsername}</p>
+              )}
 
               {/* Security Info */}
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
@@ -159,18 +208,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
           </div>
         </div>
 
-        {/* Magic Link Login */}
-        <MagicLinkLogin
-          isOpen={showMagicLinkModal}
-          onClose={() => setShowMagicLinkModal(false)}
-          title="Регистрация"
-          buttonLabel="Зарегистрироваться"
-        />
-        {/* Login By Email */}
-        <LoginByEmail
-          isOpen={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-        />
       </>
     );
   }
