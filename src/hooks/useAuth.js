@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../services/supabaseClient.js'
 
+const EMAIL_REDIRECT = 'https://tgminiapp.esperanto-leto.ru/auth/callback'
+
 /**
  * Hook for Supabase email OTP authentication
  */
@@ -14,12 +16,29 @@ export default function useAuth() {
   useEffect(() => {
     let mounted = true
 
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
       if (mounted) {
         setUser(session?.user ?? null)
       }
-    })
+
+      if (!session) {
+        const access_token = localStorage.getItem('access_token')
+        const refresh_token = localStorage.getItem('refresh_token')
+        if (access_token && refresh_token) {
+          const { data, error } = await supabase.auth.setSession({ access_token, refresh_token })
+          if (error) {
+            console.error('Restore session error:', error)
+          } else if (mounted) {
+            setUser(data.session?.user ?? null)
+          }
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+        }
+      }
+    }
+
+    initAuth()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) {
@@ -43,7 +62,7 @@ export default function useAuth() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://tgminiapp.esperanto-leto.ru/auth/callback'
+          emailRedirectTo: EMAIL_REDIRECT
         }
       })
 
