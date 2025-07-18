@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type FC } from 'react';
 import { telegramWebApp } from '../services/telegramWebApp';
+import { telegramLogin } from '../services/telegramAuth';
 
 interface TelegramWebAppContextType {
   isAvailable: boolean;
@@ -44,6 +45,9 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
         setUser(telegramWebApp.getUser());
         setIsDarkTheme(telegramWebApp.isDarkTheme());
         setThemeParams(telegramWebApp.getThemeParams());
+        telegramLogin().catch((err) =>
+          console.error('Telegram login error:', err)
+        );
       }
     };
 
@@ -56,6 +60,7 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
         checkWebApp();
       }
     }, 100);
+
 
     // Listen for back button
     const handleBackButton = () => {
