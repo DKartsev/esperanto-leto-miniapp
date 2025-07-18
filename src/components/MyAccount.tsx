@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, useEffect, useRef, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
@@ -96,7 +96,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       setLoginError('Ошибка создания профиля');
     } else {
       localStorage.setItem('user_id', userUUID);
-      navigate('/account');
     }
     setLoginLoading(false);
   };
@@ -108,6 +107,26 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       handleTelegramLogin();
     }
   }, [isAuthenticated, telegramUser]);
+
+  const navigateRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      !navigateRef.current &&
+      telegramUser &&
+      localStorage.getItem('user_id') &&
+      profile &&
+      !loading
+    ) {
+      console.log('Navigate to /account', {
+        telegramUser,
+        user_id: localStorage.getItem('user_id'),
+        profile
+      });
+      navigateRef.current = true;
+      navigate('/account');
+    }
+  }, [telegramUser, profile, loading, navigate]);
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);

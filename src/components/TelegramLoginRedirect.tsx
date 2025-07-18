@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient.js';
+import { useAuth } from './SupabaseAuthProvider';
 
 const TelegramLoginRedirect = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const { profile, loading: authLoading } = useAuth();
+  const navigateRef = useRef(false);
 
   useEffect(() => {
     const telegramUser = window?.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -32,8 +35,8 @@ const TelegramLoginRedirect = () => {
           });
         }
 
+        localStorage.setItem('user_id', userId);
         setLoading(false);
-        navigate('/account');
       } catch (err) {
         console.error('Ошибка входа:', err);
         setLoading(false);
@@ -42,6 +45,23 @@ const TelegramLoginRedirect = () => {
 
     initProfile();
   }, [navigate]);
+
+  useEffect(() => {
+    if (
+      !navigateRef.current &&
+      profile &&
+      !authLoading &&
+      localStorage.getItem('user_id')
+    ) {
+      console.log('Navigate to /account', {
+        telegramUser: window?.Telegram?.WebApp?.initDataUnsafe?.user,
+        user_id: localStorage.getItem('user_id'),
+        profile
+      });
+      navigateRef.current = true;
+      navigate('/account');
+    }
+  }, [profile, authLoading, navigate]);
 
   if (!loading) return null;
 
