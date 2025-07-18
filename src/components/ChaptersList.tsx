@@ -1,9 +1,10 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield } from 'lucide-react';
+import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield, Check } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchChapters } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
+import { supabase } from '../services/supabaseClient.js'
 
 interface Chapter {
   id: number;
@@ -39,6 +40,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [chapterProgress, setChapterProgress] = useState<Record<number, { completed: boolean; average_accuracy: number }>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -75,6 +77,30 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       }
     }
     load()
+  }, [])
+
+  useEffect(() => {
+    const loadProgress = async () => {
+      const user_id = localStorage.getItem('user_id')
+      if (!user_id) return
+      const { data } = await supabase
+        .from('user_chapter_progress')
+        .select('chapter_id, completed, average_accuracy')
+        .eq('user_id', user_id)
+
+      if (data) {
+        const map: Record<number, { completed: boolean; average_accuracy: number }> = {}
+        data.forEach((row: any) => {
+          map[row.chapter_id] = {
+            completed: row.completed,
+            average_accuracy: row.average_accuracy
+          }
+        })
+        setChapterProgress(map)
+      }
+    }
+
+    loadProgress()
   }, [])
 
 
@@ -369,6 +395,25 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                     ></div>
                   </div>
                 </div>
+              )}
+
+              {chapterProgress[chapter.id] && (
+                <>
+                  <div className="h-2 w-full bg-neutral-200 rounded mt-2">
+                    <div
+                      className={`h-full rounded transition-all duration-300 ${
+                        chapterProgress[chapter.id].average_accuracy >= 70 ? 'bg-green-500' : 'bg-gray-400'
+                      }`}
+                      style={{ width: `${chapterProgress[chapter.id].average_accuracy}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center text-xs text-gray-600 mt-1">
+                    <span>{chapterProgress[chapter.id].average_accuracy}% верно</span>
+                    {chapterProgress[chapter.id].completed && (
+                      <Check className="w-4 h-4 text-green-600 ml-2" title="Глава завершена" />
+                    )}
+                  </div>
+                </>
               )}
 
               {/* Action Button */}
