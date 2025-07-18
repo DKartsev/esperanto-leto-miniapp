@@ -17,7 +17,14 @@ export async function updateChapterProgress(user_id: string, chapter_id: number)
 
   if (!completedSections) return
 
-  if (completedSections.length === allSections.length) {
+  if (
+    Array.isArray(completedSections) &&
+    Array.isArray(allSections) &&
+    completedSections.length === allSections.length
+  ) {
+    console.log(
+      `🎉 Все разделы главы ${chapter_id} завершены. Обновляем user_chapter_progress.`
+    )
     const { data: progressData } = await supabase
       .from('user_progress')
       .select('accuracy, time_spent')
@@ -41,7 +48,7 @@ export async function updateChapterProgress(user_id: string, chapter_id: number)
           average_accuracy: avgAccuracy,
           total_time: totalTime
         },
-        { onConflict: ['user_id', 'chapter_id'] }
+        { onConflict: 'user_id,chapter_id' }
       )
   }
 }
