@@ -74,18 +74,21 @@ export async function signUp(email, password, username) {
 export async function signIn(email, password) {
   try {
     console.log('🔐 Вход пользователя:', email)
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     })
-    
+
     if (error) throw error
-    
+
     console.log('✅ Вход выполнен успешно')
     return data
   } catch (error) {
     console.error('❌ Ошибка входа:', error.message)
+    if (error.code === 'invalid_credentials' || error.message === 'Invalid login credentials') {
+      throw new Error('Неверный email или пароль')
+    }
     throw new Error(`Ошибка входа: ${error.message}`)
   }
 }
@@ -144,11 +147,11 @@ export async function getUserProfile(userId) {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single()
-    
-    if (error) throw error
-    
-    return data
+      .maybeSingle()
+
+    if (error && error.code !== 'PGRST116') throw error
+
+    return data || null
   } catch (error) {
     console.error('❌ Ошибка получения профиля:', error.message)
     return null

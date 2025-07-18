@@ -200,14 +200,13 @@ export async function getChapterProgressPercent(chapterId) {
 
     const { data: completed, error: progressError } = await supabase
       .from('user_progress')
-      .select('section_id', { count: 'exact' })
+      .select('section_id')
       .eq('user_id', user.id)
       .eq('chapter_id', chapterId)
-      .group('section_id')
 
     if (progressError) throw progressError
 
-    const completedCount = completed ? completed.length : 0
+    const completedCount = completed ? new Set(completed.map(p => p.section_id)).size : 0
 
     return Math.round((completedCount / totalSections) * 100)
   } catch (error) {
