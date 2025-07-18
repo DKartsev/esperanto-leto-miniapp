@@ -6,7 +6,11 @@ const AdminPanelPage = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   return (
-    <AdminPanel onClose={() => navigate('/')} currentUser={profile?.username || ''} />
+    <AdminPanel
+      onClose={() => navigate('/')}
+      currentUser={profile?.username || ''}
+      currentEmail={profile?.email || ''}
+    />
   );
 };
 

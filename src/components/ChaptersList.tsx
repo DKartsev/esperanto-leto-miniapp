@@ -3,6 +3,7 @@ import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, Trending
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchChapters } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService.js'
+import { isAdmin } from '../utils/adminUtils.js'
 
 interface Chapter {
   id: number;
@@ -32,7 +33,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
-    return currentUser?.toLowerCase() === 'admin5050';
+    return isAdmin(currentUser);
   };
 
   const [chapters, setChapters] = useState<Chapter[]>([])

@@ -3,6 +3,7 @@ import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCi
 import { useAuth } from './SupabaseAuthProvider';
 import MagicLinkLogin from './MagicLinkLogin';
 import LoginByEmail from './LoginByEmail';
+import { isAdmin } from '../utils/adminUtils.js';
 
 interface MyAccountProps {
   onBackToHome: () => void;
@@ -33,7 +34,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
-    return profile?.username?.toLowerCase() === 'admin5050';
+    return isAdmin(profile?.username, user?.email);
   };
 
   if (loading) {
