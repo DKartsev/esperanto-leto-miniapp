@@ -33,10 +33,38 @@ export async function saveProgress(
       isCorrect
     })
 
-    const { data, error } = await supabase
+    // В Supabase отсутствует уникальный индекс по (user_id, question_id),
+    // поэтому стандартный upsert c onConflict вызывает ошибку.
+    // Выполняем проверку существования записи вручную.
+    const { data: existing, error: selectError } = await supabase
       .from('user_progress')
-      .upsert(
-        {
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('question_id', questionId)
+      .maybeSingle()
+
+    if (selectError) throw selectError
+
+    let query
+    if (existing) {
+      query = supabase
+        .from('user_progress')
+        .update({
+          chapter_id: chapterId,
+          section_id: sectionId,
+          question_id: questionId,
+          selected_answer: selectedAnswer,
+          is_correct: isCorrect,
+          answered_at: new Date().toISOString(),
+          time_spent: timeSpent
+        })
+        .eq('id', existing.id)
+        .select()
+        .single()
+    } else {
+      query = supabase
+        .from('user_progress')
+        .insert({
           user_id: user.id,
           chapter_id: chapterId,
           section_id: sectionId,
@@ -45,11 +73,12 @@ export async function saveProgress(
           is_correct: isCorrect,
           answered_at: new Date().toISOString(),
           time_spent: timeSpent
-        },
-        { onConflict: ['user_id', 'question_id'] }
-      )
-      .select()
-      .single()
+        })
+        .select()
+        .single()
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
 
@@ -349,14 +378,12 @@ export async function saveTestResults(
         {
           user_id: user.id,
           test_type: 'section',
-          chapter_id: chapterId,
-          section_id: sectionId,
           correct_answers: correctAnswers,
           total_questions: totalQuestions,
           score: score,
           time_spent: timeSpent,
           completed_at: new Date().toISOString(),
-          section_scores: { section_id: sectionId, accuracy: score, time: timeSpent }
+          section_scores: { chapter_id: chapterId, section_id: sectionId, accuracy: score, time: timeSpent }
         }
       ])
       .select()
