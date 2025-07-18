@@ -145,7 +145,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 pt-20 space-y-6 mx-auto max-w-screen-sm">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
@@ -189,8 +189,8 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="w-full max-w-md mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-md p-4 mb-4 flex flex-col items-center text-center gap-4 box-border">
+        <div className="w-full max-w-sm mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-md px-4 py-4 mb-4 flex flex-col items-center text-center gap-4 box-border">
             <div className="flex items-center space-x-2">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
@@ -251,16 +251,16 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       {/* Chapters Grid */}
       <div className="grid gap-6">
         {filteredChapters.map((chapter) => (
-          <div key={chapter.id} className="w-full max-w-md mx-auto px-4">
+          <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
             <div
-              className={`bg-white rounded-xl shadow-md p-4 mb-4 border transition-all duration-200 flex flex-col items-center text-center gap-4 box-border ${
+              className={`bg-white rounded-xl shadow-md px-4 py-4 mb-4 border transition-all duration-200 flex flex-col items-center text-center gap-4 box-border ${
                 chapter.isLocked && !hasAdminAccess()
                   ? 'border-gray-200 opacity-60'
                   : 'border-emerald-200 hover:border-emerald-300'
               }`}
             >
               {/* Chapter Content */}
-              <div className="p-6 flex flex-col items-center text-center gap-4 box-border">
+              <div className="p-4 flex flex-col items-center text-center gap-4 box-border">
               <div className="flex items-start justify-between mb-4 w-full">
                 <div className="flex items-start space-x-4 flex-1">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
