@@ -493,7 +493,7 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-16 pb-24">
+      <section className="pt-24 pb-24 md:pt-32 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
             <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
@@ -559,7 +559,7 @@ function App() {
             <div className={`mt-16 lg:mt-0 transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
               <div className="relative">
                 {/* Phone mockup */}
-                <div className="mx-auto w-80 h-[640px] bg-emerald-900 rounded-[3rem] p-2 shadow-2xl">
+                <div className="mx-auto w-full max-w-xs aspect-[9/19] bg-emerald-900 rounded-[3rem] p-2 shadow-2xl">
                   <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative">
                     {/* Status bar */}
                     <div className="bg-emerald-50 px-6 py-2 flex justify-between items-center text-sm font-semibold">

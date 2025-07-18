@@ -93,7 +93,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   }
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 space-y-4">
+    <div className="w-full max-w-screen-sm mx-auto px-4 space-y-4 pt-20">
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={onBackToChapters}
@@ -111,8 +111,8 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
 
       <div className="grid gap-4">
         {sections.map((section) => (
-          <div key={section.id} className="w-full max-w-md mx-auto px-4">
-            <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+          <div key={section.id} className="w-full max-w-sm mx-auto px-4">
+            <div className="bg-white rounded-xl shadow-md px-4 py-4 mb-4">
             {/* Theory Block */}
             {section.theory && (
               <div className="border-b border-emerald-200">
