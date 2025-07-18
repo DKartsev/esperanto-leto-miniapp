@@ -102,11 +102,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     setLoginLoading(false);
   };
 
+  const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+
   useEffect(() => {
-    if (!isAuthenticated && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    if (!isAuthenticated && telegramUser) {
       handleTelegramLogin();
     }
-  }, []);
+  }, [isAuthenticated, telegramUser]);
 
   const formatTime = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -135,6 +137,17 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
   // Initial Login Screen
   if (!isAuthenticated) {
+    if (telegramUser) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-emerald-700">Вход через Telegram...</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <>
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center p-6">
@@ -144,7 +157,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
               <div className="w-20 h-20 bg-gradient-to-r from-emerald-600 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <User className="w-10 h-10 text-white" />
               </div>
-              
+
               <h1 className="text-2xl font-bold text-emerald-900 mb-2">
                 Добро пожаловать!
               </h1>
@@ -169,7 +182,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                   <span className="font-medium text-sm">Безопасный вход</span>
                 </div>
                 <p className="text-xs text-emerald-600">
-                  Мы используем безопасную систему входа для защиты ваших данных. 
+                  Мы используем безопасную систему входа для защиты ваших данных.
                   Ваши данные не передаются третьим лицам.
                 </p>
               </div>

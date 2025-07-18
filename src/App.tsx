@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Shield, 
   Zap, 
@@ -130,11 +131,13 @@ function App() {
     }
   }, []);
 
+  const location = useLocation();
+
   useEffect(() => {
-    if (window.location.pathname === '/account') {
+    if (location.pathname === '/account') {
       setActiveTab('account');
     }
-  }, []);
+  }, [location.pathname]);
 
   const features = [
     {
