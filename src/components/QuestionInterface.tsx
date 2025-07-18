@@ -1,5 +1,6 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
+import { fetchTheoryBlocks, fetchQuestionsWithAnswers } from '../services/courseService.js'
 
 
 interface QuestionResultItem {
@@ -40,289 +41,52 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [answers, setAnswers] = useState<QuestionResultItem[]>([]);
   const [showTheory, setShowTheory] = useState(true);
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
+  const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; content: string }>>([])
+  const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[] }>>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Get theory blocks and questions for current section
-  const getSectionData = (chapterId: number, sectionId: number) => {
-    if (chapterId === 1) {
-      switch (sectionId) {
-        case 1: // Базовая лексика
-          return {
-            theoryBlocks: [
-              {
-                title: "Основы словарного запаса эсперанто",
-                content: "Словарь эсперанто построен на интернациональных корнях, знакомых носителям европейских языков. Каждое слово имеет постоянное значение и произношение. Изучение базовой лексики начинается с самых употребительных слов повседневного общения.",
-                examples: [
-                  "saluton (привет) — универсальное приветствие",
-                  "dankon (спасибо) — выражение благодарности", 
-                  "pardonu (извините) — вежливое извинение"
-                ],
-                keyTerms: ["базовая лексика", "интернациональные корни", "повседневное общение"]
-              },
-              {
-                title: "Семья и дом",
-                content: "Слова, обозначающие семью и дом, являются основой для описания личной жизни. Эти термины помогают рассказать о себе и своих близких. Все существительные оканчиваются на -o.",
-                examples: [
-                  "domo (дом) — место жительства",
-                  "patrino (мама) — мать, родительница",
-                  "amiko (друг) — близкий человек"
-                ],
-                keyTerms: ["семья", "дом", "родственники", "окончание -o"]
-              }
-            ],
-            questions: [
-              {
-                id: 1,
-                type: 'multiple-choice',
-                question: 'Как переводится слово "здравствуйте" на эсперанто?',
-                options: ['saluton', 'dankon', 'pardonu', 'ĝis revido'],
-                correctAnswer: 'saluton',
-                explanation: 'Слово "saluton" является универсальным приветствием в эсперанто, используется в любое время дня.',
-                hints: ['Это слово используется при встрече', 'Происходит от латинского корня']
-              },
-              {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'Как переводится слово "спасибо" на эсперанто?',
-                options: ['saluton', 'dankon', 'pardonu', 'ĝis revido'],
-                correctAnswer: 'dankon',
-                explanation: 'Слово "dankon" выражает благодарность и является одним из самых важных слов вежливости.',
-                hints: ['Выражает благодарность', 'Используется после получения помощи']
-              },
-              {
-                id: 3,
-                type: 'multiple-choice',
-                question: 'Как переводится слово "дом" на эсперанто?',
-                options: ['domo', 'hundo', 'kato', 'akvo'],
-                correctAnswer: 'domo',
-                explanation: 'Слово "domo" обозначает дом, жилище. Как и все существительные в эсперанто, оканчивается на -o.',
-                hints: ['Место где живут люди', 'Оканчивается на -o']
-              },
-              {
-                id: 4,
-                type: 'multiple-choice',
-                question: 'Как переводится слово "друг" на эсперанто?',
-                options: ['amiko', 'patrino', 'lakto', 'pomo'],
-                correctAnswer: 'amiko',
-                explanation: 'Слово "amiko" означает друг. Корень "am-" связан с любовью и дружбой.',
-                hints: ['Близкий человек', 'Корень связан с любовью']
-              }
-            ]
-          };
-
-        case 2: // Произношение и алфавит
-          return {
-            theoryBlocks: [
-              {
-                title: "Алфавит и произношение",
-                content: "Алфавит эсперанто состоит из 28 букв. Каждая буква имеет только одно произношение. Нет немых букв. Это делает чтение и произношение предсказуемыми и простыми для изучения.",
-                examples: [
-                  "a, e, i, o, u — гласные звуки как в русском",
-                  "ĉ = ч, ĝ = дж, ĵ = ж, ŝ = ш, ŭ = у краткое",
-                  "Каждая буква читается одинаково во всех словах"
-                ],
-                keyTerms: ["28 букв", "одно произношение", "диакритические знаки", "предсказуемость"]
-              },
-              {
-                title: "Правила ударения",
-                content: "Ударение в эсперанто всегда падает на предпоследний слог. Это правило не имеет исключений. Знание этого правила помогает правильно произносить любое слово эсперанто.",
-                examples: [
-                  "SA-lu-ton (привет) — ударение на SA",
-                  "es-pe-RAN-to — ударение на RAN", 
-                  "u-ni-ver-si-TA-to (университет) — ударение на TA"
-                ],
-                keyTerms: ["предпоследний слог", "без исключений", "правильное произношение"]
-              }
-            ],
-            questions: [
-              {
-                id: 1,
-                type: 'multiple-choice',
-                question: 'Сколько букв в алфавите эсперанто?',
-                options: ['26', '28', '30', '32'],
-                correctAnswer: '28',
-                explanation: 'В алфавите эсперанто 28 букв: 23 латинские буквы плюс 5 букв с диакритическими знаками.',
-                hints: ['Больше чем в английском', 'Включает буквы с надстрочными знаками']
-              },
-              {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'На какой слог падает ударение в эсперанто?',
-                options: ['последний', 'предпоследний', 'первый', 'зависит от слова'],
-                correctAnswer: 'предпоследний',
-                explanation: 'Ударение в эсперанто всегда падает на предпоследний слог, без исключений.',
-                hints: ['Это правило без исключений', 'Не на последний слог']
-              }
-            ]
-          };
-
-        case 3: // Артикли и существительные
-          return {
-            theoryBlocks: [
-              {
-                title: "Определенный артикль",
-                content: "В эсперанто есть только один артикль — определенный артикль 'la'. Он не изменяется по родам, числам или падежам. Неопределенного артикля нет — его отсутствие указывает на неопределенность.",
-                examples: [
-                  "la domo (дом) — конкретный, известный дом",
-                  "domo (дом) — любой дом, дом вообще",
-                  "la libroj (книги) — конкретные книги"
-                ],
-                keyTerms: ["артикль la", "определенность", "неизменяемость", "отсутствие неопределенного артикля"]
-              },
-              {
-                title: "Существительные и их окончания",
-                content: "Все существительные в эсперанто оканчиваются на -o в единственном числе. Множественное число образуется добавлением -j. Это правило действует без исключений для всех существительных.",
-                examples: [
-                  "libro (книга) → libroj (книги)",
-                  "hundo (собака) → hundoj (собаки)",
-                  "amiko (друг) → amikoj (друзья)"
-                ],
-                keyTerms: ["окончание -o", "множественное число -j", "без исключений"]
-              }
-            ],
-            questions: [
-              {
-                id: 1,
-                type: 'multiple-choice',
-                question: 'Какое окончание имеют все существительные в эсперанто?',
-                options: ['-a', '-o', '-e', '-i'],
-                correctAnswer: '-o',
-                explanation: 'Все существительные в эсперанто оканчиваются на -o в единственном числе.',
-                hints: ['Это гласная буква', 'Как в итальянском языке']
-              },
-              {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'Как образуется множественное число существительных?',
-                options: ['добавлением -s', 'добавлением -j', 'изменением окончания', 'добавлением -oj'],
-                correctAnswer: 'добавлением -j',
-                explanation: 'Множественное число образуется добавлением -j к форме единственного числа.',
-                hints: ['Добавляется одна буква', 'Эта буква есть в русском алфавите']
-              }
-            ]
-          };
-
-        case 4: // Местоимения
-          return {
-            theoryBlocks: [
-              {
-                title: "Личные местоимения",
-                content: "Личные местоимения в эсперанто просты и логичны. Они не изменяются по падежам в именительном падеже. Система местоимений включает формы для всех лиц единственного и множественного числа.",
-                examples: [
-                  "mi (я), vi (ты/вы), li (он), ŝi (она), ĝi (оно)",
-                  "ni (мы), ili (они)",
-                  "Mi estas studento. (Я студент.)"
-                ],
-                keyTerms: ["личные местоимения", "не изменяются", "единственное число", "множественное число"]
-              },
-              {
-                title: "Притяжательные местоимения",
-                content: "Притяжательные местоимения образуются добавлением окончания -a к личным местоимениям. Они согласуются с определяемым словом в числе, добавляя -j во множественном числе.",
-                examples: [
-                  "mia (мой/моя/моё) → miaj (мои)",
-                  "via libro (твоя книга), viaj libroj (твои книги)",
-                  "lia domo (его дом), ŝia kato (её кошка)"
-                ],
-                keyTerms: ["притяжательные", "окончание -a", "согласование", "множественное число -j"]
-              }
-            ],
-            questions: [
-              {
-                id: 1,
-                type: 'multiple-choice',
-                question: 'Как сказать "я" на эсперанто?',
-                options: ['mi', 'vi', 'li', 'ni'],
-                correctAnswer: 'mi',
-                explanation: 'Местоимение "mi" означает "я" и является основой для образования других форм.',
-                hints: ['Первое лицо единственного числа', 'Короткое слово']
-              },
-              {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'Как образуются притяжательные местоимения?',
-                options: ['добавлением -o', 'добавлением -a', 'добавлением -e', 'добавлением -i'],
-                correctAnswer: 'добавлением -a',
-                explanation: 'Притяжательные местоимения образуются добавлением окончания -a к личным местоимениям.',
-                hints: ['Как у прилагательных', 'Окончание прилагательных']
-              }
-            ]
-          };
-
-        case 5: // Простые фразы
-          return {
-            theoryBlocks: [
-              {
-                title: "Базовые фразы общения",
-                content: "Простые фразы эсперанто позволяют начать общение с первых дней изучения. Эти фразы включают приветствия, благодарности, извинения и базовые вопросы. Они составляют основу вежливого общения.",
-                examples: [
-                  "Saluton! Kiel vi fartas? (Привет! Как дела?)",
-                  "Dankon pro via helpo. (Спасибо за вашу помощь.)",
-                  "Pardonu, mi ne komprenas. (Извините, я не понимаю.)"
-                ],
-                keyTerms: ["базовые фразы", "вежливое общение", "приветствия", "благодарности"]
-              },
-              {
-                title: "Построение простых предложений",
-                content: "Простые предложения в эсперанто следуют логичной структуре: подлежащее + сказуемое + дополнение. Порядок слов гибкий, но эта схема наиболее естественна для начинающих.",
-                examples: [
-                  "Mi lernas esperanton. (Я изучаю эсперанто.)",
-                  "Vi parolas bone. (Вы говорите хорошо.)",
-                  "Ni amas la naturon. (Мы любим природу.)"
-                ],
-                keyTerms: ["структура предложения", "подлежащее", "сказуемое", "дополнение", "гибкий порядок"]
-              }
-            ],
-            questions: [
-              {
-                id: 1,
-                type: 'multiple-choice',
-                question: 'Как сказать "Как дела?" на эсперанто?',
-                options: ['Kiel vi fartas?', 'Kio estas?', 'Kie vi estas?', 'Kiam vi venos?'],
-                correctAnswer: 'Kiel vi fartas?',
-                explanation: 'Фраза "Kiel vi fartas?" является стандартным способом спросить о самочувствии.',
-                hints: ['Начинается с "Kiel"', 'Вопрос о состоянии']
-              },
-              {
-                id: 2,
-                type: 'multiple-choice',
-                question: 'Как сказать "Я не понимаю" на эсперанто?',
-                options: ['Mi komprenas', 'Mi ne komprenas', 'Vi komprenas', 'Ni komprenas'],
-                correctAnswer: 'Mi ne komprenas',
-                explanation: 'Фраза "Mi ne komprenas" означает "Я не понимаю". Отрицание "ne" ставится перед глаголом.',
-                hints: ['Включает отрицание "ne"', 'Полезная фраза для изучающих']
-              }
-            ]
-          };
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try {
+        const theory = await fetchTheoryBlocks(sectionId)
+        const qData = await fetchQuestionsWithAnswers(sectionId)
+        const formatted = (qData as Array<{ id: number; text: string; hint: string | null; answers: Array<{ id: number; text: string; is_correct: boolean }> }>).map(q => ({
+          id: q.id,
+          type: 'multiple-choice',
+          question: q.text,
+          options: q.answers ? q.answers.map(a => a.text) : [],
+          correctAnswer: q.answers ? (q.answers.find(a => a.is_correct)?.text || '') : '',
+          explanation: '',
+          hints: q.hint ? [q.hint] : []
+        }))
+        setTheoryBlocks(theory as Array<{ id: number; content: string }>)
+        setQuestions(formatted)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Ошибка загрузки'
+        setError(message)
+      } finally {
+        setLoading(false)
       }
     }
+    load()
+  }, [chapterId, sectionId])
 
-    // Default data for other chapters
-    return {
-      theoryBlocks: [
-        {
-          title: "Теоретические основы",
-          content: "Этот раздел содержит основные теоретические сведения по теме. Изучите материал внимательно, так как он понадобится для выполнения практических заданий.",
-          examples: ["Пример 1", "Пример 2"],
-          keyTerms: ["термин 1", "термин 2"]
-        }
-      ],
-      questions: [
-        {
-          id: 1,
-          type: 'multiple-choice',
-          question: 'Пример вопроса для главы ' + chapterId + ', раздел ' + sectionId,
-          options: ['Вариант 1', 'Вариант 2', 'Вариант 3', 'Вариант 4'],
-          correctAnswer: 'Вариант 1',
-          explanation: 'Это пример объяснения для главы ' + chapterId + ', раздел ' + sectionId,
-          hints: ['Подсказка 1', 'Подсказка 2']
-        }
-      ]
-    };
-  };
+  const totalQuestions = questions.length * 3
+  const currentQuestionData = questions[currentQuestion % (questions.length || 1)]
 
-  const sectionData = getSectionData(chapterId, sectionId);
-  const { theoryBlocks, questions } = sectionData;
-  const totalQuestions = questions.length * 3; // Each question repeated 3 times with variations
-  const currentQuestionData = questions[currentQuestion % questions.length];
+  if (loading) {
+    return <div className="p-6">Загрузка...</div>
+  }
+
+  if (error) {
+    return <div className="p-6 text-red-600">{error}</div>
+  }
+
+  if (questions.length === 0) {
+    return <div className="p-6">Нет данных</div>
+  }
 
   const getChapterTitle = (chapterId: number): string => {
     switch (chapterId) {

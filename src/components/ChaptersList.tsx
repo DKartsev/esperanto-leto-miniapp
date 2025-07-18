@@ -1,6 +1,7 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
+import { fetchChapters } from '../services/courseService.js'
 
 interface Chapter {
   id: number;
@@ -33,231 +34,40 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     return currentUser?.toLowerCase() === 'admin5050';
   };
 
-  const chapters: Chapter[] = [
-    { 
-      id: 1, 
-      title: "Введение в Эсперанто", 
-      description: "Что такое Эсперанто, история и цели языка, принципы и структура",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: false, // Всегда доступна
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 5,
-      studentsCount: 15420,
-      rating: 4.8
-    },
-    { 
-      id: 2, 
-      title: "Алфавит и произношение", 
-      description: "Алфавит и звуки, специальные буквы, ударение, правила чтения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 5,
-      studentsCount: 13850,
-      rating: 4.7,
-      prerequisites: [1]
-    },
-    { 
-      id: 3, 
-      title: "Словообразование и основы лексики", 
-      description: "Корни слов, приставки и суффиксы, сложные слова, создание новых слов",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "3-4 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 12350,
-      rating: 4.6,
-      prerequisites: [1, 2]
-    },
-    { 
-      id: 4, 
-      title: "Существительные", 
-      description: "Суффикс -o, множественное число (-j), падежи, род, исключения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 5,
-      studentsCount: 11200,
-      rating: 4.7,
-      prerequisites: [1, 2, 3]
-    },
-    { 
-      id: 5, 
-      title: "Прилагательные", 
-      description: "Суффикс -a, согласование, порядок слов, степени сравнения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 5,
-      studentsCount: 9800,
-      rating: 4.5,
-      prerequisites: [1, 2, 3, 4]
-    },
-    { 
-      id: 6, 
-      title: "Наречия", 
-      description: "Суффикс -e, место в предложении, наречия времени и места, сравнение",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 4,
-      studentsCount: 8500,
-      rating: 4.9,
-      prerequisites: [1, 2, 3, 4, 5]
-    },
-    { 
-      id: 7, 
-      title: "Глаголы. Настоящее, прошедшее, будущее", 
-      description: "Времена глаголов: -as, -is, -os, повелительное -u, инфинитив -i",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "3-4 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 7200,
-      rating: 4.4,
-      prerequisites: [1, 2, 3, 4]
-    },
-    { 
-      id: 8, 
-      title: "Глагольные конструкции", 
-      description: "Страдательный залог, возвратные глаголы, модальные конструкции",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "3-4 часа",
-      difficulty: "Сложный",
-      sectionsCount: 5,
-      studentsCount: 5400,
-      rating: 4.3,
-      prerequisites: [1, 2, 3, 4, 7]
-    },
-    { 
-      id: 9, 
-      title: "Местоимения", 
-      description: "Личные, притяжательные, указательные, вопросительные местоимения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 6100,
-      rating: 4.2,
-      prerequisites: [1, 2, 3, 4]
-    },
-    { 
-      id: 10, 
-      title: "Числительные", 
-      description: "Количественные, порядковые, дробные числительные, дата и время",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Легкий",
-      sectionsCount: 5,
-      studentsCount: 4800,
-      rating: 4.7,
-      prerequisites: [1, 2, 3, 4]
-    },
-    { 
-      id: 11, 
-      title: "Предлоги", 
-      description: "Основные предлоги, предлоги направления и времени, сложные случаи",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "3-4 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 3200,
-      rating: 4.6,
-      prerequisites: [1, 2, 3, 4, 7]
-    },
-    { 
-      id: 12, 
-      title: "Вопросительные слова и предложения", 
-      description: "Вопросительные местоимения, слово ĉu, прямой и косвенный вопрос",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "2-3 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 2800,
-      rating: 4.5,
-      prerequisites: [1, 2, 3, 4, 9]
-    },
-    { 
-      id: 13, 
-      title: "Синтаксис и структура предложений", 
-      description: "Порядок слов, согласование, дополнения, сложные предложения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "4-5 часов",
-      difficulty: "Сложный",
-      sectionsCount: 5,
-      studentsCount: 2100,
-      rating: 4.4,
-      prerequisites: [1, 2, 3, 4, 7, 11, 12]
-    },
-    { 
-      id: 14, 
-      title: "Практика и устойчивые выражения", 
-      description: "Приветствия, часто используемые фразы, диалоги, этикет общения",
-      progress: 0,
-      badge: "Новичок", 
-      isCompleted: false, 
-      isStarted: false, 
-      isLocked: !hasAdminAccess(), // Разблокировано для админа
-      estimatedTime: "3-4 часа",
-      difficulty: "Средний",
-      sectionsCount: 5,
-      studentsCount: 1800,
-      rating: 4.8,
-      prerequisites: [1, 2, 3, 4, 7, 9, 12]
+  const [chapters, setChapters] = useState<Chapter[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchChapters()
+        const processed: Chapter[] = (data as Array<{ id: number; title: string }>).map((ch) => ({
+          id: ch.id,
+          title: ch.title || 'Нет названия',
+          description: 'Нет данных',
+          progress: 0,
+          badge: 'Новичок',
+          isCompleted: false,
+          isStarted: false,
+          isLocked: false,
+          estimatedTime: '',
+          difficulty: 'Легкий',
+          sectionsCount: 0,
+          studentsCount: 0,
+          rating: 0
+        }))
+        setChapters(processed)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Ошибка загрузки'
+        setError(message)
+      } finally {
+        setLoading(false)
+      }
     }
-  ];
+    load()
+  }, [])
+
 
   const getBadgeIcon = (badge: string) => {
     switch (badge) {
@@ -289,8 +99,9 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   };
 
   const getOverallProgress = () => {
-    const completedChapters = chapters.filter(ch => ch.isCompleted).length;
-    return Math.round((completedChapters / chapters.length) * 100);
+    if (chapters.length === 0) return 0
+    const completedChapters = chapters.filter(ch => ch.isCompleted).length
+    return Math.round((completedChapters / chapters.length) * 100)
   };
 
   const getNextRecommendedChapter = () => {
@@ -315,6 +126,14 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   };
 
   const recommendedChapter = getNextRecommendedChapter();
+
+  if (loading) {
+    return <div className="p-6">Загрузка...</div>
+  }
+
+  if (error) {
+    return <div className="p-6 text-red-600">{error}</div>
+  }
 
   return (
     <div className="p-6 space-y-6">
