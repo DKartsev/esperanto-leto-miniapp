@@ -11,20 +11,23 @@ const AuthCallback = () => {
       const access_token = query.get('access_token')
       const refresh_token = query.get('refresh_token')
 
-      if (access_token && refresh_token) {
-        const { error } = await supabase.auth.setSession({
-          access_token,
-          refresh_token,
-        })
-        if (error) {
-          console.error(error)
-          setStatus('error')
-        } else {
-          setStatus('success')
-          if (window.Telegram?.WebApp?.close) {
-            window.Telegram.WebApp.close()
+        if (access_token && refresh_token) {
+          const { error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          })
+          if (error) {
+            console.error(error)
+            setStatus('error')
+          } else {
+            setStatus('success')
+            localStorage.setItem('supabase_session_updated', Date.now().toString())
+            if (window.Telegram?.WebApp?.close) {
+              window.Telegram.WebApp.close()
+            } else {
+              window.close()
+            }
           }
-        }
       } else {
         setStatus('error')
       }
