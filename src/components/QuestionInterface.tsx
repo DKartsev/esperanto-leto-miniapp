@@ -52,6 +52,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
       try {
         const theory = await fetchTheoryBlocks(sectionId)
         const qData = await fetchQuestions(sectionId)
+        console.log('Loaded questions count:', qData.length)
         const formatted = (qData as Array<{
           id: number
           type: string
@@ -89,8 +90,8 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     load()
   }, [chapterId, sectionId])
 
-  const totalQuestions = questions.length * 3
-  const currentQuestionData = questions[currentQuestion % (questions.length || 1)]
+  const totalQuestions = questions.length
+  const currentQuestionData = questions[currentQuestion]
 
   if (loading) {
     return <div className="p-6">Загрузка...</div>
