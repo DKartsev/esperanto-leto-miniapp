@@ -11,7 +11,14 @@ import { getCurrentUser } from './authService.js'
  * @param {number} timeSpent - Время на ответ (в секундах)
  * @returns {Promise<Object>} Сохраненный ответ
  */
-export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, selectedAnswer, timeSpent = 0) {
+export async function saveProgress(
+  chapterId,
+  sectionId,
+  questionId,
+  selectedAnswer,
+  isCorrect,
+  timeSpent = 0
+) {
   try {
     const user = await getCurrentUser()
     if (!user) {
@@ -19,22 +26,28 @@ export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, se
       return null
     }
 
-    console.log('💾 Сохранение ответа:', { chapterId, sectionId, questionId, isCorrect })
+    console.log('💾 Сохранение ответа:', {
+      chapterId,
+      sectionId,
+      questionId,
+      isCorrect
+    })
 
     const { data, error } = await supabase
       .from('user_progress')
-      .insert([
+      .upsert(
         {
           user_id: user.id,
           chapter_id: chapterId,
           section_id: sectionId,
           question_id: questionId,
-          is_correct: isCorrect,
           selected_answer: selectedAnswer,
-          time_spent: timeSpent,
-          answered_at: new Date().toISOString()
-        }
-      ])
+          is_correct: isCorrect,
+          answered_at: new Date().toISOString(),
+          time_spent: timeSpent
+        },
+        { onConflict: ['user_id', 'question_id'] }
+      )
       .select()
       .single()
 
@@ -47,6 +60,9 @@ export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, se
     throw new Error(`Ошибка сохранения ответа: ${error.message}`)
   }
 }
+
+// Для обратной совместимости
+export const saveAnswer = saveProgress
 
 /**
  * Получить весь прогресс пользователя
@@ -303,6 +319,176 @@ export async function getUserTestResults() {
   } catch (error) {
     console.error('❌ Ошибка получения результатов тестов:', error.message)
     return []
+  }
+}
+
+/**
+ * Сохранить результаты прохождения раздела и выдать достижения
+ * @param {number} chapterId
+ * @param {number} sectionId
+ * @param {number} correctAnswers
+ * @param {number} totalQuestions
+ * @param {number} timeSpent
+ * @returns {Promise<Object>} сохраненный результат и список новых достижений
+ */
+export async function saveTestResults(
+  chapterId,
+  sectionId,
+  correctAnswers,
+  totalQuestions,
+  timeSpent = 0
+) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error('Пользователь не авторизован')
+
+    const score = Math.round((correctAnswers / totalQuestions) * 100)
+
+    const { data, error } = await supabase
+      .from('test_results')
+      .insert([
+        {
+          user_id: user.id,
+          test_type: 'section',
+          chapter_id: chapterId,
+          section_id: sectionId,
+          correct_answers: correctAnswers,
+          total_questions: totalQuestions,
+          score: score,
+          time_spent: timeSpent,
+          completed_at: new Date().toISOString(),
+          section_scores: { section_id: sectionId, accuracy: score, time: timeSpent }
+        }
+      ])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    const achievements = await checkAndAssignAchievements(user.id, sectionId, chapterId, score)
+
+    console.log('✅ Результаты раздела сохранены')
+    return { result: data, achievements }
+  } catch (error) {
+    console.error('❌ Ошибка сохранения результатов раздела:', error.message)
+    throw new Error(`Ошибка сохранения результатов: ${error.message}`)
+  }
+}
+
+/**
+ * Получить список достижений пользователя
+ * @returns {Promise<Array>}
+ */
+export async function getUserAchievements() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return []
+
+    const { data, error } = await supabase
+      .from('user_achievements')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('earned_at', { ascending: true })
+
+    if (error) throw error
+
+    return data || []
+  } catch (error) {
+    console.error('❌ Ошибка получения достижений:', error.message)
+    return []
+  }
+}
+
+/**
+ * Проверить и назначить достижения после завершения раздела
+ * @param {string} userId
+ * @param {number} sectionId
+ * @param {number} chapterId
+ * @param {number} accuracy
+ * @returns {Promise<string[]>} список новых достижений
+ */
+export async function checkAndAssignAchievements(userId, sectionId, chapterId, accuracy) {
+  const earned = []
+
+  const hasAchievement = async (type, extraFilter = {}) => {
+    let query = supabase
+      .from('user_achievements')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('achievement_type', type)
+
+    if (extraFilter.section_id) {
+      query = query.filter('achievement_data->>section_id', 'eq', String(extraFilter.section_id))
+    }
+    if (extraFilter.chapter_id) {
+      query = query.filter('achievement_data->>chapter_id', 'eq', String(extraFilter.chapter_id))
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    return data && data.length > 0
+  }
+
+  const insertAchievement = async (type, data = {}) => {
+    const { error } = await supabase.from('user_achievements').insert({
+      user_id: userId,
+      achievement_type: type,
+      achievement_data: data,
+      earned_at: new Date().toISOString()
+    })
+    if (!error) earned.push(type)
+  }
+
+  try {
+    // section_complete
+    if (!(await hasAchievement('section_complete', { section_id: sectionId }))) {
+      await insertAchievement('section_complete', { section_id: sectionId, chapter_id: chapterId })
+    }
+
+    // first_section
+    if (!(await hasAchievement('first_section'))) {
+      const { count } = await supabase
+        .from('user_achievements')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('achievement_type', 'section_complete')
+      if ((count || 0) === 0) {
+        await insertAchievement('first_section', { section_id: sectionId, chapter_id: chapterId })
+      }
+    }
+
+    // chapter_master
+    const { data: allSections } = await supabase
+      .from('sections')
+      .select('id')
+      .eq('chapter_id', chapterId)
+
+    const { data: completed } = await supabase
+      .from('user_progress')
+      .select('distinct section_id')
+      .eq('user_id', userId)
+      .eq('chapter_id', chapterId)
+
+    if (
+      allSections &&
+      completed &&
+      allSections.length > 0 &&
+      completed.length === allSections.length &&
+      !(await hasAchievement('chapter_master', { chapter_id: chapterId }))
+    ) {
+      await insertAchievement('chapter_master', { chapter_id: chapterId })
+    }
+
+    // accuracy_90
+    if (accuracy >= 90 && !(await hasAchievement('accuracy_90', { section_id: sectionId }))) {
+      await insertAchievement('accuracy_90', { section_id: sectionId, chapter_id: chapterId })
+    }
+
+    return earned
+  } catch (error) {
+    console.error('❌ Ошибка проверки достижений:', error.message)
+    return earned
   }
 }
 

@@ -33,6 +33,7 @@ import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
+import { saveTestResults } from './services/progressService.js';
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
@@ -43,6 +44,7 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [sectionResults, setSectionResults] = useState<QuestionResults | null>(null);
+  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([]);
 
   // Test interface state
   const [testView, setTestView] = useState<'intro' | 'test' | 'results'>('intro');
@@ -52,7 +54,7 @@ function App() {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Get auth data from Supabase
-  const { profile } = useAuth();
+  const { profile, refreshStats } = useAuth();
 
   // Telegram WebApp detection - более точная проверка
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
@@ -213,8 +215,23 @@ function App() {
     setCurrentView('questions');
   };
 
-  const handleQuestionComplete = (results: QuestionResults) => {
+  const handleQuestionComplete = async (results: QuestionResults) => {
     setSectionResults(results);
+    if (selectedChapter && selectedSection) {
+      try {
+        const { achievements } = await saveTestResults(
+          selectedChapter,
+          selectedSection,
+          results.correctAnswers,
+          results.totalQuestions,
+          0
+        );
+        setEarnedAchievements(achievements);
+        await refreshStats();
+      } catch (err) {
+        console.error('Ошибка сохранения результатов раздела:', err);
+      }
+    }
     setCurrentView('section-complete');
   };
 
@@ -426,6 +443,7 @@ function App() {
             results={sectionResults}
             chapterId={selectedChapter!}
             sectionId={selectedSection!}
+            achievements={earnedAchievements}
             onRetryIncorrect={handleRetryIncorrect}
             onCompleteChapter={handleCompleteChapter}
           />

@@ -13,6 +13,7 @@ interface SectionCompleteProps {
   results: SectionResults;
   chapterId: number;
   sectionId: number;
+  achievements?: string[];
   onRetryIncorrect: () => void;
   onCompleteChapter: () => void;
 }
@@ -21,6 +22,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   results,
   chapterId,
   sectionId,
+  achievements = [],
   onRetryIncorrect,
   onCompleteChapter
 }) => {
@@ -95,6 +97,19 @@ const SectionComplete: FC<SectionCompleteProps> = ({
             {results.correctAnswers} из {results.totalQuestions} вопросов
           </div>
         </div>
+
+        {achievements.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-yellow-200 p-4 mb-6 text-center">
+            <h3 className="font-semibold text-yellow-800 mb-2">Получены бейджи:</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              {achievements.map((a, idx) => (
+                <span key={idx} className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Incorrect Answers */}
         {incorrectCount > 0 && (
