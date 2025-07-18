@@ -49,6 +49,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [chapterStats, setChapterStats] = useState<ChapterStats | null>(null);
+  const [progressData, setProgressData] = useState<any[]>([]);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -223,6 +224,20 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
     fetchStats();
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', user.id);
+      if (!error && data) setProgressData(data as any[]);
+    };
+
+    fetchProgress();
+  }, []);
 
   const navigateRef = useRef(false);
 
@@ -588,6 +603,20 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
             <ul className="list-disc pl-5 space-y-1">
               {achievements.map((a: any, idx: number) => (
                 <li key={idx} className="text-yellow-700">{a.achievement_type}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {progressData && progressData.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4">Прогресс по разделам</h2>
+            <ul className="space-y-1 text-sm text-emerald-700">
+              {progressData.map((p) => (
+                <li key={p.section_id} className="flex justify-between">
+                  <span>Раздел {p.section_id}</span>
+                  <span>{p.accuracy}%</span>
+                </li>
               ))}
             </ul>
           </div>
