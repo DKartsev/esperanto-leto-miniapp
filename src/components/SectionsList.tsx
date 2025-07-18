@@ -1,6 +1,7 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { Play, Clock, Book, ChevronDown } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
+import { fetchSections } from '../services/courseService.js'
 
 interface Section {
   id: number;
@@ -24,267 +25,33 @@ interface SectionsListProps {
 
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
   const [expandedTheory, setExpandedTheory] = useState<number | null>(null);
+  const [sections, setSections] = useState<Section[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Define sections for different chapters
-  const getSectionsForChapter = (chapterId: number): Section[] => {
-    switch (chapterId) {
-      case 1: // Основы эсперанто
-        return [
-          { 
-            id: 1, 
-            title: "Базовая лексика", 
-            progress: 0, 
-            duration: "20 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Основы словарного запаса эсперанто",
-              content: "Словарь эсперанто построен на интернациональных корнях, знакомых носителям европейских языков. Каждое слово имеет постоянное значение и произношение. Изучение базовой лексики начинается с самых употребительных слов повседневного общения: приветствий, благодарностей, названий предметов быта.",
-              examples: [
-                "saluton (привет) — универсальное приветствие",
-                "dankon (спасибо) — выражение благодарности", 
-                "domo (дом) — место жительства",
-                "amiko (друг) — близкий человек"
-              ],
-              keyTerms: ["базовая лексика", "интернациональные корни", "повседневное общение", "постоянное значение"]
-            }
-          },
-          { 
-            id: 2, 
-            title: "Произношение и алфавит", 
-            progress: 0, 
-            duration: "25 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Фонетическая система эсперанто",
-              content: "Алфавит эсперанто состоит из 28 букв: 23 латинские буквы плюс 5 букв с диакритическими знаками. Каждая буква имеет только одно произношение во всех позициях. Ударение всегда падает на предпоследний слог без исключений. Это делает чтение и произношение предсказуемыми.",
-              examples: [
-                "ĉ = ч (ĉokolado — шоколад)",
-                "ĝ = дж (ĝardeno — сад)", 
-                "SA-lu-ton (привет) — ударение на SA",
-                "es-pe-RAN-to — ударение на RAN"
-              ],
-              keyTerms: ["28 букв", "диакритические знаки", "одно произношение", "предпоследний слог", "без исключений"]
-            }
-          },
-          { 
-            id: 3, 
-            title: "Артикли и существительные", 
-            progress: 0, 
-            duration: "30 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Система артиклей и существительных",
-              content: "В эсперанто есть только один артикль — определенный артикль 'la', который не изменяется. Все существительные оканчиваются на -o в единственном числе. Множественное число образуется добавлением -j. Неопределенного артикля нет — его отсутствие указывает на неопределенность.",
-              examples: [
-                "la domo (дом) — конкретный дом",
-                "domo (дом) — любой дом",
-                "libro → libroj (книга → книги)",
-                "hundo → hundoj (собака → собаки)"
-              ],
-              keyTerms: ["артикль la", "окончание -o", "множественное число -j", "определенность", "неопределенность"]
-            }
-          },
-          { 
-            id: 4, 
-            title: "Местоимения", 
-            progress: 0, 
-            duration: "25 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Система местоимений",
-              content: "Личные местоимения в эсперанто просты и логичны: mi (я), vi (ты/вы), li (он), ŝi (она), ĝi (оно), ni (мы), ili (они). Притяжательные местоимения образуются добавлением окончания -a. Они согласуются с определяемым словом в числе.",
-              examples: [
-                "Mi estas studento. (Я студент.)",
-                "mia libro (моя книга) → miaj libroj (мои книги)",
-                "via domo (твой дом), lia kato (его кошка)",
-                "ŝia amiko (её друг), nia lernejo (наша школа)"
-              ],
-              keyTerms: ["личные местоимения", "притяжательные", "окончание -a", "согласование", "число"]
-            }
-          },
-          { 
-            id: 5, 
-            title: "Простые фразы", 
-            progress: 0, 
-            duration: "35 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Базовые фразы общения",
-              content: "Простые фразы эсперанто позволяют начать общение с первых дней изучения. Они включают приветствия, благодарности, извинения и базовые вопросы. Структура предложений: подлежащее + сказуемое + дополнение. Порядок слов гибкий, но эта схема наиболее естественна.",
-              examples: [
-                "Saluton! Kiel vi fartas? (Привет! Как дела?)",
-                "Dankon pro via helpo. (Спасибо за помощь.)",
-                "Mi ne komprenas. (Я не понимаю.)",
-                "Ĝis revido! (До свидания!)"
-              ],
-              keyTerms: ["базовые фразы", "структура предложения", "вежливое общение", "гибкий порядок слов"]
-            }
-          }
-        ];
-      case 2: // Основные глаголы и действия
-        return [
-          { 
-            id: 1, 
-            title: "Глагол 'esti' (быть)", 
-            progress: 0, 
-            duration: "20 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Глагол-связка 'esti'",
-              content: "Глагол 'esti' (быть) — самый важный глагол в эсперанто. Он связывает подлежащее с именной частью сказуемого. Формы: estas (настоящее), estis (прошедшее), estos (будущее). Используется для описания состояния, профессии, местонахождения.",
-              examples: [
-                "Mi estas studento. (Я студент.)",
-                "La vetero estis bela. (Погода была красивая.)",
-                "Vi estos feliĉa. (Вы будете счастливы.)"
-              ],
-              keyTerms: ["esti", "связка", "состояние", "времена"]
-            }
-          },
-          { 
-            id: 2, 
-            title: "Глаголы движения", 
-            progress: 0, 
-            duration: "25 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Выражение движения",
-              content: "Основные глаголы движения: iri (идти), veni (приходить), kuri (бежать), flugi (лететь). Направление показывается предлогами: al (к), de (от), tra (через). Винительный падеж указывает направление движения.",
-              examples: [
-                "Mi iras al la butiko. (Я иду в магазин.)",
-                "Li venas de la lernejo. (Он идет из школы.)",
-                "Ni kuras tra la parko. (Мы бежим через парк.)"
-              ],
-              keyTerms: ["движение", "направление", "предлоги", "iri", "veni"]
-            }
-          },
-          { 
-            id: 3, 
-            title: "Глаголы действия", 
-            progress: 0, 
-            duration: "30 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Выражение действий",
-              content: "Основные глаголы действия: fari (делать), doni (давать), preni (брать), meti (класть), teni (держать). Эти глаголы часто требуют прямого дополнения в винительном падеже (-n).",
-              examples: [
-                "Mi faras la laboron. (Я делаю работу.)",
-                "Ŝi donas al mi libron. (Она дает мне книгу.)",
-                "Li prenas la tason. (Он берет чашку.)"
-              ],
-              keyTerms: ["действие", "fari", "doni", "прямое дополнение"]
-            }
-          },
-          { 
-            id: 4, 
-            title: "Времена глаголов", 
-            progress: 0, 
-            duration: "35 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Система времен",
-              content: "В эсперанто три основных времени: настоящее (-as), прошедшее (-is), будущее (-os). Есть также условное наклонение (-us) и повелительное (-u). Все лица имеют одинаковые окончания.",
-              examples: [
-                "Mi lernas (учу), mi lernis (учил), mi lernos (буду учить)",
-                "Se mi havus tempon, mi lernos. (Если бы у меня было время, я бы учился.)",
-                "Lernu esperanton! (Учите эсперанто!)"
-              ],
-              keyTerms: ["времена", "наклонения", "окончания", "спряжение"]
-            }
-          },
-          { 
-            id: 5, 
-            title: "Модальные глаголы", 
-            progress: 0, 
-            duration: "25 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Выражение возможности и необходимости",
-              content: "Модальные глаголы выражают отношение к действию: povi (мочь), devi (должен), voli (хотеть), ŝati (нравиться). Они управляют инфинитивом другого глагола.",
-              examples: [
-                "Mi povas paroli esperante. (Я могу говорить на эсперанто.)",
-                "Vi devas lerni. (Вы должны учиться.)",
-                "Ŝi volas veni. (Она хочет прийти.)"
-              ],
-              keyTerms: ["модальность", "povi", "devi", "voli", "инфинитив"]
-            }
-          },
-          { 
-            id: 6, 
-            title: "Практика спряжения", 
-            progress: 0, 
-            duration: "40 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Закрепление глагольных форм",
-              content: "Практика спряжения включает все изученные глаголы и времена. Важно автоматизировать использование правильных окончаний. Упражнения включают трансформации, подстановки, перевод.",
-              examples: [
-                "lerni → mi lernas, vi lernis, li lernos",
-                "Трансформация: 'Я читаю' → 'Я читал' → 'Я буду читать'",
-                "Диалог с разными временами"
-              ],
-              keyTerms: ["спряжение", "автоматизация", "трансформация", "практика"]
-            }
-          }
-        ];
-      default:
-        return [
-          { 
-            id: 1, 
-            title: "Раздел 1", 
-            progress: 0, 
-            duration: "20 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Теоретические основы",
-              content: "Этот раздел содержит основные теоретические сведения по теме. Изучите материал внимательно, так как он понадобится для выполнения практических заданий.",
-              examples: ["Пример 1", "Пример 2"],
-              keyTerms: ["термин 1", "термин 2"]
-            }
-          },
-          { 
-            id: 2, 
-            title: "Раздел 2", 
-            progress: 0, 
-            duration: "25 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Дополнительный материал",
-              content: "Дополнительные сведения и углубленное изучение темы. Практические примеры и упражнения для закрепления материала.",
-              examples: ["Пример 3", "Пример 4"],
-              keyTerms: ["термин 3", "термин 4"]
-            }
-          },
-          { 
-            id: 3, 
-            title: "Раздел 3", 
-            progress: 0, 
-            duration: "30 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Практическое применение",
-              content: "Применение изученного материала на практике. Решение задач и выполнение упражнений различной сложности.",
-              examples: ["Пример 5", "Пример 6"],
-              keyTerms: ["термин 5", "термин 6"]
-            }
-          },
-          { 
-            id: 4, 
-            title: "Раздел 4", 
-            progress: 0, 
-            duration: "35 мин", 
-            isCompleted: false,
-            theory: {
-              title: "Заключительный материал",
-              content: "Обобщение изученного материала и подготовка к контрольным вопросам. Повторение ключевых концепций.",
-              examples: ["Пример 7", "Пример 8"],
-              keyTerms: ["термин 7", "термин 8"]
-            }
-          }
-        ];
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try {
+        const data = await fetchSections(chapterId)
+        const processed: Section[] = (data as Array<{ id: number; title: string }>).map(sec => ({
+          id: sec.id,
+          title: sec.title || 'Нет названия',
+          progress: 0,
+          duration: '',
+          isCompleted: false,
+          theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
+        }))
+        setSections(processed)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Ошибка загрузки'
+        setError(message)
+      } finally {
+        setLoading(false)
+      }
     }
-  };
-
-  const sections = getSectionsForChapter(chapterId);
+    load()
+  }, [chapterId])
 
   const getChapterTitle = (chapterId: number): string => {
     switch (chapterId) {
@@ -308,6 +75,14 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   };
 
   const chapterTitle = getChapterTitle(chapterId);
+
+  if (loading) {
+    return <div className="p-6">Загрузка...</div>
+  }
+
+  if (error) {
+    return <div className="p-6 text-red-600">{error}</div>
+  }
 
   return (
     <div className="p-6 space-y-4">
