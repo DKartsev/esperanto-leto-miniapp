@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState, type FC } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { telegramWebApp } from '../services/telegramWebApp';
 import { telegramLogin } from '../services/telegramAuth';
+import { useAuth } from './SupabaseAuthProvider';
 
 interface TelegramWebAppContextType {
   isAvailable: boolean;
@@ -39,6 +40,8 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [themeParams, setThemeParams] = useState<Record<string, unknown>>({});
   const navigate = useNavigate();
+  const { profile, loading } = useAuth();
+  const navigatedRef = useRef(false);
 
   useEffect(() => {
     // Check if Telegram WebApp is available
@@ -48,15 +51,9 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
         setUser(telegramWebApp.getUser());
         setIsDarkTheme(telegramWebApp.isDarkTheme());
         setThemeParams(telegramWebApp.getThemeParams());
-        telegramLogin()
-          .then(() => {
-            if (window.location.pathname === '/' || window.location.pathname === '/welcome') {
-              navigate('/account');
-            }
-          })
-          .catch((err) =>
-            console.error('Telegram login error:', err)
-          );
+        telegramLogin().catch((err) =>
+          console.error('Telegram login error:', err)
+        );
       }
     };
 
@@ -84,6 +81,24 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
       window.removeEventListener('telegram-back-button', handleBackButton);
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      !navigatedRef.current &&
+      isAvailable &&
+      profile &&
+      !loading &&
+      (window.location.pathname === '/' || window.location.pathname === '/welcome')
+    ) {
+      console.log('Navigate to /account', {
+        telegramUser: user,
+        user_id: localStorage.getItem('user_id'),
+        profile
+      });
+      navigatedRef.current = true;
+      navigate('/account');
+    }
+  }, [isAvailable, profile, loading, navigate, user]);
 
   const contextValue: TelegramWebAppContextType = {
     isAvailable,

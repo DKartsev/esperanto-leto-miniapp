@@ -87,6 +87,11 @@ export function useSupabaseAuth() {
 
     initAuth()
 
+    const storedId = localStorage.getItem('user_id')
+    if (storedId && mounted) {
+      loadUserData({ id: storedId })
+    }
+
     // Подписка на изменения аутентификации
     const { data: { subscription } } = onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event)
@@ -108,6 +113,12 @@ export function useSupabaseAuth() {
         const { data: { session } } = await supabase.auth.getSession()
         if (mounted) {
           await loadUserData(session?.user || null)
+        }
+      }
+
+      if (e.key === 'user_id' && e.newValue) {
+        if (mounted) {
+          await loadUserData({ id: e.newValue })
         }
       }
     }
