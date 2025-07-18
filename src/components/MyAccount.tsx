@@ -118,12 +118,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
   useEffect(() => {
     const loadChapterStats = async () => {
-      if (!user?.id) return;
+      const user_id = localStorage.getItem('user_id');
+      if (!user_id) return;
 
-      const { data, error } = await supabase
+      const { data: chapters, error } = await supabase
         .from('user_chapter_progress')
-        .select('chapter_id, total_time, average_accuracy, completed')
-        .eq('user_id', user.id);
+        .select('average_accuracy, total_time, completed')
+        .eq('user_id', user_id);
 
       if (error) {
         console.error('Ошибка загрузки прогресса глав:', error);
@@ -131,22 +132,19 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       }
 
       let totalTime = 0;
-      let avgAccuracy = 0;
-      let completed = 0;
+      let averageAccuracy = 0;
+      let completedChapters = 0;
 
-      if (data && data.length > 0) {
-        totalTime = data.reduce(
-          (sum, row) => sum + (row.total_time ?? 0),
-          0
+      if (chapters && chapters.length > 0) {
+        totalTime = chapters.reduce((sum, row) => sum + row.total_time, 0);
+        averageAccuracy = Math.round(
+          chapters.reduce((sum, row) => sum + row.average_accuracy, 0) /
+            chapters.length
         );
-        avgAccuracy = Math.round(
-          data.reduce((sum, row) => sum + (row.average_accuracy ?? 0), 0) /
-            data.length
-        );
-        completed = data.filter((row) => row.completed).length;
+        completedChapters = chapters.filter((row) => row.completed).length;
       }
 
-      const { count: chaptersCount, error: chaptersError } = await supabase
+      const { count: totalChapters, error: chaptersError } = await supabase
         .from('chapters')
         .select('id', { count: 'exact', head: true });
 
@@ -156,14 +154,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
       setChapterStats({
         totalTime,
-        averageAccuracy: avgAccuracy,
-        completedChapters: completed,
-        totalChapters: chaptersCount ?? 0
+        averageAccuracy,
+        completedChapters,
+        totalChapters: totalChapters ?? 0
       });
     };
 
     loadChapterStats();
-  }, [user]);
+  }, []);
 
   const navigateRef = useRef(false);
 
@@ -347,7 +345,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                     С нами с {new Date(user?.created_at || '').toLocaleDateString('ru-RU')}
                   </span>
                   {/* Показываем статус администратора для admin5050 */}
-                  {hasAdminAccess() && (
+                {hasAdminAccess() && (
                     <>
                       <span className="text-emerald-400">•</span>
                       <span className="text-xs bg-emerald-600 text-white px-2 py-1 rounded-full font-medium">
@@ -356,6 +354,26 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                     </>
                   )}
                 </div>
+                {chapterStats && (
+                  <div className="mt-2 bg-neutral-100 rounded p-2 text-sm text-gray-600 space-y-1">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      <span>
+                        Время обучения: {formatTime(chapterStats.totalTime)}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <Trophy className="w-4 h-4 mr-1" />
+                      <span>Средняя точность: {chapterStats.averageAccuracy}%</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      <span>
+                        Пройдено глав: {chapterStats.completedChapters} из {chapterStats.totalChapters}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
