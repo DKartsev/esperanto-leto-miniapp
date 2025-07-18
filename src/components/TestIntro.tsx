@@ -99,10 +99,10 @@ const TestIntro: FC<TestIntroProps> = ({ onStartTest }) => {
         </div>
 
         {/* Start Button */}
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto px-4">
           <button
             onClick={onStartTest}
-            className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-4 px-12 rounded-2xl text-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-3 mx-auto"
+            className="w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow"
           >
             <Play className="w-6 h-6" />
             <span>Начать тест</span>

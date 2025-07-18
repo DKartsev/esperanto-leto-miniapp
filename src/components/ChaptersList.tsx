@@ -189,23 +189,25 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6 mb-6">
-          <div className="flex items-center space-x-2 mb-3">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
-            <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-semibold text-emerald-900">{recommendedChapter.title}</h4>
-              <p className="text-sm text-emerald-700">{recommendedChapter.description}</p>
+        <div className="w-full max-w-md mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+            <div className="flex items-center space-x-2 mb-3">
+              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
             </div>
-            <button
-              onClick={() => onChapterSelect(recommendedChapter.id)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-2 shadow-lg"
-            >
-              <Play className="w-4 h-4" />
-              <span>Начать</span>
-            </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-emerald-900">{recommendedChapter.title}</h4>
+                <p className="text-sm text-emerald-700">{recommendedChapter.description}</p>
+              </div>
+              <button
+                onClick={() => onChapterSelect(recommendedChapter.id)}
+                className="w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow"
+              >
+                <Play className="w-4 h-4" />
+                <span>Начать</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -251,16 +253,16 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       {/* Chapters Grid */}
       <div className="grid gap-6">
         {filteredChapters.map((chapter) => (
-          <div
-            key={chapter.id}
-            className={`bg-white border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${
-              chapter.isLocked && !hasAdminAccess()
-                ? 'border-gray-200 opacity-60' 
-                : 'border-emerald-200 hover:border-emerald-300'
-            }`}
-          >
-            {/* Chapter Content */}
-            <div className="p-6">
+          <div key={chapter.id} className="w-full max-w-md mx-auto px-4">
+            <div
+              className={`bg-white rounded-xl shadow-md p-4 mb-4 border transition-all duration-200 ${
+                chapter.isLocked && !hasAdminAccess()
+                  ? 'border-gray-200 opacity-60'
+                  : 'border-emerald-200 hover:border-emerald-300'
+              }`}
+            >
+              {/* Chapter Content */}
+              <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start space-x-4 flex-1">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
@@ -365,12 +367,12 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               <button
                 onClick={() => onChapterSelect(chapter.id)}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`w-full font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                className={`w-full h-12 px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold shadow transition-colors duration-200 ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : hasAdminAccess() && chapter.isLocked
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg border-2 border-emerald-400'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg'
+                    ? 'bg-green-600 hover:bg-green-700 text-white border-2 border-emerald-400'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
                 }`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (
@@ -392,6 +394,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </button>
             </div>
           </div>
+        </div>
         ))}
       </div>
 
