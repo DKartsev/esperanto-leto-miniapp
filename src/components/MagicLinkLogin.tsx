@@ -2,6 +2,8 @@ import { useState, type FC } from 'react'
 import { X, Mail, Loader } from 'lucide-react'
 import { supabase } from '../services/supabaseClient.js'
 
+const EMAIL_REDIRECT = 'https://tgminiapp.esperanto-leto.ru/auth/callback'
+
 export interface MagicLinkLoginProps {
   isOpen: boolean
   onClose: () => void
@@ -34,7 +36,7 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://tgminiapp.esperanto-leto.ru/auth/callback',
+          emailRedirectTo: EMAIL_REDIRECT,
         },
       })
       if (signInError) throw signInError
