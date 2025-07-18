@@ -1,7 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
-import { saveProgress } from '../services/progressService.js'
+import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
 
 

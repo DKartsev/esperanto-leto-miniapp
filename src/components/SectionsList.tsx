@@ -2,7 +2,7 @@ import { useState, useEffect, type FC } from 'react';
 import { Play, Clock, Book, ChevronDown } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchSections } from '../services/courseService.js'
-import { getSectionProgressPercent } from '../services/progressService.js'
+import { getSectionProgressPercent } from '../services/progressService'
 
 interface Section {
   id: number;

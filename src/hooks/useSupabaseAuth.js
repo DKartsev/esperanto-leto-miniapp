@@ -9,7 +9,7 @@ import {
   ensureUserProfile
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
-import { getUserStats, getUserAchievements } from '../services/progressService.js'
+import { getUserStats, getUserAchievements } from '../services/progressService'
 
 /**
  * Хук для работы с аутентификацией Supabase

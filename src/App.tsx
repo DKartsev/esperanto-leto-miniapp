@@ -34,8 +34,8 @@ import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
-import { saveTestResults } from './services/progressService.js';
-import { updateChapterProgress } from './services/progressService';
+import { saveTestResults } from './services/progressService';
+import { updateChapterProgress } from './services/progressUpdater';
 import { supabase } from './services/supabaseClient.js';
 import { isAdmin } from './utils/adminUtils.js';
 
@@ -307,7 +307,7 @@ function App() {
             time_spent: timeSpent,
             completed: accuracy >= 70
           },
-          { onConflict: ['user_id', 'section_id'].join(',') }
+          { onConflict: ['user_id', 'section_id'] as any }
         );
         await updateChapterProgress(user_id, selectedChapter);
         await refreshStats();

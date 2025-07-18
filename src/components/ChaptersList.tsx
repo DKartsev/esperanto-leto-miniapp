@@ -2,7 +2,7 @@ import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchChapters } from '../services/courseService.js'
-import { getChapterProgressPercent } from '../services/progressService.js'
+import { getChapterProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
 
 interface Chapter {
