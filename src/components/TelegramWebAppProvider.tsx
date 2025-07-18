@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { telegramWebApp } from '../services/telegramWebApp';
 import { telegramLogin } from '../services/telegramAuth';
 
@@ -37,6 +38,7 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
   const [user, setUser] = useState<unknown>(null);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [themeParams, setThemeParams] = useState<Record<string, unknown>>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if Telegram WebApp is available
@@ -46,9 +48,15 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
         setUser(telegramWebApp.getUser());
         setIsDarkTheme(telegramWebApp.isDarkTheme());
         setThemeParams(telegramWebApp.getThemeParams());
-        telegramLogin().catch((err) =>
-          console.error('Telegram login error:', err)
-        );
+        telegramLogin()
+          .then(() => {
+            if (window.location.pathname === '/' || window.location.pathname === '/welcome') {
+              navigate('/account');
+            }
+          })
+          .catch((err) =>
+            console.error('Telegram login error:', err)
+          );
       }
     };
 
