@@ -48,7 +48,7 @@ export async function updateChapterProgress(user_id: string, chapter_id: number)
           average_accuracy: avgAccuracy,
           total_time: totalTime
         },
-        { onConflict: 'user_id,chapter_id' }
+        { onConflict: ['user_id', 'chapter_id'] }
       )
   }
 }
