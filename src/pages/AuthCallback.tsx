@@ -6,29 +6,40 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const handleAuth = async () => {
-      const hash = window.location.hash
-      const query = new URLSearchParams(hash.substring(1))
-      const access_token = query.get('access_token')
-      const refresh_token = query.get('refresh_token')
+      try {
+        const hash = window.location.hash
+        console.log('Auth callback hash:', hash)
+
+        const params = new URLSearchParams(hash.replace(/^#/, ''))
+        const access_token = params.get('access_token') || ''
+        const refresh_token = params.get('refresh_token') || ''
+        console.log('Parsed tokens:', { access_token, refresh_token })
 
         if (access_token && refresh_token) {
-          const { error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          })
+          const { error } = await supabase.auth.setSession({ access_token, refresh_token })
           if (error) {
-            console.error(error)
+            console.error('setSession error:', error)
             setStatus('error')
-          } else {
-            setStatus('success')
-            localStorage.setItem('supabase_session_updated', Date.now().toString())
+            return
+          }
+
+          setStatus('success')
+          localStorage.setItem('supabase_session_updated', Date.now().toString())
+
+          const closeApp = () => {
             if (window.Telegram?.WebApp?.close) {
               window.Telegram.WebApp.close()
             } else {
               window.close()
             }
           }
-      } else {
+          setTimeout(closeApp, 1000)
+        } else {
+          console.error('Missing tokens in URL hash')
+          setStatus('error')
+        }
+      } catch (err) {
+        console.error('Auth callback processing error:', err)
         setStatus('error')
       }
     }
@@ -45,4 +56,4 @@ const AuthCallback = () => {
   )
 }
 
-export default AuthCallback;
+export default AuthCallback
