@@ -177,12 +177,17 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
             {/* Section Content */}
             <div className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center gap-2">
                   <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold">
                     {section.id}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-emerald-900">{section.title}</h3>
+                    <h3
+                      className="text-lg font-semibold text-emerald-900 break-words"
+                      style={{ textWrap: 'balance' }}
+                    >
+                      {section.title}
+                    </h3>
                     <div className="flex items-center space-x-2 text-sm text-emerald-700">
                       <Clock className="w-4 h-4" />
                       <span>{section.duration}</span>

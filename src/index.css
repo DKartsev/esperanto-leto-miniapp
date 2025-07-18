@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure consistent sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* Custom animations for checkmark */
 @keyframes scale-in {
   0% {

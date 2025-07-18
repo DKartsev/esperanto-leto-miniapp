@@ -191,13 +191,18 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       {recommendedChapter && (
         <div className="w-full max-w-sm mx-auto px-4">
           <div className="bg-white rounded-xl shadow-md px-4 py-4 mb-4 flex flex-col items-center text-center gap-4 box-border">
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
             </div>
             <div>
-              <h4 className="font-semibold text-emerald-900">{recommendedChapter.title}</h4>
-              <p className="text-sm text-emerald-700">{recommendedChapter.description}</p>
+              <h4
+                className="font-semibold text-emerald-900 break-words"
+                style={{ textWrap: 'balance' }}
+              >
+                {recommendedChapter.title}
+              </h4>
+              <p className="text-sm text-emerald-700 break-words">{recommendedChapter.description}</p>
             </div>
             <button
               onClick={() => onChapterSelect(recommendedChapter.id)}
@@ -270,8 +275,13 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   </div>
                   
                   <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-lg font-semibold text-emerald-900">{chapter.title}</h3>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3
+                        className="text-lg font-semibold text-emerald-900 break-words"
+                        style={{ textWrap: 'balance' }}
+                      >
+                        {chapter.title}
+                      </h3>
                       <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(chapter.badge)}`}>
                         {getBadgeIcon(chapter.badge)}
                         <span>{chapter.badge}</span>
@@ -288,7 +298,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                       )}
                     </div>
                     
-                    <p className="text-emerald-700 mb-3">{chapter.description}</p>
+                    <p className="text-emerald-700 mb-3 break-words">{chapter.description}</p>
                     
                     {/* Chapter Stats */}
                     <div className="flex flex-wrap gap-4 text-sm text-emerald-600 mb-3">
