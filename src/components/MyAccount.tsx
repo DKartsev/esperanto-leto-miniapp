@@ -157,7 +157,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                 <button
                   onClick={handleTelegramLogin}
                   disabled={loginLoading}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
+                  className="w-full mt-4 bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition"
                 >
                   <span>Начать через Telegram</span>
                 </button>
