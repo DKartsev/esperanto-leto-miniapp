@@ -65,6 +65,35 @@ function App() {
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const [showNavigation, setShowNavigation] = useState(true);
 
+  // Save aggregated progress for a section
+  const saveProgressToSupabase = async (
+    chapterId: number,
+    sectionId: number,
+    correctAnswers: number,
+    totalQuestions: number,
+    timeSpent: number
+  ) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
+    const completed = accuracy >= 70;
+
+    await supabase.from('user_progress').upsert(
+      {
+        user_id: user.id,
+        chapter_id: chapterId,
+        section_id: sectionId,
+        completed,
+        accuracy,
+        time_spent: timeSpent
+      },
+      { onConflict: 'user_id, section_id' }
+    );
+
+    await updateChapterProgress(user.id, chapterId);
+  };
+
   useEffect(() => {
     setIsVisible(true);
     
@@ -234,6 +263,13 @@ function App() {
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
+        await saveProgressToSupabase(
+          selectedChapter,
+          selectedSection,
+          results.correctAnswers,
+          results.totalQuestions,
+          0
+        );
         const { achievements } = await (saveTestResults(
           selectedChapter,
           selectedSection,
@@ -298,18 +334,13 @@ function App() {
 
     if (user_id) {
       try {
-        await supabase.from('user_progress').upsert(
-          {
-            user_id,
-            chapter_id: selectedChapter,
-            section_id: selectedSection,
-            accuracy,
-            time_spent: timeSpent,
-            completed: accuracy >= 70
-          },
-          { onConflict: 'user_id, section_id' }
+        await saveProgressToSupabase(
+          selectedChapter,
+          selectedSection,
+          correct,
+          total,
+          timeSpent
         );
-        await updateChapterProgress(user_id, selectedChapter);
         await refreshStats();
       } catch (err) {
         console.error('Error saving progress', err);
