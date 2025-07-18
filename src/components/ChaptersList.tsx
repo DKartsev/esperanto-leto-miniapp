@@ -2,6 +2,7 @@ import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchChapters } from '../services/courseService.js'
+import { getChapterProgressPercent } from '../services/progressService.js'
 
 interface Chapter {
   id: number;
@@ -42,21 +43,28 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     const load = async () => {
       try {
         const data = await fetchChapters()
-        const processed: Chapter[] = (data as Array<{ id: number; title: string }>).map((ch) => ({
-          id: ch.id,
-          title: ch.title || 'Нет названия',
-          description: 'Нет данных',
-          progress: 0,
-          badge: 'Новичок',
-          isCompleted: false,
-          isStarted: false,
-          isLocked: false,
-          estimatedTime: '',
-          difficulty: 'Легкий',
-          sectionsCount: 0,
-          studentsCount: 0,
-          rating: 0
-        }))
+        const processed: Chapter[] = []
+
+        for (const ch of data as Array<{ id: number; title: string }>) {
+          const progress = await getChapterProgressPercent(ch.id)
+
+          processed.push({
+            id: ch.id,
+            title: ch.title || 'Нет названия',
+            description: 'Нет данных',
+            progress,
+            badge: 'Новичок',
+            isCompleted: progress === 100,
+            isStarted: progress > 0,
+            isLocked: false,
+            estimatedTime: '',
+            difficulty: 'Легкий',
+            sectionsCount: 0,
+            studentsCount: 0,
+            rating: 0
+          })
+        }
+
         setChapters(processed)
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Ошибка загрузки'

@@ -124,6 +124,80 @@ export async function getSectionProgress(chapterId, sectionId) {
 }
 
 /**
+ * Получить процент прохождения раздела
+ * @param {number} chapterId - ID главы
+ * @param {number} sectionId - ID раздела
+ * @returns {Promise<number>} Процент завершения
+ */
+export async function getSectionProgressPercent(chapterId, sectionId) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return 0
+
+    const { count: answeredCount, error: progressError } = await supabase
+      .from('user_progress')
+      .select('question_id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('chapter_id', chapterId)
+      .eq('section_id', sectionId)
+
+    if (progressError) throw progressError
+
+    const { count: totalQuestions, error: questionsError } = await supabase
+      .from('questions')
+      .select('id', { count: 'exact', head: true })
+      .eq('section_id', sectionId)
+
+    if (questionsError) throw questionsError
+
+    if (!totalQuestions || totalQuestions === 0) return 0
+
+    return Math.round((answeredCount / totalQuestions) * 100)
+  } catch (error) {
+    console.error('❌ Ошибка получения процента прогресса раздела:', error.message)
+    return 0
+  }
+}
+
+/**
+ * Получить процент прохождения главы
+ * @param {number} chapterId - ID главы
+ * @returns {Promise<number>} Процент завершения
+ */
+export async function getChapterProgressPercent(chapterId) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return 0
+
+    const { data: sections, error: sectionsError } = await supabase
+      .from('sections')
+      .select('id')
+      .eq('chapter_id', chapterId)
+
+    if (sectionsError) throw sectionsError
+
+    const totalSections = sections ? sections.length : 0
+    if (totalSections === 0) return 0
+
+    const { data: completed, error: progressError } = await supabase
+      .from('user_progress')
+      .select('section_id', { count: 'exact' })
+      .eq('user_id', user.id)
+      .eq('chapter_id', chapterId)
+      .group('section_id')
+
+    if (progressError) throw progressError
+
+    const completedCount = completed ? completed.length : 0
+
+    return Math.round((completedCount / totalSections) * 100)
+  } catch (error) {
+    console.error('❌ Ошибка получения процента прогресса главы:', error.message)
+    return 0
+  }
+}
+
+/**
  * Получить статистику пользователя
  * @returns {Promise<Object>} Статистика пользователя
  */
