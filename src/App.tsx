@@ -290,19 +290,25 @@ function App() {
     const timeSpent = results.timeSpent || 0;
     const user_id = localStorage.getItem('user_id');
 
+    if (!selectedChapter || !selectedSection) {
+      console.error('Missing chapter or section ID for saving progress');
+      return;
+    }
+
     if (user_id) {
       try {
         await supabase.from('user_progress').upsert(
           {
             user_id,
-            chapter_id: 0,
-            section_id: 0,
+            chapter_id: selectedChapter,
+            section_id: selectedSection,
             accuracy,
             time_spent: timeSpent,
             completed: accuracy >= 70
           },
           { onConflict: 'user_id,section_id' }
         );
+        await refreshStats();
       } catch (err) {
         console.error('Error saving progress', err);
       }
