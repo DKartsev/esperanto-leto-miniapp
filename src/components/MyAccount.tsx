@@ -1,7 +1,8 @@
 import { useState, type FC } from 'react';
-import { User, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
+import { User, LogIn, Shield, LogOut, Settings, Trophy, Clock, BookOpen, CheckCircle } from 'lucide-react';
 import { useAuth } from './SupabaseAuthProvider';
 import MagicLinkLogin from './MagicLinkLogin';
+import LoginByEmail from './LoginByEmail';
 
 interface MyAccountProps {
   onBackToHome: () => void;
@@ -10,6 +11,7 @@ interface MyAccountProps {
 const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const { user, profile, stats, loading, signOut, isAuthenticated } = useAuth();
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -65,13 +67,24 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
               </p>
 
               {/* Register Button */}
-              <div className="mb-6">
+              <div className="mb-4">
                 <button
                   onClick={() => setShowMagicLinkModal(true)}
                   className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
                 >
                   <User className="w-6 h-6" />
                   <span>Зарегистрироваться</span>
+                </button>
+              </div>
+
+              {/* Login Button */}
+              <div className="mb-6">
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="w-full border border-emerald-500 text-emerald-600 font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 hover:bg-emerald-50 shadow-lg flex items-center justify-center space-x-3"
+                >
+                  <LogIn className="w-6 h-6" />
+                  <span>Войти</span>
                 </button>
               </div>
 
@@ -122,6 +135,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
         <MagicLinkLogin
           isOpen={showMagicLinkModal}
           onClose={() => setShowMagicLinkModal(false)}
+          title="Регистрация"
+          buttonLabel="Зарегистрироваться"
+        />
+        {/* Login By Email */}
+        <LoginByEmail
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
         />
       </>
     );
