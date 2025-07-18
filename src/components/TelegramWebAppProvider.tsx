@@ -15,6 +15,7 @@ interface TelegramWebAppContextType {
   hideMainButton: () => void;
   showBackButton: () => void;
   hideBackButton: () => void;
+  openTelegramLink: (url: string) => void;
 }
 
 const TelegramWebAppContext = createContext<TelegramWebAppContextType | null>(null);
@@ -88,7 +89,8 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
     setMainButton: telegramWebApp.setMainButton.bind(telegramWebApp),
     hideMainButton: telegramWebApp.hideMainButton.bind(telegramWebApp),
     showBackButton: telegramWebApp.showBackButton.bind(telegramWebApp),
-    hideBackButton: telegramWebApp.hideBackButton.bind(telegramWebApp)
+    hideBackButton: telegramWebApp.hideBackButton.bind(telegramWebApp),
+    openTelegramLink: telegramWebApp.openTelegramLink.bind(telegramWebApp)
   };
 
   return (

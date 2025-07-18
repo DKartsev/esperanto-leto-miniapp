@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { v5 as uuidv5 } from 'uuid';
 import { useAuth } from './SupabaseAuthProvider';
+import { useTelegramWebApp } from './TelegramWebAppProvider';
 import { supabase } from '../services/supabaseClient.js';
 import { isAdmin } from '../utils/adminUtils.js';
 
@@ -38,6 +39,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [newUsername, setNewUsername] = useState(profile?.username || '');
   const [loginLoading, setLoginLoading] = useState(false);
   const [tgUsername, setTgUsername] = useState<string | null>(null);
+  const { openTelegramLink } = useTelegramWebApp();
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -77,7 +79,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
     const tg = window.Telegram?.WebApp;
     const userData = tg?.initDataUnsafe?.user;
     if (!userData) {
-      alert('Ошибка: Telegram не предоставил пользователя');
+      openTelegramLink('https://t.me/EsperantoLetoBot/webapp');
       return;
     }
 
