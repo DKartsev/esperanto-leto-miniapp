@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   getUserProfile,
   updateUserProfile as authUpdateUserProfile,
   onAuthStateChange,
   signIn as authSignIn,
   signUp as authSignUp,
-  signOut as authSignOut
+  signOut as authSignOut,
+  ensureUserProfile
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
 import { getUserStats, getUserAchievements } from '../services/progressService.js'
@@ -21,6 +22,7 @@ export function useSupabaseAuth() {
   const [achievements, setAchievements] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const profileCheckedRef = useRef(false)
 
   // Загрузка данных пользователя
   const loadUserData = async (currentUser) => {
@@ -35,6 +37,11 @@ export function useSupabaseAuth() {
     try {
       setLoading(true)
       setError(null)
+
+      if (!profileCheckedRef.current) {
+        profileCheckedRef.current = true
+        await ensureUserProfile(currentUser)
+      }
 
       // Загружаем профиль, статистику и достижения параллельно
       const [userProfile, userStats, userAchievements] = await Promise.all([
