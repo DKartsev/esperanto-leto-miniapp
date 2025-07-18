@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
+import AdminPanelPage from './pages/AdminPanelPage';
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import AuthCallback from './pages/AuthCallback';
@@ -25,6 +26,7 @@ root.render(
       <SupabaseAuthProvider>
         <Routes>
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/admin-panel" element={<AdminPanelPage />} />
           <Route path="/*" element={<App />} />
         </Routes>
       </SupabaseAuthProvider>

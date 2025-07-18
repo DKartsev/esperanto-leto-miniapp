@@ -1,8 +1,11 @@
 import { useState, type FC } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { X, Mail, Loader } from 'lucide-react'
 import { supabase } from '../services/supabaseClient.js'
 
 const EMAIL_REDIRECT = 'https://tgminiapp.esperanto-leto.ru/auth/callback'
+const ADMIN_EMAIL = 'admin5050@gmail.com'
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin'
 
 export interface MagicLinkLoginProps {
   isOpen: boolean
@@ -17,9 +20,11 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
   buttonLabel = 'Отправить ссылку',
 }) => {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,17 +35,41 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
       setError('Некорректный email')
       return
     }
-
     try {
       setLoading(true)
+
+      if (email === ADMIN_EMAIL) {
+        if (password !== ADMIN_PASSWORD) {
+          setError('Неверный пароль')
+          return
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD,
+        })
+
+        if (error) {
+          setError('Ошибка входа администратора')
+        } else {
+          navigate('/admin-panel')
+        }
+
+        return
+      }
+
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: EMAIL_REDIRECT,
         },
       })
-      if (signInError) throw signInError
-      setSuccess(true)
+
+      if (signInError) {
+        setError('Ошибка отправки ссылки для входа')
+      } else {
+        setSuccess(true)
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       setError(message || 'Ошибка отправки')
@@ -75,6 +104,15 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
                 disabled={loading}
               />
             </div>
+            {email === ADMIN_EMAIL && (
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Введите пароль администратора"
+                className="input"
+              />
+            )}
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
