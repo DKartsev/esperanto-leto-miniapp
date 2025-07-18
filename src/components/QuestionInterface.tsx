@@ -1,6 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
+import useSaveProgress from '../hooks/useSaveProgress'
 
 
 interface QuestionResultItem {
@@ -45,6 +46,8 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[]; difficulty: string }>>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { progress, saveProgress } = useSaveProgress(chapterId, sectionId)
+  const [questionStartTime, setQuestionStartTime] = useState(Date.now())
 
   useEffect(() => {
     const load = async () => {
@@ -89,6 +92,16 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     load()
   }, [chapterId, sectionId])
 
+  useEffect(() => {
+    if (progress.length > 0) {
+      setCurrentQuestion(progress.length)
+    }
+  }, [progress])
+
+  useEffect(() => {
+    setQuestionStartTime(Date.now())
+  }, [currentQuestion])
+
   const totalQuestions = questions.length * 3
   const currentQuestionData = questions[currentQuestion % (questions.length || 1)]
 
@@ -127,11 +140,13 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     return `Раздел ${sectionId}`;
   };
 
-  const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer);
-    const correct = answer === currentQuestionData.correctAnswer;
-    setIsCorrect(correct);
-    
+  const handleAnswerSelect = async (answer: string) => {
+    setSelectedAnswer(answer)
+    const correct = answer === currentQuestionData.correctAnswer
+    setIsCorrect(correct)
+
+    const timeSpent = Math.round((Date.now() - questionStartTime) / 1000)
+
     const newAnswer = {
       questionId: currentQuestionData.id,
       question: currentQuestionData.question,
@@ -139,10 +154,15 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
       correctAnswer: currentQuestionData.correctAnswer,
       isCorrect: correct,
       hintsUsed: hintsUsed
-    };
-    
-    setAnswers(prev => [...prev, newAnswer]);
-  };
+    }
+
+    setAnswers(prev => [...prev, newAnswer])
+    try {
+      await saveProgress(currentQuestionData.id, correct, answer, timeSpent)
+    } catch (err) {
+      console.error('Failed to save progress', err)
+    }
+  }
 
   const handleNext = () => {
     if (currentQuestion + 1 >= totalQuestions) {
@@ -159,6 +179,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
       setIsCorrect(null);
       setHintsUsed(0);
       setShowHint(false);
+      setQuestionStartTime(Date.now());
     }
   };
 

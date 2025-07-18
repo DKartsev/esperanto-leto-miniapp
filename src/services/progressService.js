@@ -20,18 +20,21 @@ export async function saveAnswer(chapterId, sectionId, questionId, isCorrect, se
 
     const { data, error } = await supabase
       .from('user_progress')
-      .insert([
-        {
-          user_id: user.id,
-          chapter_id: chapterId,
-          section_id: sectionId,
-          question_id: questionId,
-          is_correct: isCorrect,
-          selected_answer: selectedAnswer,
-          time_spent: timeSpent,
-          answered_at: new Date().toISOString()
-        }
-      ])
+      .upsert(
+        [
+          {
+            user_id: user.id,
+            chapter_id: chapterId,
+            section_id: sectionId,
+            question_id: questionId,
+            is_correct: isCorrect,
+            selected_answer: selectedAnswer,
+            time_spent: timeSpent,
+            answered_at: new Date().toISOString()
+          }
+        ],
+        { onConflict: 'user_id,question_id' }
+      )
       .select()
       .single()
 
