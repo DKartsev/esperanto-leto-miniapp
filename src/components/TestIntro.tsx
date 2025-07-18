@@ -102,7 +102,7 @@ const TestIntro: FC<TestIntroProps> = ({ onStartTest }) => {
         <div className="text-center max-w-md mx-auto px-4">
           <button
             onClick={onStartTest}
-            className="w-full h-12 px-4 py-2 rounded-xl flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 ease-in-out text-white font-semibold shadow"
+            className="w-full max-w-xs py-2 px-4 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
           >
             <Play className="w-6 h-6" />
             <span>Начать тест</span>
