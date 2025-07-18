@@ -7,6 +7,7 @@ import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
 import AuthCallback from './pages/AuthCallback';
+import TelegramLoginRedirect from './components/TelegramLoginRedirect';
 
 // Hide loading screen when React app mounts
 function hideLoadingScreen() {
@@ -26,6 +27,7 @@ root.render(
     <BrowserRouter>
       <TelegramWebAppProvider>
         <SupabaseAuthProvider>
+          <TelegramLoginRedirect />
           <Routes>
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/admin-panel" element={<AdminPanelPage />} />
