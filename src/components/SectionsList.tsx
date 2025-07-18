@@ -2,6 +2,7 @@ import { useState, useEffect, type FC } from 'react';
 import { Play, Clock, Book, ChevronDown } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
 import { fetchSections } from '../services/courseService.js'
+import { getSectionProgressPercent } from '../services/progressService.js'
 
 interface Section {
   id: number;
@@ -34,14 +35,21 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
       setLoading(true)
       try {
         const data = await fetchSections(chapterId)
-        const processed: Section[] = (data as Array<{ id: number; title: string }>).map(sec => ({
-          id: sec.id,
-          title: sec.title || 'Нет названия',
-          progress: 0,
-          duration: '',
-          isCompleted: false,
-          theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
-        }))
+        const processed: Section[] = []
+
+        for (const sec of data as Array<{ id: number; title: string }>) {
+          const progress = await getSectionProgressPercent(chapterId, sec.id)
+
+          processed.push({
+            id: sec.id,
+            title: sec.title || 'Нет названия',
+            progress,
+            duration: '',
+            isCompleted: progress === 100,
+            theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
+          })
+        }
+
         setSections(processed)
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Ошибка загрузки'

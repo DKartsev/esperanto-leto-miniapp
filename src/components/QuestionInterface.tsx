@@ -1,6 +1,8 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
+import { saveAnswer } from '../services/progressService.js'
+import { useAuth } from './SupabaseAuthProvider'
 
 
 interface QuestionResultItem {
@@ -27,11 +29,12 @@ interface QuestionInterfaceProps {
 }
 
 const QuestionInterface: FC<QuestionInterfaceProps> = ({
-  chapterId, 
-  sectionId, 
-  onComplete, 
-  onBackToSections 
+  chapterId,
+  sectionId,
+  onComplete,
+  onBackToSections
 }) => {
+  const { refreshStats } = useAuth()
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
@@ -127,11 +130,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     return `Раздел ${sectionId}`;
   };
 
-  const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer);
-    const correct = answer === currentQuestionData.correctAnswer;
-    setIsCorrect(correct);
-    
+  const handleAnswerSelect = async (answer: string) => {
+    setSelectedAnswer(answer)
+    const correct = answer === currentQuestionData.correctAnswer
+    setIsCorrect(correct)
+
     const newAnswer = {
       questionId: currentQuestionData.id,
       question: currentQuestionData.question,
@@ -139,10 +142,24 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
       correctAnswer: currentQuestionData.correctAnswer,
       isCorrect: correct,
       hintsUsed: hintsUsed
-    };
-    
-    setAnswers(prev => [...prev, newAnswer]);
-  };
+    }
+
+    setAnswers(prev => [...prev, newAnswer])
+
+    try {
+      await saveAnswer(
+        chapterId,
+        sectionId,
+        currentQuestionData.id,
+        correct,
+        answer,
+        0
+      )
+      await refreshStats()
+    } catch (err) {
+      console.error('Ошибка сохранения ответа:', err)
+    }
+  }
 
   const handleNext = () => {
     if (currentQuestion + 1 >= totalQuestions) {
