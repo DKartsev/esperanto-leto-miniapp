@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js';
 import { v5 as uuidv5 } from 'uuid';
+import { telegramWebApp } from './telegramWebApp';
 
 const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
@@ -12,7 +13,8 @@ export async function telegramLogin() {
   const tg = window.Telegram.WebApp;
   const user = tg.initDataUnsafe?.user;
   if (!user) {
-    console.error('Telegram user data not found');
+    console.warn('Telegram user data not found');
+    telegramWebApp.openTelegramLink('https://t.me/EsperantoLetoBot/webapp');
     return null;
   }
 
