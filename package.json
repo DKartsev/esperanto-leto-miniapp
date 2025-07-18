@@ -12,7 +12,8 @@
     "bot:dev": "node --watch src/bot/index.js",
     "start": "concurrently \"npm run dev\" \"npm run bot:dev\" --names \"WebApp,TelegramBot\" --prefix-colors \"cyan,yellow\"",
     "start:prod": "concurrently \"npm run preview\" \"npm run bot\" --names \"WebApp,TelegramBot\" --prefix-colors \"green,blue\"",
-    "diagnostics": "node src/bot/diagnostics.js"
+    "diagnostics": "node src/bot/diagnostics.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
