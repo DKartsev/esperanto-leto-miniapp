@@ -12,6 +12,17 @@ import {
   getWebAppKeyboard
 } from './utils/keyboard.js';
 import { esperantoChapters } from './data/esperantoData.js';
+
+const BOT_USERNAME = process.env.BOT_USERNAME || 'YOUR_BOT_USERNAME';
+
+function buildWebAppUrl(params = {}) {
+  const base = `https://t.me/${BOT_USERNAME}/webapp`;
+  if (params && Object.keys(params).length > 0) {
+    const search = new URLSearchParams(params);
+    return `${base}?startapp=${encodeURIComponent(search.toString())}`;
+  }
+  return base;
+}
 import { 
   getUserState, 
   updateUserState, 
@@ -189,26 +200,20 @@ export function handleWebAppCommand(bot, msg) {
   try {
     // Убеждаемся, что пользователь инициализирован
     getUserState(userId);
-    
-    const webAppMessage = `
-🌐 *Веб-приложение Esperanto-Leto*
 
-Откройте полнофункциональное приложение для изучения эсперанто с расширенными возможностями:
-
-✨ *Преимущества веб-версии:*
-• 🎨 Красивый адаптивный интерфейс
-• 🤖 Продвинутый AI-помощник с голосом
-• 📊 Детальная статистика прогресса
-• 🎯 Интерактивные упражнения
-• 📱 Оптимизация для мобильных устройств
-• 🔄 Синхронизация с Telegram
-
-Нажмите кнопку ниже, чтобы открыть приложение:
-    `;
-    
-    bot.sendMessage(chatId, webAppMessage, {
-      parse_mode: 'Markdown',
-      reply_markup: getWebAppKeyboard()
+    bot.sendMessage(chatId, 'Откройте мини-приложение:', {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: 'Открыть',
+              web_app: {
+                url: buildWebAppUrl()
+              }
+            }
+          ]
+        ]
+      }
     }).then(() => {
       logger.info(`User ${userId} requested webapp`);
       console.log(`✅ WebApp сообщение отправлено пользователю ${userId}`);
@@ -314,7 +319,7 @@ export function handleTestCommand(bot, msg) {
             {
               text: '🌐 Пройти в веб-приложении',
               web_app: {
-                url: 'https://tgminiapp.esperanto-leto.ru'
+                url: buildWebAppUrl()
               }
             }
           ],
@@ -372,7 +377,7 @@ export function handleProfileCommand(bot, msg) {
             {
               text: '🌐 Открыть профиль в приложении',
               web_app: {
-                url: 'https://tgminiapp.esperanto-leto.ru'
+                url: buildWebAppUrl()
               }
             }
           ],
@@ -444,7 +449,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
                 {
                   text: '🌐 AI-чат в приложении',
                   web_app: {
-                    url: 'https://tgminiapp.esperanto-leto.ru'
+                    url: buildWebAppUrl()
                   }
                 }
               ],
@@ -552,7 +557,7 @@ export function handleChapterSelection(bot, msg, chapterId) {
             {
               text: '🌐 Изучать в приложении',
               web_app: {
-                url: `https://tgminiapp.esperanto-leto.ru?chapter=${chapterId}`
+                url: buildWebAppUrl({ chapter: chapterId })
               }
             }
           ],
@@ -647,7 +652,7 @@ ${content.content}
             {
               text: '🌐 Изучать в приложении',
               web_app: {
-                url: `https://tgminiapp.esperanto-leto.ru?chapter=${chapterId}&section=${sectionId}`
+                url: buildWebAppUrl({ chapter: chapterId, section: sectionId })
               }
             }
           ],
