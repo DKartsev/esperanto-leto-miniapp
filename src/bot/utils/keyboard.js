@@ -2,6 +2,17 @@
  * Keyboard utilities for the Telegram bot
  */
 
+const BOT_USERNAME = process.env.BOT_USERNAME || 'YOUR_BOT_USERNAME';
+
+function buildWebAppUrl(params = {}) {
+  const base = `https://t.me/${BOT_USERNAME}/webapp`;
+  if (params && Object.keys(params).length > 0) {
+    const search = new URLSearchParams(params);
+    return `${base}?startapp=${encodeURIComponent(search.toString())}`;
+  }
+  return base;
+}
+
 /**
  * Create main menu keyboard with WebApp button
  * @returns {Object} Keyboard markup
@@ -27,7 +38,7 @@ export function getMainMenuInlineKeyboard() {
         {
           text: '🚀 Открыть приложение',
           web_app: {
-            url: 'https://tgminiapp.esperanto-leto.ru'
+            url: buildWebAppUrl()
           }
         }
       ],
@@ -130,7 +141,7 @@ export function getWebAppKeyboard() {
         {
           text: '🌐 Открыть веб-приложение',
           web_app: {
-            url: 'https://tgminiapp.esperanto-leto.ru'
+            url: buildWebAppUrl()
           }
         }
       ]
