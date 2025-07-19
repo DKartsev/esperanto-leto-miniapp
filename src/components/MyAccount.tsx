@@ -50,6 +50,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [chapterStats, setChapterStats] = useState<ChapterStats | null>(null);
   const [progressData, setProgressData] = useState<any[]>([]);
+  const [chapterProgress, setChapterProgress] = useState<any[]>([]);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -239,6 +240,63 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
     fetchProgress();
   }, []);
+
+  useEffect(() => {
+    const fetchChapterProgress = async () => {
+      const { data: chapters } = await supabase
+        .from('chapters')
+        .select('id, title');
+
+      const { data: sections } = await supabase
+        .from('sections')
+        .select('id, chapter_id');
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || localStorage.getItem('user_id') || profile?.id;
+      if (!userId || !chapters) return;
+
+      const { data: completed } = await supabase
+        .from('user_progress')
+        .select('chapter_id, section_id')
+        .eq('user_id', userId)
+        .eq('completed', true);
+
+      const sectionsByChapter = new Map<number, number>();
+      sections?.forEach((s: any) => {
+        sectionsByChapter.set(
+          s.chapter_id,
+          (sectionsByChapter.get(s.chapter_id) || 0) + 1
+        );
+      });
+
+      const completedMap: Record<number, Set<number>> = {};
+      completed?.forEach((c: any) => {
+        if (!completedMap[c.chapter_id]) {
+          completedMap[c.chapter_id] = new Set();
+        }
+        completedMap[c.chapter_id].add(c.section_id);
+      });
+
+      const result = chapters.map((ch: any) => {
+        const total = sectionsByChapter.get(ch.id) || 0;
+        const done = completedMap[ch.id]?.size || 0;
+        const percent = total ? Math.round((done / total) * 100) : 0;
+        return {
+          chapterId: ch.id,
+          title: ch.title,
+          totalSections: total,
+          completedSections: done,
+          percent
+        };
+      });
+
+      setChapterProgress(result);
+    };
+
+    if (isAuthenticated) {
+      fetchChapterProgress();
+    }
+  }, [isAuthenticated]);
 
   const navigateRef = useRef(false);
 
@@ -622,6 +680,30 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
                       {p.completed ? 'Завершён' : 'Не завершён'}
                     </span>
                   </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {chapterProgress && chapterProgress.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+            <h2 className="text-xl font-semibold text-emerald-900 mb-4">Прогресс по главам</h2>
+            <ul className="space-y-2 text-sm text-emerald-700">
+              {chapterProgress.map((cp) => (
+                <li key={cp.chapterId} className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span>
+                      {cp.title} — {cp.completedSections} из {cp.totalSections} разделов ({cp.percent}%)
+                    </span>
+                    {cp.percent === 100 && <Check className="w-4 h-4 text-green-600" />}
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="h-2 bg-emerald-600 rounded-full"
+                      style={{ width: `${cp.percent}%` }}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
