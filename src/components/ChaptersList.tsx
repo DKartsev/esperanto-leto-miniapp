@@ -1,6 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield, Check } from 'lucide-react';
-import CheckmarkIcon from './CheckmarkIcon';
+import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield } from 'lucide-react';
 import Toast from './Toast';
 import { fetchChapters } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService'
@@ -141,15 +140,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Легкий': return 'bg-emerald-100 text-emerald-800';
-      case 'Средний': return 'bg-yellow-100 text-yellow-800';
-      case 'Сложный': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const getOverallProgress = () => {
     if (chapters.length === 0) return 0
     const completedChapters = chapters.filter(ch => ch.isCompleted).length
@@ -165,17 +155,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     if (selectedDifficulty !== 'all' && chapter.difficulty !== selectedDifficulty) return false;
     return true;
   });
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`w-3 h-3 ${
-          i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-        }`}
-      />
-    ));
-  };
 
   const recommendedChapter = getNextRecommendedChapter();
 
@@ -301,146 +280,34 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
         {filteredChapters.map((chapter) => (
           <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
             <div
-              className={`bg-white rounded-xl shadow-md px-4 py-4 mb-4 border transition-all duration-200 flex flex-col items-center text-center gap-4 box-border ${
-                chapter.isLocked && !hasAdminAccess()
-                  ? 'border-gray-200 opacity-60'
-                  : 'border-emerald-200 hover:border-emerald-300'
+              className={`rounded-2xl bg-white shadow p-4 text-center space-y-2 ${
+                chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''
               }`}
             >
-              {/* Chapter Content */}
-              <div className="p-4 flex flex-col items-center text-center gap-4 box-border">
-              <div className="flex items-start justify-between mb-4 w-full">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                    chapter.isLocked && !hasAdminAccess() ? 'bg-gray-400' : 'bg-emerald-600'
-                  }`}>
-                    {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-6 h-6" /> : chapter.id}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3
-                        className="text-lg font-semibold text-emerald-900 break-words"
-                        style={{ textWrap: 'balance' }}
-                      >
-                        {chapter.title}
-                      </h3>
-                      <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(chapter.badge)}`}>
-                        {getBadgeIcon(chapter.badge)}
-                        <span>{chapter.badge}</span>
-                      </div>
-                      {chapter.isLocked && !hasAdminAccess() && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                          🔒 Заблокировано
-                        </span>
-                      )}
-                      {hasAdminAccess() && chapter.isLocked && (
-                        <span className="text-xs text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">
-                          👑 Админ доступ
-                        </span>
-                      )}
-                    </div>
-                    
-                    <p className="text-emerald-700 mb-3 break-words">{chapter.description}</p>
-                    
-                    {/* Chapter Stats */}
-                    <div className="flex flex-wrap gap-4 text-sm text-emerald-600 mb-3">
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{chapter.estimatedTime}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <BookOpen className="w-4 h-4" />
-                        <span>{chapter.sectionsCount} разделов</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-4 h-4" />
-                        <span>{chapter.studentsCount.toLocaleString()} студентов</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <div className="flex">{renderStars(chapter.rating)}</div>
-                        <span>{chapter.rating}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Difficulty Badge */}
-                    <div className="flex items-center space-x-2 mb-3">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(chapter.difficulty)}`}>
-                        {chapter.difficulty}
-                      </span>
-                    </div>
-                    
-                    {/* Prerequisites */}
-                    {chapter.prerequisites && chapter.prerequisites.length > 0 && !hasAdminAccess() && (
-                      <div className="mb-3">
-                        <span className="text-xs text-emerald-600">
-                          Требуется: {chapter.prerequisites.map(id => `Глава ${id}`).join(', ')}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Admin Prerequisites Override */}
-                    {chapter.prerequisites && chapter.prerequisites.length > 0 && hasAdminAccess() && (
-                      <div className="mb-3">
-                        <span className="text-xs text-emerald-600">
-                          Обычно требуется: {chapter.prerequisites.map(id => `Глава ${id}`).join(', ')}
-                        </span>
-                        <span className="text-xs text-emerald-700 ml-2 font-medium">
-                          (Пропущено для админа)
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {chapter.isCompleted && (
-                  <CheckmarkIcon size={32} animated={true} />
-                )}
+              <div
+                className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                  chapter.isLocked && !hasAdminAccess() ? 'bg-gray-400' : 'bg-emerald-600'
+                }`}
+              >
+                {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-6 h-6" /> : chapter.id}
               </div>
 
-              {/* Progress Bar */}
-              {chapter.progress > 0 && (
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-emerald-700">Прогресс</span>
-                    <span className="text-sm font-semibold text-emerald-600">{chapter.progress}%</span>
-                  </div>
-                  <div className="w-full bg-emerald-200 rounded-full h-2">
-                    <div
-                      className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${chapter.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
+              <h3 className="text-lg font-semibold text-emerald-900 break-words" style={{ textWrap: 'balance' }}>
+                {chapter.title}
+              </h3>
 
-              {chapterProgress[chapter.id] && (
-                <>
-                  <div className="h-2 w-full bg-neutral-200 rounded mt-2">
-                    <div
-                      className={`h-full rounded transition-all duration-300 ${
-                        chapterProgress[chapter.id].average_accuracy >= 70 ? 'bg-green-500' : 'bg-gray-400'
-                      }`}
-                      style={{ width: `${chapterProgress[chapter.id].average_accuracy}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center text-xs text-gray-600 mt-1">
-                    <span>{chapterProgress[chapter.id].average_accuracy}% верно</span>
-                    {chapterProgress[chapter.id].completed && (
-                      <Check className="w-4 h-4 text-green-600 ml-2" />
-                    )}
-                  </div>
-                </>
-              )}
+              <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(chapter.badge)}`}>
+                {getBadgeIcon(chapter.badge)}
+                <span>{chapter.badge}</span>
+              </div>
 
-              {/* Action Button */}
               <button
                 onClick={() => onChapterSelect(chapter.id)}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`w-full max-w-xs py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
+                className={`w-full py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md active:scale-100'
+                    : 'bg-green-600 text-white shadow hover:bg-green-700 hover:scale-105 active:scale-100'
                 } ${hasAdminAccess() && chapter.isLocked ? 'border-2 border-emerald-400' : ''}`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (
@@ -462,7 +329,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </button>
             </div>
           </div>
-        </div>
         ))}
       </div>
 
