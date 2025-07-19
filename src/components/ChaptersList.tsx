@@ -1,11 +1,10 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield } from 'lucide-react';
 import Toast from './Toast';
-import { fetchChapters, fetchSections } from '../services/courseService.js';
-import { getChapterProgressPercent } from '../services/progressService';
-import { isAdmin } from '../utils/adminUtils.js';
-import { supabase } from '../services/supabaseClient.js';
-import AnimatedLoader from './AnimatedLoader';
+import { fetchChapters, fetchSections } from '../services/courseService.js'
+import { getChapterProgressPercent } from '../services/progressService'
+import { isAdmin } from '../utils/adminUtils.js'
+import { supabase } from '../services/supabaseClient.js'
 
 interface Chapter {
   id: number;
@@ -185,7 +184,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   };
 
   if (loading) {
-    return <AnimatedLoader />;
+    return <div className="p-6">Загрузка...</div>
   }
 
   if (error) {

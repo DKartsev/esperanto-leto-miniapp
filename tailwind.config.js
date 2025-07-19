@@ -9,9 +9,6 @@ export default {
       screens: {
         'safe-area': 'screen and (display-mode: standalone)',
       },
-      animation: {
-        'spin-slow': 'spin 10s linear infinite',
-      },
     },
   },
   plugins: [],
