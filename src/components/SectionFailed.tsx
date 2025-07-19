@@ -44,9 +44,13 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
           </div>
         )}
         <button
-          onClick={handleRetry}
+          onClick={showRetry ? handleRetry : undefined}
           disabled={!showRetry}
-          className={`transition-all text-white px-6 py-3 rounded-full text-lg font-semibold w-full ${showRetry ? 'bg-gray-400 hover:bg-gray-500' : 'bg-green-600 opacity-80 cursor-not-allowed'}`}
+          className={`transition-all text-white px-6 py-3 rounded-full text-lg font-semibold w-full ${
+            showRetry
+              ? 'bg-gray-400 hover:bg-gray-500 cursor-pointer'
+              : 'bg-green-600 opacity-80 cursor-not-allowed'
+          }`}
         >
           {showRetry ? 'Попробовать ещё раз' : `Загрузка${dots}`}
         </button>
