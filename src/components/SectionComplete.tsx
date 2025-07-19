@@ -45,9 +45,38 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const completed = percentage >= 70;
 
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        console.error('Ошибка получения пользователя:', userError);
+      let userId: string | null = user?.id || null;
+
+      // Получаем Telegram ID из WebApp, если есть
+      const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+      if (!userId && telegramId) {
+        userId = String(telegramId);
+      }
+
+      if (userError || !userId) {
+        console.error('Ошибка получения пользователя или Telegram ID:', userError);
         return;
+      }
+
+      // Если userId — это числовой Telegram ID, конвертируем в UUID из таблицы profiles
+      if (/^\d+$/.test(userId)) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('telegram_id', userId)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Ошибка поиска профиля:', profileError);
+        }
+
+        if (profile?.id) {
+          userId = profile.id as string;
+        } else {
+          console.error('UUID для Telegram ID не найден');
+          return;
+        }
       }
 
       const { error } = await supabase
@@ -55,7 +84,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         .upsert(
           [
             {
-              user_id: user.id,
+              user_id: userId,
               section_id: sectionId,
               chapter_id: chapterId,
               accuracy: percentage,
