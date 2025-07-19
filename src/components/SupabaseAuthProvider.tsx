@@ -10,6 +10,7 @@ export interface AuthContextValue {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
+  isAdmin: boolean
   signIn: (email: string, password: string) => Promise<unknown>
   signUp: (email: string, password: string, username: string) => Promise<unknown>
   signOut: () => Promise<void>
@@ -27,10 +28,15 @@ const SupabaseAuthContext = createContext<AuthContextValue | null>(null)
  * @param {React.ReactNode} props.children - Дочерние компоненты
  */
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
-  const auth = useAuthHook() as unknown as AuthContextValue
+  const auth = useAuthHook() as unknown as Omit<AuthContextValue, 'isAdmin'> & {
+    profile: { is_admin?: boolean }
+  }
+
+  const isAdmin = Boolean(auth.profile?.is_admin)
+  const value = { ...auth, isAdmin } as AuthContextValue
 
   return (
-    <SupabaseAuthContext.Provider value={auth}>
+    <SupabaseAuthContext.Provider value={value}>
       {children}
     </SupabaseAuthContext.Provider>
   )

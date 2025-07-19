@@ -53,11 +53,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [progressData, setProgressData] = useState<any[]>([]);
   const [chapterProgress, setChapterProgress] = useState<any[]>([]);
   const [recommendedChapter, setRecommendedChapter] = useState<{ chapterId: number; title: string } | null>(null);
-  const [userStats, setUserStats] = useState({
-    completedSections: 0,
-    averageAccuracy: 0,
-    totalTimeSpent: 0
-  });
   const [completedChapters, setCompletedChapters] = useState(0);
   const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
   const [averageAccuracy, setAverageAccuracy] = useState(0);
