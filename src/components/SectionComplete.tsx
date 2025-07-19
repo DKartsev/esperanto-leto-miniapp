@@ -74,8 +74,26 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         if (profile?.id) {
           userId = profile.id as string;
         } else {
-          console.error('UUID для Telegram ID не найден');
-          return;
+          console.warn('⚠️ UUID не найден, создаём профиль');
+
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                telegram_id: String(userId),
+                username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+              }
+            ])
+            .select('id')
+            .single();
+
+          if (insertError || !newProfile) {
+            console.error('❌ Ошибка создания нового профиля:', insertError);
+            return;
+          }
+
+          userId = newProfile.id as string;
+          console.log('✅ Профиль создан. UUID:', userId);
         }
       }
 
