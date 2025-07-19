@@ -256,6 +256,11 @@ function App() {
     setCurrentView('sections');
   };
 
+  const handleStartChapterFromAccount = (chapterId: number) => {
+    handleChapterSelect(chapterId);
+    setActiveTab('home');
+  };
+
   const handleSectionSelect = (sectionId: number) => {
     setSelectedSection(sectionId);
     setSectionStartTime(Date.now());
@@ -328,7 +333,6 @@ function App() {
 
     const correct = results.answers?.filter(a => a.isCorrect).length || 0;
     const total = results.totalQuestions || 1;
-    const accuracy = Math.round((correct / total) * 100);
     const timeSpent = results.timeSpent || 0;
     const user_id = localStorage.getItem('user_id');
 
@@ -433,7 +437,10 @@ function App() {
     return (
       <div className="h-screen flex flex-col bg-gradient-to-br from-emerald-50 to-green-50">
         <div className={`flex-1 overflow-y-auto ${showNavigation ? 'pb-24' : ''}`}>
-          <MyAccount onBackToHome={() => setActiveTab('home')} />
+          <MyAccount
+            onBackToHome={() => setActiveTab('home')}
+            onStartChapter={handleStartChapterFromAccount}
+          />
         </div>
         <NavigationBar />
       </div>
