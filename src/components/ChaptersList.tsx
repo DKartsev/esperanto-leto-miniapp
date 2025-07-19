@@ -1,6 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, Clock, Users, TrendingUp, Award, Shield, Check } from 'lucide-react';
 import CheckmarkIcon from './CheckmarkIcon';
+import Toast from './Toast';
 import { fetchChapters } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
@@ -41,6 +42,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [chapterProgress, setChapterProgress] = useState<Record<number, { completed: boolean; average_accuracy: number }>>({})
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -102,6 +104,21 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
     loadProgress()
   }, [])
+
+  // Показываем уведомление о завершении главы
+  useEffect(() => {
+    if (!chapters.length) return
+    for (const ch of chapters) {
+      if (chapterProgress[ch.id]?.completed) {
+        const key = `chapter_reward_${ch.id}`
+        if (!localStorage.getItem(key)) {
+          setToastMessage(`Поздравляем! Вы завершили главу ${ch.title}`)
+          localStorage.setItem(key, 'true')
+          break
+        }
+      }
+    }
+  }, [chapterProgress, chapters])
 
 
   const getBadgeIcon = (badge: string) => {
@@ -499,6 +516,9 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
           )}
         </div>
       </div>
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      )}
     </div>
   );
 };
