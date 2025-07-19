@@ -124,8 +124,12 @@ function App() {
       }
     }
 
-    if (!userId) {
-      setDebugLogs((logs) => [...logs, '❌ Нет user_id, прогресс не будет сохранён']);
+    if (!userId || /^\d+$/.test(String(userId))) {
+      setDebugLogs((logs) => [
+        ...logs,
+        '❌ Ошибка: userId не является UUID, прогресс не будет сохранён'
+      ]);
+      console.error('❌ Ошибка: userId не является UUID, прогресс не будет сохранён');
       return;
     }
 
@@ -145,6 +149,7 @@ function App() {
       ...logs,
       `📦 upsert data: ${JSON.stringify(upsertData)}`
     ]);
+    console.log('📦 upsert data:', upsertData);
 
     const { error } = await supabase
       .from('user_progress')
