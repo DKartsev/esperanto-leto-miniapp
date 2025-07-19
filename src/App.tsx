@@ -35,7 +35,6 @@ import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
-import { updateChapterProgress } from './services/progressUpdater';
 import { supabase } from './services/supabaseClient.js';
 import { isAdmin } from './utils/adminUtils.js';
 
@@ -106,6 +105,7 @@ function App() {
         ...logs,
         `🔎 Ищем UUID в profiles по telegramId ${userId}`
       ]);
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -123,14 +123,9 @@ function App() {
         setDebugLogs((logs) => [...logs, '❌ UUID для Telegram ID не найден']);
       }
     }
-    
+
     if (!userId) {
       setDebugLogs((logs) => [...logs, '❌ Нет user_id, прогресс не будет сохранён']);
-      return;
-    }
-    // Проверка, что userId — UUID перед записью
-    if (!/^[0-9a-fA-F\-]{36}$/.test(String(userId))) {
-      setDebugLogs((logs) => [...logs, '❌ Ошибка: userId не UUID, прогресс не будет сохранён']);
       return;
     }
 
@@ -156,13 +151,9 @@ function App() {
       .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
 
     if (error) {
-      setDebugLogs((logs) => [
-        ...logs,
-        `❌ upsert error: ${error.message} | ${error.details}`
-      ]);
+      setDebugLogs((logs) => [...logs, '❌ Ошибка при сохранении прогресса: ' + error.message]);
     } else {
-      setDebugLogs((logs) => [...logs, '✅ Прогресс сохранён успешно']);
-      await updateChapterProgress(userId, chapterId);
+      setDebugLogs((logs) => [...logs, '✅ Прогресс успешно сохранён']);
     }
   };
 
