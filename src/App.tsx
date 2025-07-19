@@ -100,12 +100,16 @@ function App() {
     setDebugLogs((logs) => [...logs, '👤 Полученный userId: ' + userId]);
 
     // Convert Telegram numeric ID to UUID stored in profiles table
-    if (userId && /^\d+$/.test(userId)) {
-      setDebugLogs((logs) => [...logs, `🔎 Ищем UUID в profiles по telegramId ${userId}`]);
+    if (userId && /^\d+$/.test(String(userId))) {
+      userId = String(userId);
+      setDebugLogs((logs) => [
+        ...logs,
+        `🔎 Ищем UUID в profiles по telegramId ${userId}`
+      ]);
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('telegram_id', String(userId))
+        .eq('telegram_id', userId)
         .maybeSingle();
 
       if (profileError) {
