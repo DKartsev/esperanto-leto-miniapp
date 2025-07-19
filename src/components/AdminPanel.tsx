@@ -154,7 +154,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
             },
             ...prev
           ]);
-          // @ts-ignore
+          // @ts-expect-error capture console output
           original[type](...args);
         };
 

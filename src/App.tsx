@@ -64,28 +64,6 @@ function App() {
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const [showNavigation, setShowNavigation] = useState(true);
   const [sectionStartTime, setSectionStartTime] = useState<number | null>(null);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
-
-  const debugOverlay =
-    debugLogs.length > 0 && (
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 64,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          backgroundColor: 'black',
-          color: 'lime',
-          fontSize: '14px',
-          padding: '12px',
-          whiteSpace: 'pre-wrap'
-        }}
-      >
-        {debugLogs.join('\n')}
-      </div>
-    );
-
   // Save aggregated progress for a section
   const saveProgressToSupabase = async (
     chapterId: number,
@@ -94,16 +72,14 @@ function App() {
     totalQuestions: number,
     timeSpent: number
   ) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
     let userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
-    setDebugLogs((logs) => [...logs, '👤 Полученный userId: ' + userId]);
 
     // Если это Telegram ID (число) — ищем или создаём профиль
     if (userId && /^\d+$/.test(String(userId))) {
       const telegramId = String(userId);
-
-      setDebugLogs((logs) => [...logs, `🔎 Ищем UUID в profiles по telegramId ${telegramId}`]);
-
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
@@ -111,15 +87,12 @@ function App() {
         .maybeSingle();
 
       if (profileError) {
-        setDebugLogs((logs) => [...logs, `❌ Ошибка поиска профиля: ${profileError.message}`]);
+        console.error('Ошибка поиска профиля:', profileError.message);
       }
 
       if (profileData?.id) {
         userId = profileData.id;
-        setDebugLogs((logs) => [...logs, `📛 Найден UUID: ${userId}`]);
       } else {
-        setDebugLogs((logs) => [...logs, '⚠️ UUID не найден, создаём профиль']);
-
         const { data: newProfile, error: insertError } = await supabase
           .from('profiles')
           .insert([
@@ -132,17 +105,15 @@ function App() {
           .single();
 
         if (insertError || !newProfile) {
-          setDebugLogs((logs) => [...logs, '❌ Ошибка создания профиля: ' + insertError?.message]);
+          console.error('Ошибка создания профиля:', insertError?.message);
           return;
         }
 
         userId = newProfile.id;
-        setDebugLogs((logs) => [...logs, `✅ Профиль создан. UUID: ${userId}`]);
       }
     }
 
     if (!userId || /^\d+$/.test(String(userId))) {
-      setDebugLogs((logs) => [...logs, '❌ userId не является UUID, прогресс не будет сохранён']);
       return;
     }
 
@@ -157,8 +128,6 @@ function App() {
       accuracy,
       time_spent: timeSpent
     };
-
-    setDebugLogs((logs) => [...logs, `📦 upsert data: ${JSON.stringify(upsertData)}`]);
     console.log('📦 upsert data:', upsertData);
 
     const { error } = await supabase
@@ -166,9 +135,7 @@ function App() {
       .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
 
     if (error) {
-      setDebugLogs((logs) => [...logs, '❌ Ошибка при сохранении прогресса: ' + error.message]);
-    } else {
-      setDebugLogs((logs) => [...logs, '✅ Прогресс успешно сохранён']);
+      console.error('Ошибка при сохранении прогресса:', error.message);
     }
   };
 
@@ -240,9 +207,7 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    setDebugLogs((logs) => [...logs, '🧪 Тестовое сообщение для лога']);
-  }, []);
+  useEffect(() => {  }, []);
 
   const location = useLocation();
 
@@ -347,20 +312,12 @@ function App() {
     setCurrentView('questions');
   };
 
+
   const handleQuestionComplete = async (results: QuestionResults) => {
-    setDebugLogs((logs) => [
-      ...logs,
-      `✅ handleQuestionComplete: ${JSON.stringify(results)}`
-    ]);
-    setDebugLogs((logs) => [...logs, '📥 handleQuestionComplete вызван']);
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
         const timeSpent = sectionStartTime ? Math.round((Date.now() - sectionStartTime) / 1000) : 0;
-        setDebugLogs((logs) => [
-          ...logs,
-          `📤 saveProgressToSupabase: chapter=${selectedChapter}, section=${selectedSection}`
-        ]);
         await saveProgressToSupabase(
           selectedChapter,
           selectedSection,
@@ -384,7 +341,6 @@ function App() {
     setSectionStartTime(null);
     setCurrentView('section-complete');
   };
-
   const handleRetryIncorrect = () => {
     setCurrentView('questions');
   };
@@ -417,9 +373,7 @@ function App() {
     setTestView('test');
   };
 
-  const handleTestComplete = async (results: FullTestResults) => {
-    setDebugLogs((logs) => [...logs, '📥 handleTestComplete вызван']);
-    setTestResults(results);
+  const handleTestComplete = async (results: FullTestResults) => {    setTestResults(results);
 
     const correct = results.answers?.filter(a => a.isCorrect).length || 0;
     const total = results.totalQuestions || 1;
@@ -597,7 +551,6 @@ function App() {
               />
               <NavigationBar />
             </div>
-            {debugOverlay}
           </>
         );
       case 'sections':
@@ -611,7 +564,6 @@ function App() {
               />
               <NavigationBar />
             </div>
-            {debugOverlay}
           </>
         );
       case 'questions':
@@ -623,7 +575,6 @@ function App() {
               onComplete={handleQuestionComplete}
               onBackToSections={handleBackToSections}
             />
-            {debugOverlay}
           </>
         );
       case 'section-complete':
@@ -637,7 +588,6 @@ function App() {
               onRetryIncorrect={handleRetryIncorrect}
               onCompleteChapter={handleCompleteChapter}
             />
-            {debugOverlay}
           </>
         );
       case 'chapter-complete':
@@ -648,7 +598,6 @@ function App() {
               onNextChapter={handleNextChapter}
               onBackToChapters={handleBackToChapters}
             />
-            {debugOverlay}
           </>
         );
     }
@@ -1072,7 +1021,6 @@ function App() {
       </footer>
 
       <NavigationBar />
-      {debugOverlay}
     </div>
   );
 }
