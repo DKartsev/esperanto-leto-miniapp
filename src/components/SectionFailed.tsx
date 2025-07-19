@@ -29,36 +29,28 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
   };
 
   return (
-    <div className="relative w-screen h-screen">
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-black z-50">
       <video
         src={videoFile}
         autoPlay
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute top-0 left-0 w-full h-full object-cover"
       />
-      {showRetry ? (
-        <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 text-center">
-          <div className="mb-3 inline-block px-4 py-1 rounded-full border border-red-500 text-red-600 bg-white/70 backdrop-blur-sm text-sm font-semibold">
+      <div className="absolute bottom-[12%] left-1/2 transform -translate-x-1/2 text-center px-4 w-full max-w-xs">
+        {showRetry && (
+          <div className="mb-3 px-4 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold w-fit mx-auto">
             Fiasko
           </div>
-          <button
-            onClick={handleRetry}
-            className="mt-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-full text-lg font-semibold transition-colors"
-          >
-            Попробовать ещё раз
-          </button>
-        </div>
-      ) : (
-        <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2">
-          <button
-            disabled
-            className="bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold opacity-80 cursor-not-allowed"
-          >
-            Загрузка{dots}
-          </button>
-        </div>
-      )}
+        )}
+        <button
+          onClick={handleRetry}
+          disabled={!showRetry}
+          className={`transition-all text-white px-6 py-3 rounded-full text-lg font-semibold w-full ${showRetry ? 'bg-gray-400 hover:bg-gray-500' : 'bg-green-600 opacity-80 cursor-not-allowed'}`}
+        >
+          {showRetry ? 'Попробовать ещё раз' : `Загрузка${dots}`}
+        </button>
+      </div>
     </div>
   );
 }; 
