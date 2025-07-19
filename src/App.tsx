@@ -185,7 +185,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setDebugLogs(['🧪 Тестовое сообщение для лога']);
+    setDebugLogs((logs) => [...logs, '🧪 Тестовое сообщение для лога']);
   }, []);
 
   const location = useLocation();
@@ -586,6 +586,11 @@ function App() {
   // Original landing page content for other tabs (Account)
   return (
     <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
+      {debugLogs.length > 0 && (
+        <div style={{ background: 'red', color: 'white', padding: '10px', fontSize: '16px', zIndex: 9999 }}>
+          {debugLogs.join(' | ')}
+        </div>
+      )}
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b border-emerald-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
