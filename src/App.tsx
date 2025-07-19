@@ -33,6 +33,7 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
+import VisualLog from "./components/VisualLog";
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { updateChapterProgress } from './services/progressUpdater';
@@ -65,6 +66,7 @@ function App() {
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const [showNavigation, setShowNavigation] = useState(true);
   const [sectionStartTime, setSectionStartTime] = useState<number | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
 
   // Save aggregated progress for a section
   const saveProgressToSupabase = async (
@@ -76,16 +78,16 @@ function App() {
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
-    console.log('👤 Полученный userId:', userId);
+    setDebugLogs((logs) => [...logs, '👤 Полученный userId: ' + userId]);
     if (!userId) {
-      console.error('❌ Нет user_id, прогресс не будет сохранён');
+      setDebugLogs((logs) => [...logs, '❌ Нет user_id, прогресс не будет сохранён']);
       return;
     }
 
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
     const completed = accuracy >= 70;
 
-    const { data, error } = await supabase.from('user_progress').upsert(
+    const { error } = await supabase.from('user_progress').upsert(
       {
         user_id: userId,
         chapter_id: chapterId,
@@ -98,9 +100,9 @@ function App() {
     );
 
     if (error) {
-      console.error('❌ Ошибка при сохранении прогресса:', error);
+      setDebugLogs((logs) => [...logs, '❌ Ошибка при сохранении прогресса: ' + error.message]);
     } else {
-      console.log('✅ Прогресс сохранён успешно:', data);
+      setDebugLogs((logs) => [...logs, '✅ Прогресс сохранён успешно']);
       await updateChapterProgress(userId, chapterId);
     }
   };
@@ -451,7 +453,6 @@ function App() {
             onStartChapter={handleStartChapterFromAccount}
           />
         </div>
-        <NavigationBar />
       </div>
     );
   }
@@ -976,6 +977,7 @@ function App() {
         </div>
       </footer>
 
+      <VisualLog logs={debugLogs} />
       <NavigationBar />
     </div>
   );
