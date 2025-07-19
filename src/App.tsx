@@ -279,6 +279,7 @@ function App() {
   };
 
   const handleQuestionComplete = async (results: QuestionResults) => {
+    setDebugLogs((logs) => [...logs, '📥 handleQuestionComplete вызван']);
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
@@ -340,6 +341,7 @@ function App() {
   };
 
   const handleTestComplete = async (results: FullTestResults) => {
+    setDebugLogs((logs) => [...logs, '📥 handleTestComplete вызван']);
     setTestResults(results);
 
     const correct = results.answers?.filter(a => a.isCorrect).length || 0;
