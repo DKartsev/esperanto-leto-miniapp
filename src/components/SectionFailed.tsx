@@ -1,18 +1,15 @@
-// src/components/SectionFailed.tsx
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import videoFile from '../assets/Failed.mp4'; // убедись, что файл загружен в эту папку
+import videoFile from '../assets/Failed.mp4';
 
 const SectionFailed = ({ sectionId }: { sectionId: string }) => {
   const [showRetry, setShowRetry] = useState(false);
   const [dots, setDots] = useState('');
   const navigate = useNavigate();
 
-  // Анимация точек и смена кнопки
   useEffect(() => {
     const dotInterval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? '' : prev + '.'));
+      setDots((prev) => (prev === '...' ? '' : prev + '.'));
     }, 400);
 
     const timeout = setTimeout(() => {
@@ -32,34 +29,31 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
   };
 
   return (
-    <div className="relative w-screen h-screen bg-black">
+    <div className="relative w-screen h-screen">
       <video
         src={videoFile}
         autoPlay
         muted
         playsInline
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-
       {showRetry ? (
-        <>
-          <div className="absolute top-[65%] left-1/2 transform -translate-x-1/2 text-center">
-            <div className="mb-3 px-4 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold">
-              Fiasko
-            </div>
-            <button
-              onClick={handleRetry}
-              className="bg-gray-400 hover:bg-gray-500 transition-all text-white px-6 py-3 rounded-full text-lg font-semibold"
-            >
-              Попробовать еще раз
-            </button>
+        <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 text-center">
+          <div className="mb-3 inline-block px-4 py-1 rounded-full border border-red-500 text-red-600 bg-white/70 backdrop-blur-sm text-sm font-semibold">
+            Fiasko
           </div>
-        </>
+          <button
+            onClick={handleRetry}
+            className="mt-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-3 rounded-full text-lg font-semibold transition-colors"
+          >
+            Попробовать ещё раз
+          </button>
+        </div>
       ) : (
-        <div className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2">
           <button
             disabled
-            className="bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold opacity-80"
+            className="bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold opacity-80 cursor-not-allowed"
           >
             Загрузка{dots}
           </button>
@@ -67,6 +61,6 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
       )}
     </div>
   );
-};
+}; 
 
 export default SectionFailed;
