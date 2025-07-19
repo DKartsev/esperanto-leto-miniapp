@@ -53,6 +53,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [progressData, setProgressData] = useState<any[]>([]);
   const [chapterProgress, setChapterProgress] = useState<any[]>([]);
   const [recommendedChapter, setRecommendedChapter] = useState<{ chapterId: number; title: string } | null>(null);
+  const [userStats, setUserStats] = useState({
+    completedSections: 0,
+    averageAccuracy: 0,
+    totalTimeSpent: 0
+  });
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -242,6 +247,37 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     };
 
     fetchProgress();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('Ошибка получения пользователя:', userError);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('accuracy, time_spent')
+        .eq('user_id', user.id)
+        .eq('completed', true);
+
+      if (error) {
+        console.error('Ошибка загрузки прогресса:', error);
+        return;
+      }
+
+      const completedSections = data ? data.length : 0;
+      const averageAccuracy = data && data.length > 0
+        ? Math.round(data.reduce((sum: number, row: any) => sum + (row.accuracy || 0), 0) / data.length)
+        : 0;
+      const totalTimeSpent = data ? data.reduce((sum: number, row: any) => sum + (row.time_spent || 0), 0) : 0;
+
+      setUserStats({ completedSections, averageAccuracy, totalTimeSpent });
+    };
+
+    fetchUserStats();
   }, []);
 
   useEffect(() => {
@@ -585,6 +621,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow border p-4 my-4">
+          <h2 className="text-xl font-semibold mb-2">Ваш прогресс</h2>
+          <p>📘 Пройдено разделов: <strong>{userStats.completedSections}</strong></p>
+          <p>🎯 Средняя точность: <strong>{userStats.averageAccuracy}%</strong></p>
+          <p>⏱️ Общее время обучения: <strong>{Math.floor(userStats.totalTimeSpent / 60)} мин</strong></p>
         </div>
 
         {/* Admin Access Notice for admin5050 */}
