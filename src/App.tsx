@@ -105,7 +105,7 @@ function App() {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', userId)
+        .eq('telegram_id', userId)
         .maybeSingle();
 
       if (profileError) {
