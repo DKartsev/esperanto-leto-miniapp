@@ -79,21 +79,27 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         }
       }
 
+      if (!userId || /^\d+$/.test(userId)) {
+        console.error('❌ Ошибка: userId не является UUID, прогресс не будет сохранён');
+        return;
+      }
+
+      const upsertData = [
+        {
+          user_id: userId,
+          section_id: sectionId,
+          chapter_id: chapterId,
+          accuracy: percentage,
+          completed,
+          updated_at: new Date().toISOString()
+        }
+      ];
+
+      console.log('📦 upsert data:', upsertData[0]);
+
       const { error } = await supabase
         .from('user_progress')
-        .upsert(
-          [
-            {
-              user_id: userId,
-              section_id: sectionId,
-              chapter_id: chapterId,
-              accuracy: percentage,
-              completed,
-              updated_at: new Date().toISOString()
-            }
-          ],
-          { onConflict: ['user_id', 'section_id'] }
-        );
+        .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
 
       if (error) {
         console.error('Ошибка сохранения прогресса:', error);
