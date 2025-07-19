@@ -1,6 +1,7 @@
-import type { FC } from 'react';
+import { FC, useEffect } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
 import { CheckCircle, XCircle, RotateCcw, ArrowRight, Trophy, Clock } from 'lucide-react';
+import { supabase } from '../services/supabaseClient.js';
 
 interface SectionResults {
   totalQuestions: number;
@@ -38,6 +39,42 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
   const performance = getPerformanceMessage();
   const PerformanceIcon = performance.icon;
+
+  useEffect(() => {
+    const saveSectionProgress = async () => {
+      const completed = percentage >= 70;
+
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('Ошибка получения пользователя:', userError);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_progress')
+        .upsert(
+          [
+            {
+              user_id: user.id,
+              section_id: sectionId,
+              chapter_id: chapterId,
+              accuracy: percentage,
+              completed,
+              updated_at: new Date().toISOString()
+            }
+          ],
+          { onConflict: ['user_id', 'section_id'] }
+        );
+
+      if (error) {
+        console.error('Ошибка сохранения прогресса:', error);
+      } else {
+        console.log('Прогресс раздела успешно сохранён.');
+      }
+    };
+
+    saveSectionProgress();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
