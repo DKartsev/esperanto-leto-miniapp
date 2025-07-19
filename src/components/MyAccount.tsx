@@ -18,6 +18,7 @@ import { v5 as uuidv5 } from 'uuid';
 import { useAuth } from './SupabaseAuthProvider';
 import { supabase } from '../services/supabaseClient.js';
 import { isAdmin } from '../utils/adminUtils.js';
+import AdminPanelButton from '../components/AdminPanelButton';
 
 interface MyAccountProps {
   onBackToHome: () => void;
@@ -823,16 +824,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
                 <div className="text-emerald-100">Отчеты и статистика</div>
               </div>
             </div>
-            <button
-              onClick={() => navigate('/admin-panel')}
-              className="mt-4 inline-flex items-center px-4 py-2 bg-white bg-opacity-20 rounded-lg text-sm font-semibold text-white hover:bg-opacity-30 transition-colors"
-            >
-              Открыть админ-панель
-            </button>
+            <AdminPanelButton />
           </div>
         )}
 
-        {/* Progress Overview */}
+                    {/* Progress Overview */}
         {chapterStats && (
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
             <h2 className="text-xl font-semibold text-emerald-900 mb-4">Общий прогресс</h2>
@@ -1032,12 +1028,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         {/* Back to Learning Button */}
         <div className="mt-8 text-center">
           {hasAdminAccess() && (
-            <button
-              onClick={() => navigate('/admin-panel')}
-              className="bg-green-100 text-green-900 rounded-xl px-4 py-2 shadow mr-4"
-            >
-              Панель администратора
-            </button>
+            <AdminPanelButton />
           )}
           <button
             onClick={onBackToHome}
