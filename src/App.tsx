@@ -279,11 +279,19 @@ function App() {
   };
 
   const handleQuestionComplete = async (results: QuestionResults) => {
+    setDebugLogs((logs) => [
+      ...logs,
+      `✅ handleQuestionComplete: ${JSON.stringify(results)}`
+    ]);
     setDebugLogs((logs) => [...logs, '📥 handleQuestionComplete вызван']);
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
         const timeSpent = sectionStartTime ? Math.round((Date.now() - sectionStartTime) / 1000) : 0;
+        setDebugLogs((logs) => [
+          ...logs,
+          `📤 saveProgressToSupabase: chapter=${selectedChapter}, section=${selectedSection}`
+        ]);
         await saveProgressToSupabase(
           selectedChapter,
           selectedSection,
