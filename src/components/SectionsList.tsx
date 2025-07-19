@@ -1,6 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Clock, Book, ChevronDown, Check } from 'lucide-react';
-import CheckmarkIcon from './CheckmarkIcon';
+import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
 import { getSectionProgressPercent } from '../services/progressService';
 import { supabase } from '../services/supabaseClient.js';
@@ -214,7 +213,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                 </div>
                 
                 {section.isCompleted && (
-                  <CheckmarkIcon size={28} animated={true} />
+                  <CheckCircle2 className="text-green-500 w-5 h-5" />
                 )}
               </div>
 
@@ -242,7 +241,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                     <div className="flex items-center text-xs text-gray-600 mt-1">
                       <span>{progressBySectionId[section.id].accuracy}% верно</span>
                       {progressBySectionId[section.id].completed && (
-                        <Check className="w-4 h-4 text-green-600 ml-2" />
+                        <CheckCircle2 className="w-4 h-4 text-green-600 ml-2" />
                       )}
                     </div>
                   </>
