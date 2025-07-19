@@ -58,6 +58,10 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     averageAccuracy: 0,
     totalTimeSpent: 0
   });
+  const [completedChapters, setCompletedChapters] = useState(0);
+  const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
+  const [averageAccuracy, setAverageAccuracy] = useState(0);
+  const [startDate, setStartDate] = useState<string | null>(null);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -91,6 +95,90 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   };
 
   const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
+  useEffect(() => {
+    const fetchActualProgress = async () => {
+      if (!user?.id) return;
+
+      const { data: progress, error } = await supabase
+        .from('user_progress')
+        .select('chapter_id, section_id, is_correct, time_spent, answered_at')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Ошибка загрузки прогресса:', error);
+        return;
+      }
+
+      if (!progress) return;
+
+      let totalTimeSec = 0;
+      let correctAnswers = 0;
+      const sectionMap = new Map<string, { correct: number; total: number; chapter: number }>();
+      let firstDate: Date | null = null;
+
+      progress.forEach((row: any) => {
+        totalTimeSec += row.time_spent || 0;
+        if (row.is_correct) correctAnswers += 1;
+
+        const key = `${row.chapter_id}-${row.section_id}`;
+        if (!sectionMap.has(key)) {
+          sectionMap.set(key, { correct: 0, total: 0, chapter: row.chapter_id });
+        }
+        const stat = sectionMap.get(key)!;
+        stat.total += 1;
+        if (row.is_correct) stat.correct += 1;
+
+        if (row.answered_at) {
+          const d = new Date(row.answered_at);
+          if (!firstDate || d < firstDate) firstDate = d;
+        }
+      });
+
+      const avgAccuracy = progress.length
+        ? Math.round((correctAnswers / progress.length) * 100)
+        : 0;
+
+      const { data: sections, error: sectionsError } = await supabase
+        .from('sections')
+        .select('id, chapter_id');
+
+      if (sectionsError) {
+        console.error('Ошибка загрузки списка разделов:', sectionsError);
+        return;
+      }
+
+      const sectionsPerChapter = new Map<number, number>();
+      sections?.forEach((s: any) => {
+        sectionsPerChapter.set(
+          s.chapter_id,
+          (sectionsPerChapter.get(s.chapter_id) || 0) + 1
+        );
+      });
+
+      const chapterAcc: Record<number, number[]> = {};
+      sectionMap.forEach((val) => {
+        const acc = val.total ? val.correct / val.total : 0;
+        if (!chapterAcc[val.chapter]) chapterAcc[val.chapter] = [];
+        chapterAcc[val.chapter].push(acc);
+      });
+
+      let completed = 0;
+      for (const [chapterId, total] of sectionsPerChapter) {
+        const arr = chapterAcc[chapterId] || [];
+        if (arr.length === total && arr.every((a) => a >= 0.7)) {
+          completed += 1;
+        }
+      }
+
+      setCompletedChapters(completed);
+      setTotalStudyMinutes(Math.round(totalTimeSec / 60));
+      setAverageAccuracy(avgAccuracy);
+      setStartDate(firstDate ? firstDate.toISOString() : null);
+    };
+
+    fetchActualProgress();
+  }, [user?.id]);
 
   async function loadChapterStats() {
     const user_id = localStorage.getItem('user_id');
@@ -628,6 +716,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           <p>📘 Пройдено разделов: <strong>{userStats.completedSections}</strong></p>
           <p>🎯 Средняя точность: <strong>{userStats.averageAccuracy}%</strong></p>
           <p>⏱️ Общее время обучения: <strong>{Math.floor(userStats.totalTimeSpent / 60)} мин</strong></p>
+          <p>✅ Главы завершены: <strong>{completedChapters}</strong></p>
+          <p>🕒 Время обучения всего: <strong>{totalStudyMinutes} мин</strong></p>
+          <p>⚖️ Точность ответов: <strong>{averageAccuracy}%</strong></p>
+          {startDate && (
+            <p>📅 Начало занятий: <strong>{new Date(startDate).toLocaleDateString()}</strong></p>
+          )}
         </div>
 
         {/* Admin Access Notice for admin5050 */}
