@@ -76,14 +76,18 @@ function App() {
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
-    if (!userId) return;
+    console.log('👤 Полученный userId:', userId);
+    if (!userId) {
+      console.error('❌ Нет user_id, прогресс не будет сохранён');
+      return;
+    }
 
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
     const completed = accuracy >= 70;
 
-    await supabase.from('user_progress').upsert(
+    const { data, error } = await supabase.from('user_progress').upsert(
       {
-        user_id: user.id,
+        user_id: userId,
         chapter_id: chapterId,
         section_id: sectionId,
         completed,
@@ -93,7 +97,12 @@ function App() {
       { onConflict: ['user_id', 'section_id'] }
     );
 
-    await updateChapterProgress(userId, chapterId);
+    if (error) {
+      console.error('❌ Ошибка при сохранении прогресса:', error);
+    } else {
+      console.log('✅ Прогресс сохранён успешно:', data);
+      await updateChapterProgress(userId, chapterId);
+    }
   };
 
   useEffect(() => {
