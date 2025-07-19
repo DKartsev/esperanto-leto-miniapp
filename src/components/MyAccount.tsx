@@ -228,11 +228,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   useEffect(() => {
     const fetchProgress = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = user?.id || localStorage.getItem('user_id') || profile?.id;
+      if (!userId) return;
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
       if (!error && data) setProgressData(data as any[]);
     };
 
@@ -615,7 +616,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
               {progressData.map((p) => (
                 <li key={p.section_id} className="flex justify-between">
                   <span>Раздел {p.section_id}</span>
-                  <span>{p.accuracy}%</span>
+                  <span className="flex items-center space-x-2">
+                    <span>{p.accuracy}%</span>
+                    <span className={p.completed ? 'text-green-600' : 'text-red-600'}>
+                      {p.completed ? 'Завершён' : 'Не завершён'}
+                    </span>
+                  </span>
                 </li>
               ))}
             </ul>

@@ -64,6 +64,7 @@ function App() {
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const [showNavigation, setShowNavigation] = useState(true);
+  const [sectionStartTime, setSectionStartTime] = useState<number | null>(null);
 
   // Save aggregated progress for a section
   const saveProgressToSupabase = async (
@@ -74,7 +75,8 @@ function App() {
     timeSpent: number
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
+    if (!userId) return;
 
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
     const completed = accuracy >= 70;
@@ -88,10 +90,10 @@ function App() {
         accuracy,
         time_spent: timeSpent
       },
-      { onConflict: 'user_id, section_id' }
+      { onConflict: ['user_id', 'section_id'] }
     );
 
-    await updateChapterProgress(user.id, chapterId);
+    await updateChapterProgress(userId, chapterId);
   };
 
   useEffect(() => {
@@ -256,6 +258,7 @@ function App() {
 
   const handleSectionSelect = (sectionId: number) => {
     setSelectedSection(sectionId);
+    setSectionStartTime(Date.now());
     setCurrentView('questions');
   };
 
@@ -263,19 +266,20 @@ function App() {
     setSectionResults(results);
     if (selectedChapter && selectedSection) {
       try {
+        const timeSpent = sectionStartTime ? Math.round((Date.now() - sectionStartTime) / 1000) : 0;
         await saveProgressToSupabase(
           selectedChapter,
           selectedSection,
           results.correctAnswers,
           results.totalQuestions,
-          0
+          timeSpent
         );
         const { achievements } = await (saveTestResults(
           selectedChapter,
           selectedSection,
           results.correctAnswers,
           results.totalQuestions,
-          0
+          timeSpent
         ) as any);
         setEarnedAchievements(achievements);
         await refreshStats();
@@ -283,6 +287,7 @@ function App() {
         console.error('Ошибка сохранения результатов раздела:', err);
       }
     }
+    setSectionStartTime(null);
     setCurrentView('section-complete');
   };
 
