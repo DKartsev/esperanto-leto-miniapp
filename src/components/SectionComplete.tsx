@@ -64,7 +64,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
-          .eq('telegram_id', userId)
+          .eq('telegram_id', String(userId))
           .maybeSingle();
 
         if (profileError) {
