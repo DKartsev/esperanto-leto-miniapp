@@ -21,6 +21,7 @@ import {
 import DataExporter from './DataExporter';
 import esperantoData, { Chapter, Section } from '../data/esperantoData';
 import { isAdmin } from '../utils/adminUtils.js';
+import { supabase } from '../services/supabaseClient.js';
 
 interface AdminUser {
   id: string;
@@ -62,7 +63,7 @@ type EditingItem =
   | { type: 'chapter'; data: Chapter | null }
   | { type: 'section'; data: Section | null; chapterId: number };
 
-type AdminTab = 'content' | 'users' | 'analytics' | 'settings';
+type AdminTab = 'content' | 'users' | 'analytics' | 'settings' | 'logs';
 
 const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('content');
@@ -91,6 +92,16 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
     completionRate: 0
   });
 
+  interface LogEntry {
+    id?: string;
+    type: string;
+    message: string;
+    created_at: string;
+  }
+
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logPage, setLogPage] = useState(1);
+
   const checkAdminAccess = useCallback(() => {
     if (isAdmin(currentUser, currentEmail)) {
       setIsAuthorized(true);
@@ -107,6 +118,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
       await loadUsers();
       await loadAnalytics();
       await loadAdminUsers();
+      await loadLogs(1);
     } catch (error) {
       console.error('Error loading system data:', error);
     } finally {
@@ -119,6 +131,50 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
     checkAdminAccess();
     loadSystemData();
   }, [checkAdminAccess, loadSystemData]);
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const original = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error
+      };
+
+      const capture = (type: 'log' | 'warn' | 'error') =>
+        (...args: any[]) => {
+          setLogs(prev => [
+            {
+              type,
+              message: args
+                .map(a =>
+                  typeof a === 'object' ? JSON.stringify(a) : String(a)
+                )
+                .join(' '),
+              created_at: new Date().toISOString()
+            },
+            ...prev
+          ]);
+          // @ts-ignore
+          original[type](...args);
+        };
+
+      console.log = capture('log');
+      console.warn = capture('warn');
+      console.error = capture('error');
+
+      return () => {
+        console.log = original.log;
+        console.warn = original.warn;
+        console.error = original.error;
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV && logPage > 1) {
+      loadLogs(logPage);
+    }
+  }, [logPage]);
 
   const loadUsers = async () => {
     // Mock user data - in real app this would come from backend
@@ -200,6 +256,24 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
       }
     ];
     setAdminUsers(mockAdminUsers);
+  };
+
+  const loadLogs = async (page: number) => {
+    if (import.meta.env.DEV) return;
+
+    const from = (page - 1) * 20;
+    const to = from + 19;
+
+    const { data, error } = await supabase
+      .from('logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(from, to);
+
+    if (!error && data) {
+      setLogs(prev => [...prev, ...data]);
+      setLogPage(page + 1);
+    }
   };
 
   // Content Management Functions
@@ -371,6 +445,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
               { id: 'content', label: 'Управление контентом', icon: BookOpen },
               { id: 'users', label: 'Пользователи', icon: Users },
               { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
+              { id: 'logs', label: 'Логи', icon: AlertTriangle },
               { id: 'settings', label: 'Настройки', icon: Settings }
             ] as { id: AdminTab; label: string; icon: LucideIcon }[]
           ).map((tab) => {
@@ -713,6 +788,34 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
 
               {/* Data Export Component */}
               <DataExporter />
+            </div>
+          )}
+
+          {/* Logs Tab */}
+          {activeTab === 'logs' && (
+            <div className="p-6 h-full overflow-y-auto">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Логи</h2>
+              <div className="space-y-2">
+                {logs.map((log, idx) => (
+                  <details
+                    key={log.id || idx}
+                    className="rounded-xl bg-gray-50 border p-4 overflow-auto max-h-48 text-sm"
+                  >
+                    <summary className="cursor-pointer select-none">
+                      {log.type} - {new Date(log.created_at).toLocaleString()}
+                    </summary>
+                    <pre className="whitespace-pre-wrap mt-2">{log.message}</pre>
+                  </details>
+                ))}
+              </div>
+              {!import.meta.env.DEV && (
+                <button
+                  onClick={() => setLogPage(logPage + 1)}
+                  className="mt-4 px-4 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 text-sm"
+                >
+                  Загрузить ещё
+                </button>
+              )}
             </div>
           )}
 
