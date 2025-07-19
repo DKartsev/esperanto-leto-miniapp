@@ -33,7 +33,6 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
-import VisualLog from "./components/VisualLog";
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { updateChapterProgress } from './services/progressUpdater';
@@ -67,6 +66,26 @@ function App() {
   const [showNavigation, setShowNavigation] = useState(true);
   const [sectionStartTime, setSectionStartTime] = useState<number | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  const debugOverlay =
+    debugLogs.length > 0 && (
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 64,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          backgroundColor: 'black',
+          color: 'lime',
+          fontSize: '14px',
+          padding: '12px',
+          whiteSpace: 'pre-wrap'
+        }}
+      >
+        {debugLogs.join('\n')}
+      </div>
+    );
 
   // Save aggregated progress for a section
   const saveProgressToSupabase = async (
@@ -533,52 +552,67 @@ function App() {
     switch (currentView) {
       case 'chapters':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
-            <ChaptersList
-              onChapterSelect={handleChapterSelect}
-              currentUser={(profile as any)?.username}
-            />
-            <NavigationBar />
-          </div>
+          <>
+            <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
+              <ChaptersList
+                onChapterSelect={handleChapterSelect}
+                currentUser={(profile as any)?.username}
+              />
+              <NavigationBar />
+            </div>
+            {debugOverlay}
+          </>
         );
       case 'sections':
         return (
-          <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
-            <SectionsList 
-              chapterId={selectedChapter!} 
-              onSectionSelect={handleSectionSelect}
-              onBackToChapters={handleBackToChapters}
-            />
-            <NavigationBar />
-          </div>
+          <>
+            <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 ${showNavigation ? 'pb-24' : ''}`}>
+              <SectionsList
+                chapterId={selectedChapter!}
+                onSectionSelect={handleSectionSelect}
+                onBackToChapters={handleBackToChapters}
+              />
+              <NavigationBar />
+            </div>
+            {debugOverlay}
+          </>
         );
       case 'questions':
         return (
-          <QuestionInterface
-            chapterId={selectedChapter!}
-            sectionId={selectedSection!}
-            onComplete={handleQuestionComplete}
-            onBackToSections={handleBackToSections}
-          />
+          <>
+            <QuestionInterface
+              chapterId={selectedChapter!}
+              sectionId={selectedSection!}
+              onComplete={handleQuestionComplete}
+              onBackToSections={handleBackToSections}
+            />
+            {debugOverlay}
+          </>
         );
       case 'section-complete':
         return (
-          <SectionComplete
-            results={sectionResults!}
-            chapterId={selectedChapter!}
-            sectionId={selectedSection!}
-            achievements={earnedAchievements}
-            onRetryIncorrect={handleRetryIncorrect}
-            onCompleteChapter={handleCompleteChapter}
-          />
+          <>
+            <SectionComplete
+              results={sectionResults!}
+              chapterId={selectedChapter!}
+              sectionId={selectedSection!}
+              achievements={earnedAchievements}
+              onRetryIncorrect={handleRetryIncorrect}
+              onCompleteChapter={handleCompleteChapter}
+            />
+            {debugOverlay}
+          </>
         );
       case 'chapter-complete':
         return (
-          <ChapterComplete
-            chapterId={selectedChapter!}
-            onNextChapter={handleNextChapter}
-            onBackToChapters={handleBackToChapters}
-          />
+          <>
+            <ChapterComplete
+              chapterId={selectedChapter!}
+              onNextChapter={handleNextChapter}
+              onBackToChapters={handleBackToChapters}
+            />
+            {debugOverlay}
+          </>
         );
     }
   }
@@ -586,11 +620,6 @@ function App() {
   // Original landing page content for other tabs (Account)
   return (
     <div className={`min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 ${showNavigation ? 'pb-24' : ''}`}>
-      {debugLogs.length > 0 && (
-        <div style={{ background: 'red', color: 'white', padding: '10px', fontSize: '16px', zIndex: 9999 }}>
-          {debugLogs.join(' | ')}
-        </div>
-      )}
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b border-emerald-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1006,7 +1035,7 @@ function App() {
       </footer>
 
       <NavigationBar />
-      <VisualLog logs={debugLogs} />
+      {debugOverlay}
     </div>
   );
 }
