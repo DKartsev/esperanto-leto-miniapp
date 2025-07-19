@@ -109,18 +109,43 @@ function App() {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('telegram_id', String(userId))
+        .eq('telegram_id', userId)
         .maybeSingle();
 
       if (profileError) {
-        setDebugLogs((logs) => [...logs, `❌ Ошибка поиска профиля: ${profileError.message}`]);
+        setDebugLogs((logs) => [
+          ...logs,
+          `❌ Ошибка поиска профиля: ${profileError.message}`
+        ]);
       }
 
       if (profileData?.id) {
         userId = profileData.id as string;
         setDebugLogs((logs) => [...logs, `📛 Найден UUID: ${userId}`]);
       } else {
-        setDebugLogs((logs) => [...logs, '❌ UUID для Telegram ID не найден']);
+        setDebugLogs((logs) => [...logs, '⚠️ UUID не найден, создаём профиль']);
+
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              telegram_id: userId,
+              username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+            }
+          ])
+          .select('id')
+          .single();
+
+        if (insertError || !newProfile) {
+          setDebugLogs((logs) => [
+            ...logs,
+            `❌ Ошибка создания нового профиля: ${insertError?.message}`
+          ]);
+          return;
+        }
+
+        userId = newProfile.id as string;
+        setDebugLogs((logs) => [...logs, `✅ Профиль создан. UUID: ${userId}`]);
       }
     }
 
