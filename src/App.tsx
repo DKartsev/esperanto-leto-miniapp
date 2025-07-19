@@ -184,6 +184,10 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    setDebugLogs(['🧪 Тестовое сообщение для лога']);
+  }, []);
+
   const location = useLocation();
 
   useEffect(() => {
@@ -996,8 +1000,8 @@ function App() {
         </div>
       </footer>
 
-      <VisualLog logs={debugLogs} />
       <NavigationBar />
+      <VisualLog logs={debugLogs} />
     </div>
   );
 }
