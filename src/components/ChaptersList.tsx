@@ -211,8 +211,11 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
           </div>
         )}
         
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
         {/* Overall Progress */}
-        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-emerald-900">Общий прогресс</h2>
             <span className="text-2xl font-bold text-emerald-600">{getOverallProgress()}%</span>
@@ -232,38 +235,35 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
             )}
           </p>
         </div>
-      </div>
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="w-full max-w-sm mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-md px-4 py-4 mb-4 flex flex-col items-center text-center gap-4 box-border">
-            <div className="flex flex-wrap items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-600" />
-              <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
-            </div>
-            <div>
-              <h4
-                className="font-semibold text-emerald-900 break-words"
-                style={{ textWrap: 'balance' }}
-              >
-                {recommendedChapter.title}
-              </h4>
-              <p className="text-sm text-emerald-700 break-words">{recommendedChapter.description}</p>
-            </div>
-            <button
-              onClick={() => onChapterSelect(recommendedChapter.id)}
-              className="w-full max-w-xs py-2 px-4 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
-            >
-              <Play className="w-4 h-4" />
-              <span>Начать</span>
-            </button>
+        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 flex flex-col items-center text-center gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
           </div>
+          <div>
+            <h4
+              className="font-semibold text-emerald-900 break-words"
+              style={{ textWrap: 'balance' }}
+            >
+              {recommendedChapter.title}
+            </h4>
+            <p className="text-sm text-emerald-700 break-words">{recommendedChapter.description}</p>
+          </div>
+          <button
+            onClick={() => onChapterSelect(recommendedChapter.id)}
+            className="w-full py-2 px-4 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
+          >
+            <Play className="w-4 h-4" />
+            <span>Начать</span>
+          </button>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-4 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-emerald-800">Сложность:</span>
@@ -424,9 +424,10 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
           )}
         </div>
       </div>
-      {toastMessage && (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
-      )}
+        {toastMessage && (
+          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+        )}
+      </div>
     </div>
   );
 };
