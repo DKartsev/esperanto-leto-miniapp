@@ -96,8 +96,30 @@ function App() {
     timeSpent: number
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
-    const userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
+    let userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
     setDebugLogs((logs) => [...logs, '👤 Полученный userId: ' + userId]);
+
+    // Convert Telegram numeric ID to UUID stored in profiles table
+    if (userId && /^\d+$/.test(userId)) {
+      setDebugLogs((logs) => [...logs, `🔎 Ищем UUID в profiles по telegramId ${userId}`]);
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (profileError) {
+        setDebugLogs((logs) => [...logs, `❌ Ошибка поиска профиля: ${profileError.message}`]);
+      }
+
+      if (profileData?.id) {
+        userId = profileData.id as string;
+        setDebugLogs((logs) => [...logs, `📛 Найден UUID: ${userId}`]);
+      } else {
+        setDebugLogs((logs) => [...logs, '❌ UUID для Telegram ID не найден']);
+      }
+    }
+
     if (!userId) {
       setDebugLogs((logs) => [...logs, '❌ Нет user_id, прогресс не будет сохранён']);
       return;
