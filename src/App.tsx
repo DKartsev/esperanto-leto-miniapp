@@ -486,6 +486,7 @@ function App() {
             onStartChapter={handleStartChapterFromAccount}
           />
         </div>
+        <NavigationBar />
       </div>
     );
   }
@@ -575,6 +576,7 @@ function App() {
               onComplete={handleQuestionComplete}
               onBackToSections={handleBackToSections}
             />
+            <NavigationBar />
           </>
         );
       case 'section-complete':
@@ -588,6 +590,7 @@ function App() {
               onRetryIncorrect={handleRetryIncorrect}
               onCompleteChapter={handleCompleteChapter}
             />
+            <NavigationBar />
           </>
         );
       case 'chapter-complete':
@@ -598,6 +601,7 @@ function App() {
               onNextChapter={handleNextChapter}
               onBackToChapters={handleBackToChapters}
             />
+            <NavigationBar />
           </>
         );
     }
