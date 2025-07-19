@@ -98,29 +98,24 @@ function App() {
     let userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
     setDebugLogs((logs) => [...logs, '👤 Полученный userId: ' + userId]);
 
-    // Convert Telegram numeric ID to UUID stored in profiles table
+    // Если это Telegram ID (число) — ищем или создаём профиль
     if (userId && /^\d+$/.test(String(userId))) {
-      userId = String(userId);
-      setDebugLogs((logs) => [
-        ...logs,
-        `🔎 Ищем UUID в profiles по telegramId ${userId}`
-      ]);
+      const telegramId = String(userId);
+
+      setDebugLogs((logs) => [...logs, `🔎 Ищем UUID в profiles по telegramId ${telegramId}`]);
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('telegram_id', userId)
+        .eq('telegram_id', telegramId)
         .maybeSingle();
 
       if (profileError) {
-        setDebugLogs((logs) => [
-          ...logs,
-          `❌ Ошибка поиска профиля: ${profileError.message}`
-        ]);
+        setDebugLogs((logs) => [...logs, `❌ Ошибка поиска профиля: ${profileError.message}`]);
       }
 
       if (profileData?.id) {
-        userId = profileData.id as string;
+        userId = profileData.id;
         setDebugLogs((logs) => [...logs, `📛 Найден UUID: ${userId}`]);
       } else {
         setDebugLogs((logs) => [...logs, '⚠️ UUID не найден, создаём профиль']);
@@ -129,7 +124,7 @@ function App() {
           .from('profiles')
           .insert([
             {
-              telegram_id: userId,
+              telegram_id: telegramId,
               username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
             }
           ])
@@ -137,24 +132,17 @@ function App() {
           .single();
 
         if (insertError || !newProfile) {
-          setDebugLogs((logs) => [
-            ...logs,
-            `❌ Ошибка создания нового профиля: ${insertError?.message}`
-          ]);
+          setDebugLogs((logs) => [...logs, '❌ Ошибка создания профиля: ' + insertError?.message]);
           return;
         }
 
-        userId = newProfile.id as string;
+        userId = newProfile.id;
         setDebugLogs((logs) => [...logs, `✅ Профиль создан. UUID: ${userId}`]);
       }
     }
 
     if (!userId || /^\d+$/.test(String(userId))) {
-      setDebugLogs((logs) => [
-        ...logs,
-        '❌ Ошибка: userId не является UUID, прогресс не будет сохранён'
-      ]);
-      console.error('❌ Ошибка: userId не является UUID, прогресс не будет сохранён');
+      setDebugLogs((logs) => [...logs, '❌ userId не является UUID, прогресс не будет сохранён']);
       return;
     }
 
@@ -170,10 +158,7 @@ function App() {
       time_spent: timeSpent
     };
 
-    setDebugLogs((logs) => [
-      ...logs,
-      `📦 upsert data: ${JSON.stringify(upsertData)}`
-    ]);
+    setDebugLogs((logs) => [...logs, `📦 upsert data: ${JSON.stringify(upsertData)}`]);
     console.log('📦 upsert data:', upsertData);
 
     const { error } = await supabase
