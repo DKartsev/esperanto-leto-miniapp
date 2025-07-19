@@ -41,6 +41,13 @@ import { isAdmin } from './utils/adminUtils.js';
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+
+  useEffect(() => {
+    const isTelegramWebApp = window?.Telegram?.WebApp?.initData;
+    if (!isTelegramWebApp) {
+      window.location.href = 'https://t.me/EsperantoLetoBot?start=start';
+    }
+  }, []);
   
   // Learning interface state
   const [currentView, setCurrentView] = useState<'chapters' | 'sections' | 'questions' | 'section-complete' | 'chapter-complete'>('chapters');
