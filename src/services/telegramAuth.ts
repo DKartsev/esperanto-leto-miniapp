@@ -20,17 +20,27 @@ export async function telegramLogin() {
 
   const telegramId = user.id.toString();
   const username = user.username || `${user.first_name}${user.last_name || ''}`;
-  const email = `${username}@telegram.fake`;
+  const email = `${telegramId}@telegram.local`;
   const userUUID = uuidv5(telegramId, TELEGRAM_NAMESPACE);
 
-  const { error } = await supabase.rpc('create_user_from_telegram', {
-    uid: userUUID,
-    username,
-    email,
-  });
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: userUUID,
+        telegram_id: telegramId,
+        username: username || `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+        email
+      },
+      {
+        onConflict: ['telegram_id']
+      }
+    );
 
   if (error) {
-    console.error('\u274C \u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0438 \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044F:', error);
+    console.error('❌ Ошибка при сохранении профиля в Supabase:', error.message);
+  } else {
+    console.log('✅ Профиль создан или обновлён:', data);
   }
 
   localStorage.setItem('user_id', userUUID);
