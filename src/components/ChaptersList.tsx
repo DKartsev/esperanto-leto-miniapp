@@ -358,9 +358,12 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </button>
 
               {openChapterId === chapter.id && (
-                <ul className="mt-4 space-y-1 text-left">
+                <ul className="mt-4 space-y-2 text-left">
                   {sectionsByChapter[chapter.id]?.map((section) => (
-                    <li key={section.id} className="border-t border-emerald-200 pt-2 text-sm text-emerald-800">
+                    <li
+                      key={section.id}
+                      className="max-w-[90%] ml-4 border-l-4 border-green-400 rounded-lg bg-gray-50 shadow-sm px-3 py-2 text-sm text-emerald-800"
+                    >
                       {section.title}
                     </li>
                   ))}
