@@ -65,6 +65,29 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [progressLoading, setProgressLoading] = useState(true);
 
   useEffect(() => {
+    const fetchStartDate = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('answered_at')
+        .eq('user_id', user.id)
+        .order('answered_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Ошибка получения даты начала обучения:', error);
+        return;
+      }
+
+      setStartDate(data?.answered_at ?? null);
+    };
+
+    fetchStartDate();
+  }, [user?.id]);
+
+  useEffect(() => {
     setNewUsername(profile?.username || '');
   }, [profile]);
 
@@ -691,7 +714,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
       {/* Stats Cards */}
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -730,6 +753,20 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
                   {stats?.accuracy || 0}%
                 </div>
                 <div className="text-sm text-emerald-700">Точность ответов</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-emerald-900">
+                  {startDate ? new Date(startDate).toLocaleDateString('ru-RU') : '-'}
+                </div>
+                <div className="text-sm text-emerald-700">Дата начала</div>
               </div>
             </div>
           </div>
