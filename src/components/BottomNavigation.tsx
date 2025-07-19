@@ -20,8 +20,8 @@ const BottomNavigation = () => {
             clsx(
               'flex flex-col items-center justify-center text-xs transition duration-300 ease-in-out',
               isActive
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-400 animate-gradient'
-                : 'text-gray-500 hover:text-green-500'
+                ? 'text-green-600 font-semibold'
+                : 'text-gray-500 hover:text-green-600'
             )
           }
         >
