@@ -12,8 +12,8 @@ interface ChapterCardProps {
 // Remove common prefixes like "Глава 1" or "1." from the title
 const cleanTitle = (title: string): string => {
   return title
-    .replace(/^\s*Глава\s*\d+[:.\-]?\s*/i, '')
-    .replace(/^\s*\d+[:.\-]?\s*/, '')
+    .replace(/^\s*Глава\s*\d+[:.-]?\s*/i, '')
+    .replace(/^\s*\d+[:.-]?\s*/, '')
     .trim();
 };
 

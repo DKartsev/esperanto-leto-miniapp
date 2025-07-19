@@ -6,7 +6,6 @@ import videoFile from '../assets/Failed.mp4'; // убедись, что файл
 
 const SectionFailed = ({ sectionId }: { sectionId: string }) => {
   const [showRetry, setShowRetry] = useState(false);
-  const [buttonLabel, setButtonLabel] = useState('Загрузка');
   const [dots, setDots] = useState('');
   const navigate = useNavigate();
 
