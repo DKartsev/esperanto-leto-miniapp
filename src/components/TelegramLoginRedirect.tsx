@@ -17,22 +17,29 @@ const TelegramLoginRedirect = () => {
     }
 
     const userId = telegramUser.id.toString();
+    const firstName = telegramUser.first_name;
 
     const initProfile = async () => {
       try {
         const { data } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, username')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (!data) {
           await supabase.from('profiles').insert({
             id: userId,
-            username: telegramUser.username,
-            email: `${telegramUser.username}@telegram`,
+            username: firstName,
+            email: `${userId}@telegram`,
+            telegram_id: userId,
             created_at: new Date().toISOString(),
           });
+        } else if (!data.username) {
+          await supabase
+            .from('profiles')
+            .update({ username: firstName })
+            .eq('id', userId);
         }
 
         localStorage.setItem('user_id', userId);

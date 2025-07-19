@@ -38,7 +38,7 @@ export function useSupabaseAuth() {
       setLoading(true)
       setError(null)
 
-      if (!profileCheckedRef.current) {
+      if (!profileCheckedRef.current && currentUser.email) {
         profileCheckedRef.current = true
         await ensureUserProfile(currentUser)
       }

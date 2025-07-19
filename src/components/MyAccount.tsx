@@ -272,6 +272,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   };
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const isTelegramUser = Boolean(telegramUser);
 
   useEffect(() => {
     if (!isAuthenticated && telegramUser) {
@@ -599,7 +600,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
                 <User className="w-8 h-8 text-white" />
               </div>
               <div>
-                {isEditingUsername ? (
+                {isTelegramUser ? (
+                  <h1 className="text-2xl font-bold text-emerald-900">
+                    {profile?.username || 'Пользователь'}
+                  </h1>
+                ) : isEditingUsername ? (
                   <div className="flex items-center space-x-2">
                     <input
                       type="text"
