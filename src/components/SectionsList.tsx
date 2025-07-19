@@ -3,6 +3,7 @@ import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
 import { getSectionProgressPercent } from '../services/progressService';
 import { supabase } from '../services/supabaseClient.js';
+import AnimatedLoader from './AnimatedLoader';
 
 interface Section {
   id: number;
@@ -102,7 +103,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   const chapterTitle = getChapterTitle(chapterId);
 
   if (loading) {
-    return <div className="p-6">Загрузка...</div>
+    return <AnimatedLoader />;
   }
 
   if (error) {
