@@ -192,7 +192,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   }
 
   return (
-    <div className="p-6 pt-20 space-y-6 mx-auto max-w-screen-sm">
+    <div className="p-6 pt-2 space-y-6 mx-auto max-w-screen-sm">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
