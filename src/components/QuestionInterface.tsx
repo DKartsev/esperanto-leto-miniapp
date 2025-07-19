@@ -3,7 +3,6 @@ import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
 import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
-import AnimatedLoader from './AnimatedLoader';
 
 
 export interface QuestionResultItem {
@@ -98,7 +97,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const currentQuestionData = questions[currentQuestion]
 
   if (loading) {
-    return <AnimatedLoader />;
+    return <div className="p-6">Загрузка...</div>
   }
 
   if (error) {
