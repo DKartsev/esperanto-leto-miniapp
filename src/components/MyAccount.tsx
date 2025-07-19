@@ -152,7 +152,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     const { error } = await supabase.rpc('create_user_from_telegram', {
       uid: userUUID,
       username,
-      email
+      email,
+      telegram_id: tgUser.id.toString()
     });
 
     if (error) {
