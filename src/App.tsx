@@ -87,20 +87,29 @@ function App() {
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
     const completed = accuracy >= 70;
 
-    const { error } = await supabase.from('user_progress').upsert(
-      {
-        user_id: userId,
-        chapter_id: chapterId,
-        section_id: sectionId,
-        completed,
-        accuracy,
-        time_spent: timeSpent
-      },
-      { onConflict: ['user_id', 'section_id'] }
-    );
+    const upsertData = {
+      user_id: userId,
+      chapter_id: chapterId,
+      section_id: sectionId,
+      completed,
+      accuracy,
+      time_spent: timeSpent
+    };
+
+    setDebugLogs((logs) => [
+      ...logs,
+      `📦 upsert data: ${JSON.stringify(upsertData)}`
+    ]);
+
+    const { error } = await supabase
+      .from('user_progress')
+      .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
 
     if (error) {
-      setDebugLogs((logs) => [...logs, '❌ Ошибка при сохранении прогресса: ' + error.message]);
+      setDebugLogs((logs) => [
+        ...logs,
+        `❌ upsert error: ${error.message} | ${error.details}`
+      ]);
     } else {
       setDebugLogs((logs) => [...logs, '✅ Прогресс сохранён успешно']);
       await updateChapterProgress(userId, chapterId);
