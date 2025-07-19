@@ -62,6 +62,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
   const [averageAccuracy, setAverageAccuracy] = useState(0);
   const [startDate, setStartDate] = useState<string | null>(null);
+  const [progressLoading, setProgressLoading] = useState(true);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -98,7 +99,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
   useEffect(() => {
     const fetchActualProgress = async () => {
-      if (!user?.id) return;
+      setProgressLoading(true);
+      if (!user?.id) {
+        setProgressLoading(false);
+        return;
+      }
 
       const { data: progress, error } = await supabase
         .from('user_progress')
@@ -107,10 +112,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
       if (error) {
         console.error('Ошибка загрузки прогресса:', error);
+        setProgressLoading(false);
         return;
       }
 
-      if (!progress) return;
+      if (!progress) {
+        setProgressLoading(false);
+        return;
+      }
 
       let totalTimeSec = 0;
       let correctAnswers = 0;
@@ -145,6 +154,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
       if (sectionsError) {
         console.error('Ошибка загрузки списка разделов:', sectionsError);
+        setProgressLoading(false);
         return;
       }
 
@@ -175,6 +185,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       setTotalStudyMinutes(Math.round(totalTimeSec / 60));
       setAverageAccuracy(avgAccuracy);
       setStartDate(firstDate ? firstDate.toISOString() : null);
+      setProgressLoading(false);
     };
 
     fetchActualProgress();
@@ -465,6 +476,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     return `${mins}м`;
   };
 
+  const formatHoursMinutes = (minutes: number): string => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const h = String(hrs).padStart(2, '0');
+    const m = String(mins).padStart(2, '0');
+    return `${h}:${m}`;
+  };
+
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
     return isAdmin(profile?.username, user?.email);
@@ -711,18 +730,37 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow border p-4 my-4">
-          <h2 className="text-xl font-semibold mb-2">Ваш прогресс</h2>
-          <p>📘 Пройдено разделов: <strong>{userStats.completedSections}</strong></p>
-          <p>🎯 Средняя точность: <strong>{userStats.averageAccuracy}%</strong></p>
-          <p>⏱️ Общее время обучения: <strong>{Math.floor(userStats.totalTimeSpent / 60)} мин</strong></p>
-          <p>✅ Главы завершены: <strong>{completedChapters}</strong></p>
-          <p>🕒 Время обучения всего: <strong>{totalStudyMinutes} мин</strong></p>
-          <p>⚖️ Точность ответов: <strong>{averageAccuracy}%</strong></p>
-          {startDate && (
-            <p>📅 Начало занятий: <strong>{new Date(startDate).toLocaleDateString()}</strong></p>
-          )}
-        </div>
+        {progressLoading ? (
+          <div className="rounded-2xl p-4 bg-white shadow my-4">
+            <div className="space-y-2 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/3" />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl p-4 bg-white shadow my-4 space-y-2">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <span>Завершено глав: {completedChapters}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-emerald-600" />
+              <span>Обучение: {formatHoursMinutes(totalStudyMinutes)}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="w-4 h-4 text-emerald-600" />
+              <span>Точность ответов: {averageAccuracy}%</span>
+            </div>
+            {startDate && (
+              <div className="flex items-center space-x-2">
+                <BookOpen className="w-4 h-4 text-emerald-600" />
+                <span>Начало: {new Date(startDate).toLocaleDateString('ru-RU')}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Admin Access Notice for admin5050 */}
         {hasAdminAccess() && (
