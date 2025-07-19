@@ -2,6 +2,7 @@ import { FC, useEffect } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
 import { CheckCircle, XCircle, RotateCcw, ArrowRight, Trophy, Clock } from 'lucide-react';
 import { supabase } from '../services/supabaseClient.js';
+import SectionFailed from './SectionFailed';
 
 interface SectionResults {
   totalQuestions: number;
@@ -29,6 +30,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 }) => {
   const percentage = Math.round((results.correctAnswers / results.totalQuestions) * 100);
   const incorrectCount = results.incorrectAnswers.length;
+  const accuracy = results.totalQuestions > 0 ? results.correctAnswers / results.totalQuestions : 0;
 
   const getPerformanceMessage = () => {
     if (percentage >= 90) return { message: "Отличная работа!", color: "text-green-600", icon: Trophy };
@@ -128,6 +130,10 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
     saveSectionProgress();
   }, []);
+
+  if (accuracy < 0.7) {
+    return <SectionFailed sectionId={String(sectionId)} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
