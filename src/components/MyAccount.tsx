@@ -21,6 +21,7 @@ import { isAdmin } from '../utils/adminUtils.js';
 
 interface MyAccountProps {
   onBackToHome: () => void;
+  onStartChapter?: (chapterId: number) => void;
 }
 
 interface ChapterStats {
@@ -31,7 +32,7 @@ interface ChapterStats {
   progress: number;
 }
 
-const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
+const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const {
     user,
     profile,
@@ -51,6 +52,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
   const [chapterStats, setChapterStats] = useState<ChapterStats | null>(null);
   const [progressData, setProgressData] = useState<any[]>([]);
   const [chapterProgress, setChapterProgress] = useState<any[]>([]);
+  const [recommendedChapter, setRecommendedChapter] = useState<{ chapterId: number; title: string } | null>(null);
 
   useEffect(() => {
     setNewUsername(profile?.username || '');
@@ -297,6 +299,17 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
       fetchChapterProgress();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (chapterProgress && chapterProgress.length > 0) {
+      const next = chapterProgress.find((cp: any) => cp.percent < 100);
+      if (next) {
+        setRecommendedChapter({ chapterId: next.chapterId, title: next.title });
+      } else {
+        setRecommendedChapter(null);
+      }
+    }
+  }, [chapterProgress]);
 
   const navigateRef = useRef(false);
 
@@ -688,6 +701,23 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome }) => {
 
         {chapterProgress && chapterProgress.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+            {recommendedChapter ? (
+              <div className="mb-4 flex justify-between items-center">
+                <span className="text-emerald-700">
+                  Рекомендуем начать с главы: <span className="font-semibold">{recommendedChapter.title}</span>
+                </span>
+                {onStartChapter && (
+                  <button
+                    onClick={() => onStartChapter(recommendedChapter.chapterId)}
+                    className="bg-emerald-600 text-white text-sm px-3 py-1 rounded-lg hover:bg-emerald-700"
+                  >
+                    Начать обучение
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="mb-4 text-emerald-700">Вы прошли все главы 🎉</div>
+            )}
             <h2 className="text-xl font-semibold text-emerald-900 mb-4">Прогресс по главам</h2>
             <ul className="space-y-2 text-sm text-emerald-700">
               {chapterProgress.map((cp) => (
