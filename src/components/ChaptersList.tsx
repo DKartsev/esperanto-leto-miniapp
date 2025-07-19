@@ -1,7 +1,7 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield } from 'lucide-react';
 import Toast from './Toast';
-import { fetchChapters } from '../services/courseService.js'
+import { fetchChapters, fetchSections } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
 import { supabase } from '../services/supabaseClient.js'
@@ -23,6 +23,11 @@ interface Chapter {
   prerequisites?: number[];
 }
 
+interface Section {
+  id: number;
+  title: string;
+}
+
 interface ChaptersListProps {
   onChapterSelect: (chapterId: number) => void;
   currentUser?: string | null | undefined;
@@ -42,6 +47,8 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   const [error, setError] = useState<string | null>(null)
   const [chapterProgress, setChapterProgress] = useState<Record<number, { completed: boolean; average_accuracy: number }>>({})
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [openChapterId, setOpenChapterId] = useState<number | null>(null)
+  const [sectionsByChapter, setSectionsByChapter] = useState<Record<number, Section[]>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -157,6 +164,24 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   });
 
   const recommendedChapter = getNextRecommendedChapter();
+
+  const handleToggleChapter = async (chapter: Chapter) => {
+    if (chapter.isLocked && !hasAdminAccess()) return;
+    const chapterId = chapter.id;
+    if (openChapterId === chapterId) {
+      setOpenChapterId(null);
+      return;
+    }
+    if (!sectionsByChapter[chapterId]) {
+      try {
+        const data = await fetchSections(chapterId);
+        setSectionsByChapter(prev => ({ ...prev, [chapterId]: data as Section[] }));
+      } catch (err) {
+        console.error('Ошибка загрузки разделов:', err);
+      }
+    }
+    setOpenChapterId(chapterId);
+  };
 
   if (loading) {
     return <div className="p-6">Загрузка...</div>
@@ -280,7 +305,8 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
         {filteredChapters.map((chapter) => (
           <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
             <div
-              className={`rounded-2xl bg-white shadow p-4 text-center space-y-2 ${
+              onClick={() => handleToggleChapter(chapter)}
+              className={`rounded-2xl bg-white shadow p-4 text-center space-y-2 cursor-pointer ${
                 chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''
               }`}
             >
@@ -302,7 +328,10 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </div>
 
               <button
-                onClick={() => onChapterSelect(chapter.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChapterSelect(chapter.id);
+                }}
                 disabled={chapter.isLocked && !hasAdminAccess()}
                 className={`w-full py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
                   chapter.isLocked && !hasAdminAccess()
@@ -327,6 +356,16 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   </>
                 )}
               </button>
+
+              {openChapterId === chapter.id && (
+                <ul className="mt-4 space-y-1 text-left">
+                  {sectionsByChapter[chapter.id]?.map((section) => (
+                    <li key={section.id} className="border-t border-emerald-200 pt-2 text-sm text-emerald-800">
+                      {section.title}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         ))}
