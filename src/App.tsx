@@ -123,9 +123,14 @@ function App() {
         setDebugLogs((logs) => [...logs, '❌ UUID для Telegram ID не найден']);
       }
     }
-
+    
     if (!userId) {
       setDebugLogs((logs) => [...logs, '❌ Нет user_id, прогресс не будет сохранён']);
+      return;
+    }
+    // Проверка, что userId — UUID перед записью
+    if (!/^[0-9a-fA-F\-]{36}$/.test(String(userId))) {
+      setDebugLogs((logs) => [...logs, '❌ Ошибка: userId не UUID, прогресс не будет сохранён']);
       return;
     }
 
