@@ -1,7 +1,6 @@
 import { supabase } from './supabaseClient.js'
-import { v5 as uuidv5 } from 'uuid'
 
-const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+const PASSWORD_SUFFIX = '_tg'
 
 /**
  * Регистрация нового пользователя
@@ -119,22 +118,31 @@ export async function signOut() {
  * @returns {Promise<Object|null>} Данные пользователя или null
  */
 export async function getCurrentUser() {
-  const storedId = localStorage.getItem('user_id')
-  if (storedId) {
-    return { id: storedId }
-  }
-
   try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-
-    if (error) {
-      if (error.message && error.message.includes('Auth session missing')) {
-        return null
-      }
-      throw error
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      return session.user
     }
 
-    return user
+    const email = localStorage.getItem('user_email')
+    const password = localStorage.getItem('user_password')
+
+    if (email && password) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+      if (!error) {
+        return data.user
+      }
+    }
+
+    const storedId = localStorage.getItem('user_id')
+    if (storedId) {
+      return { id: storedId }
+    }
+
+    return null
   } catch (error) {
     console.error('❌ Ошибка получения пользователя:', error.message)
     return null
@@ -254,18 +262,50 @@ export async function findOrCreateUserProfile(telegramId, username = null) {
       return profile.id
     }
 
-    const userUUID = uuidv5(String(telegramId), TELEGRAM_NAMESPACE)
-    const email = `${telegramId}@telegram.fake`
+    const email = `${telegramId}@telegram.local`
+    const password = String(telegramId) + PASSWORD_SUFFIX
 
-    const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
-      uid: userUUID,
-      username,
+    let authUserId
+    try {
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password
+      })
+      if (signUpError && !signUpError.message.includes('User already registered')) {
+        throw signUpError
+      }
+      if (signUpData?.user) {
+        authUserId = signUpData.user.id
+      } else {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        })
+        if (signInError) throw signInError
+        authUserId = signInData.user.id
+      }
+    } catch (err) {
+      console.error('❌ Ошибка входа через Supabase:', err)
+      return null
+    }
+
+    if (!authUserId) return null
+
+    const { error: profileInsertError } = await supabase.from('profiles').insert({
+      id: authUserId,
+      username: username || 'User',
       email,
       telegram_id: String(telegramId)
     })
-    if (rpcError) throw rpcError
 
-    return userUUID
+    if (profileInsertError) throw profileInsertError
+
+    localStorage.setItem('user_id', authUserId)
+    localStorage.setItem('user_email', email)
+    localStorage.setItem('user_password', password)
+    localStorage.setItem('telegram_id', String(telegramId))
+
+    return authUserId
   } catch (err) {
     console.error('❌ Ошибка поиска/создания профиля Telegram:', err)
     return null
