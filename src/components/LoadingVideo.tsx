@@ -9,6 +9,7 @@ const LoadingVideo: React.FC = () => (
       muted
       loop
       playsInline
+      preload="auto"
       className="w-full h-full object-cover"
     />
   </div>

@@ -39,6 +39,7 @@ const SectionFailed = ({ sectionId, delay = 2000, onRetry }: SectionFailedProps)
         autoPlay
         muted
         playsInline
+        preload="auto"
         className="absolute top-0 left-0 w-full h-full object-cover"
       />
       <div className="absolute bottom-[12%] left-1/2 transform -translate-x-1/2 text-center px-4 w-full max-w-xs">
