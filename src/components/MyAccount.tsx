@@ -13,6 +13,9 @@ import SectionProgressList from './account/SectionProgressList'
 import SummaryCards from './account/SummaryCards'
 import useChapterStats from '../hooks/useChapterStats'
 import useUserProgress from '../hooks/useUserProgress'
+import ProgressSummary from './account/ProgressSummary'
+import { getCurrentUser } from '../services/authService.js'
+import { getFullUserProgress } from '../services/progressService.js'
 
 interface MyAccountProps {
   onBackToHome: () => void
@@ -38,6 +41,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [loginError, setLoginError] = useState<string | null>(null)
 
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(null)
+  const [fullProgress, setFullProgress] = useState<any[]>([])
+  const [progressStats, setProgressStats] = useState({
+    correct: 0,
+    incorrect: 0,
+    totalTime: 0,
+    completedSections: 0
+  })
 
   useEffect(() => {
     const resolveUserId = async () => {
@@ -62,6 +72,29 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     recommendedChapter,
     progressData
   } = useUserProgress(resolvedUserId)
+
+  useEffect(() => {
+    async function fetchProgressData() {
+      const user = await getCurrentUser()
+      if (!user) return
+
+      const progress = await getFullUserProgress(user.id)
+      setFullProgress(progress)
+
+      if (progress && progress.length > 0) {
+        const correct = progress.filter(p => p.is_correct).length
+        const incorrect = progress.length - correct
+        const totalTime = progress.reduce(
+          (sum, p) => sum + (p.time_spent || 0),
+          0
+        )
+        const completedSections = new Set(progress.map(p => p.section_id)).size
+        setProgressStats({ correct, incorrect, totalTime, completedSections })
+      }
+    }
+
+    fetchProgressData()
+  }, [])
 
   // Debug info from localStorage about saveProgress
   const debugCall = localStorage.getItem('saveProgress_called')
@@ -221,6 +254,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           totalTimeMinutes={totalStudyMinutes}
           averageAccuracy={averageAccuracy}
           startDate={startDate}
+        />
+        <ProgressSummary
+          correct={progressStats.correct}
+          incorrect={progressStats.incorrect}
+          totalTime={progressStats.totalTime}
+          completedSections={progressStats.completedSections}
         />
         {/* Debug info to check saveProgress() calls */}
         <div className="text-sm text-emerald-700 mb-4">
