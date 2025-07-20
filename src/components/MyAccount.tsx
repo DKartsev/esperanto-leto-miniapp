@@ -98,11 +98,13 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
     if (!userId) {
       setLoginError('Ошибка создания профиля')
-    } else {
-      localStorage.setItem('user_id', userId)
-      await refreshStats()
+      return
     }
-    setLoginLoading(false)
+
+    // ✅ сохраняем telegram_id
+    localStorage.setItem('user_id', tgUser.id.toString())
+
+    window.location.reload()
   }
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user
