@@ -2,9 +2,9 @@ import { useState, useEffect, type FC } from 'react';
 import LoadingVideo from './LoadingVideo';
 import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
-import { getSectionProgressPercent } from '../services/progressService';
-import { supabase } from '../services/supabaseClient.js';
 import { useLoadData } from '../hooks/useLoadData';
+import useUserProgress from '../hooks/useUserProgress'
+import useUserProfile from '../hooks/useUserProfile'
 import ProgressBar from './ui/ProgressBar';
 
 interface Section {
@@ -30,48 +30,35 @@ interface SectionsListProps {
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
   const [expandedTheory, setExpandedTheory] = useState<number | null>(null);
   const [sections, setSections] = useState<Section[]>([])
+  const { userId } = useUserProfile()
+  const { sectionProgressMap } = useUserProgress(userId)
   const { data, loading, error } = useLoadData(async () => {
     const data = await fetchSections(chapterId)
-    const processed: Section[] = []
-    for (const sec of data as Array<{ id: number; title: string }>) {
-      const progress = await getSectionProgressPercent(chapterId, sec.id)
-      processed.push({
-        id: sec.id,
-        title: sec.title || 'Нет названия',
-        progress,
-        duration: '',
-        isCompleted: progress === 100,
-        theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
-      })
-    }
-    return processed
+    return (data as Array<{ id: number; title: string }>).map(sec => ({
+      id: sec.id,
+      title: sec.title || 'Нет названия',
+      progress: 0,
+      duration: '',
+      isCompleted: false,
+      theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
+    }))
   }, [chapterId])
   const [progressBySectionId, setProgressBySectionId] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
-    if (data) setSections(data)
-  }, [data])
-
-  useEffect(() => {
-    const loadProgress = async () => {
-      const user_id = localStorage.getItem('user_id')
-      if (user_id) {
-        const { data: progressData } = await supabase
-            .from('user_progress')
-            .select('section_id, accuracy, completed')
-            .eq('user_id', user_id)
-
-        if (progressData) {
-          const map: Record<number, { accuracy: number; completed: boolean }> = {}
-          progressData.forEach((row: any) => {
-            map[row.section_id] = { accuracy: row.accuracy, completed: row.completed }
-          })
-          setProgressBySectionId(map)
-        }
+    if (!data) return
+    const updated = (data as Section[]).map(sec => {
+      const prog = sectionProgressMap[sec.id]
+      return {
+        ...sec,
+        progress: prog ? (prog.completed ? 100 : 0) : 0,
+        isCompleted: prog?.completed ?? false
       }
-    }
-    loadProgress()
-  }, [chapterId])
+    })
+    setSections(updated)
+    setProgressBySectionId(sectionProgressMap)
+  }, [data, sectionProgressMap])
+
 
   const getChapterTitle = (chapterId: number): string => {
     switch (chapterId) {

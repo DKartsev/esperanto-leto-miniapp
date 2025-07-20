@@ -18,6 +18,7 @@ export const useUserProgress = (userId?: string | null) => {
   const [chapterProgress, setChapterProgress] = useState<ChapterProgress[]>([])
   const [recommendedChapter, setRecommendedChapter] = useState<{chapterId:number; title:string} | null>(null)
   const [progressData, setProgressData] = useState<any[]>([])
+  const [sectionProgressMap, setSectionProgressMap] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
     const fetchStart = async () => {
@@ -139,6 +140,19 @@ export const useUserProgress = (userId?: string | null) => {
   }, [userId])
 
   useEffect(() => {
+    const map: Record<number, { accuracy: number; completed: boolean }> = {}
+    progressData.forEach((row: any) => {
+      if (row.section_id && !row.question_id) {
+        map[row.section_id] = {
+          accuracy: row.accuracy ?? 0,
+          completed: row.completed ?? false
+        }
+      }
+    })
+    setSectionProgressMap(map)
+  }, [progressData])
+
+  useEffect(() => {
     const fetchChapterProgress = async () => {
       if (!userId) return
 
@@ -210,7 +224,8 @@ export const useUserProgress = (userId?: string | null) => {
     averageAccuracy,
     chapterProgress,
     recommendedChapter,
-    progressData
+    progressData,
+    sectionProgressMap
   }
 }
 
