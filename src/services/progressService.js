@@ -110,6 +110,33 @@ export async function getUserProgress() {
   }
 }
 
+// Получить подробный прогресс пользователя по разделам и главам
+export async function getFullUserProgress(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select(`
+        chapter_id,
+        section_id,
+        is_correct,
+        time_spent,
+        answered_at,
+        hints_used
+      `)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Ошибка получения прогресса:', error.message)
+      return []
+    }
+
+    return data
+  } catch (e) {
+    console.error('Критическая ошибка запроса прогресса:', e.message)
+    return []
+  }
+}
+
 /**
  * Получить прогресс по конкретной главе
  * @param {number} chapterId - ID главы
