@@ -1,6 +1,55 @@
 import { supabase } from './supabaseClient.js';
 import { telegramWebApp } from './telegramWebApp';
 
+/**
+ * Ensure that a profile record exists for the given user ID.
+ * If the profile does not exist it will be created using the
+ * provided Telegram user data.
+ */
+export async function ensureUserProfileExists(
+  userId: string,
+  telegramData: {
+    id: number
+    username?: string
+    first_name?: string
+    last_name?: string
+    email?: string | null
+  }
+) {
+  if (!userId) return;
+  try {
+    const { data: existing, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') throw error;
+
+    if (!existing) {
+      const username =
+        telegramData.username ||
+        `${telegramData.first_name || ''}${telegramData.last_name || ''}`;
+
+      const { error: insertError } = await supabase.from('profiles').insert({
+        id: userId,
+        username,
+        email: telegramData.email || null,
+        telegram_id: String(telegramData.id),
+        created_at: new Date().toISOString()
+      });
+
+      if (insertError) {
+        console.error('❌ Ошибка создания профиля:', insertError);
+      } else {
+        console.log('✅ Профиль создан для пользователя', userId);
+      }
+    }
+  } catch (err) {
+    console.error('❌ Ошибка проверки профиля:', err);
+  }
+}
+
 const PASSWORD_SUFFIX = '_tg';
 
 
@@ -51,6 +100,14 @@ export async function telegramLogin() {
     console.warn('Supabase auth user not created');
     return null;
   }
+
+  await ensureUserProfileExists(authUserId, {
+    id: user.id,
+    username: user.username,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: null
+  });
 
   const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
     uid: authUserId,
