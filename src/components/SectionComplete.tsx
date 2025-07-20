@@ -17,12 +17,16 @@ interface SectionCompleteProps {
   results: SectionResults;
   chapterId: number;
   sectionId: number;
+  onRetry?: () => void;
+  onNext?: (nextSectionId?: string, nextChapterId?: string) => void;
 }
 
 const SectionComplete: FC<SectionCompleteProps> = ({
   results,
   chapterId,
-  sectionId
+  sectionId,
+  onRetry,
+  onNext
 }) => {
   const percentage = Math.round((results.correctAnswers / results.totalQuestions) * 100);
   const incorrectCount = results.incorrectAnswers.length;
@@ -90,7 +94,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   }, []);
 
   if (accuracy < 0.7) {
-    return <SectionFailed sectionId={String(sectionId)} />;
+    return <SectionFailed sectionId={String(sectionId)} onRetry={onRetry} />;
   }
 
   if (accuracy >= 0.7) {
@@ -99,6 +103,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         sectionId={String(sectionId)}
         nextSectionId={nextSectionId}
         nextChapterId={nextChapterId}
+        onNext={() => onNext && onNext(nextSectionId, nextChapterId)}
       />
     );
   }

@@ -367,6 +367,30 @@ function App() {
     setSelectedSection(null);
   };
 
+  const handleRetrySection = () => {
+    setSectionResults(null);
+    setSectionStartTime(Date.now());
+    setCurrentView('questions');
+  };
+
+  const handleNextStep = (
+    nextSectionId?: string,
+    nextChapterId?: string
+  ) => {
+    setSectionResults(null);
+    setSectionStartTime(null);
+    if (nextSectionId) {
+      setSelectedSection(parseInt(nextSectionId));
+      setCurrentView('questions');
+    } else if (nextChapterId) {
+      setSelectedChapter(parseInt(nextChapterId));
+      setSelectedSection(null);
+      setCurrentView('sections');
+    } else {
+      setCurrentView('chapters');
+    }
+  };
+
   // Test interface handlers
   const handleStartTest = () => {
     setTestView('test');
@@ -591,6 +615,8 @@ function App() {
               results={sectionResults!}
               chapterId={selectedChapter!}
               sectionId={selectedSection!}
+              onRetry={handleRetrySection}
+              onNext={handleNextStep}
             />
             <NavigationBar />
           </>
@@ -984,30 +1010,30 @@ function App() {
                 {isTelegramWebApp ? 'Обучение' : 'Продукт'}
               </h4>
               <ul className="space-y-2 text-emerald-300">
-                <li><a href="#" className="hover:text-white transition-colors">
+                <li><span className="cursor-default hover:text-white transition-colors">
                   {isTelegramWebApp ? 'Главы курса' : 'Кошелек'}
-                </a></li>
-                <li><a href="#" className="hover:text-white transition-colors">
+                </span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">
                   {isTelegramWebApp ? 'AI-помощник' : 'Биржа'}
-                </a></li>
-                <li><a href="#" className="hover:text-white transition-colors">
+                </span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">
                   {isTelegramWebApp ? 'Тесты' : 'P2P'}
-                </a></li>
-                <li><a href="#" className="hover:text-white transition-colors">
+                </span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">
                   {isTelegramWebApp ? 'Прогресс' : 'API'}
-                </a></li>
+                </span></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4 text-emerald-100">Поддержка</h4>
               <ul className="space-y-2 text-emerald-300">
-                <li><a href="#" className="hover:text-white transition-colors">Помощь</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">
+                <li><span className="cursor-default hover:text-white transition-colors">Помощь</span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">
                   {isTelegramWebApp ? 'Обратная связь' : 'Безопасность'}
-                </a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Условия</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Контакты</a></li>
+                </span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">Условия</span></li>
+                <li><span className="cursor-default hover:text-white transition-colors">Контакты</span></li>
               </ul>
             </div>
           </div>
