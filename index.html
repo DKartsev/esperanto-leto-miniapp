@@ -124,19 +124,7 @@
       <div class="loading-spinner"></div>
     </div>
 
-    <!-- Start video loader -->
-    <div id="start-loader" style="position: fixed; inset: 0; z-index: 9999; background: black;">
-      <video
-        id="loadingVideo"
-        src="/start-loading.mp4"
-        autoplay
-        muted
-        playsinline
-        preload="auto"
-        onended="window.hideLoadingScreen()"
-        style="width: 100%; height: 100%; object-fit: cover"
-      ></video>
-    </div>
+    <!-- Placeholder for React splash screen -->
 
     <div id="root"></div>
     
@@ -150,38 +138,7 @@
             loadingElement.style.display = 'none';
           }, 300);
         }
-
-        const startLoader = document.getElementById('start-loader');
-        if (startLoader) {
-          startLoader.remove();
-        }
       }
-
-      // Attempt to autoplay the intro video on page load
-      document.addEventListener('DOMContentLoaded', function () {
-        const video = document.getElementById('loadingVideo');
-        if (!video || typeof video.play !== 'function') return;
-
-        const tryPlay = () => {
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch((err) => {
-              console.error('Intro video failed to play:', err);
-              // Fallback: play on first user interaction
-              const resume = () => {
-                video.play().catch((err2) => console.error('Retry failed:', err2));
-              };
-              document.addEventListener('click', resume, { once: true });
-            });
-          }
-        };
-
-        if (video.readyState >= 2) {
-          tryPlay();
-        } else {
-          video.addEventListener('canplay', tryPlay, { once: true });
-        }
-      });
 
       // Universal Links Detection and Handling
       function detectTelegramWebApp() {
