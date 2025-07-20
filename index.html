@@ -132,7 +132,6 @@
         autoplay
         muted
         playsinline
-        loop
         onended="window.hideLoadingScreen()"
         style="width: 100%; height: 100%; object-fit: cover"
       ></video>
@@ -156,6 +155,30 @@
           startLoader.remove();
         }
       }
+
+      // Attempt to autoplay the intro video on page load
+      document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('loadingVideo');
+        if (!video) {
+          return;
+        }
+
+        const tryPlay = () => {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              console.error('Intro video failed to play:', err);
+              hideLoadingScreen();
+            });
+          }
+        };
+
+        if (video.readyState >= 1) {
+          tryPlay();
+        } else {
+          video.addEventListener('loadedmetadata', tryPlay, { once: true });
+        }
+      });
 
       // Universal Links Detection and Handling
       function detectTelegramWebApp() {
