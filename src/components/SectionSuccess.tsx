@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import videoFile from '../assets/Complete.mp4';
 
 interface SectionSuccessProps {
@@ -7,17 +6,18 @@ interface SectionSuccessProps {
   nextSectionId?: string;
   nextChapterId?: string;
   delay?: number;
+  onNext?: (nextSectionId?: string, nextChapterId?: string) => void;
 }
 
 const SectionSuccess = ({
   sectionId,
   nextSectionId,
   nextChapterId,
-  delay = 2000
+  delay = 2000,
+  onNext
 }: SectionSuccessProps) => {
   const [ready, setReady] = useState(false);
   const [dots, setDots] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const dotInterval = setInterval(() => {
@@ -37,12 +37,8 @@ const SectionSuccess = ({
 
   const handleNext = () => {
     if (!ready) return;
-    if (nextSectionId) {
-      navigate(`/section/${nextSectionId}`);
-    } else if (nextChapterId) {
-      navigate(`/chapter/${nextChapterId}`);
-    } else {
-      navigate(`/section/${sectionId}`);
+    if (onNext) {
+      onNext(nextSectionId, nextChapterId);
     }
   };
 
