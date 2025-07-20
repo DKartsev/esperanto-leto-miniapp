@@ -12,7 +12,6 @@ export interface AuthContextValue {
   isAuthenticated: boolean
   isAdmin: boolean
   signIn: (email: string, password: string) => Promise<unknown>
-  signUp: (email: string, password: string, username: string) => Promise<unknown>
   signOut: () => Promise<void>
   updateProfile: (updates: Record<string, unknown>) => Promise<unknown>
   refreshStats: () => Promise<void>

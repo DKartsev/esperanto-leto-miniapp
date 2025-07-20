@@ -1,26 +1,21 @@
 import { useState, type FormEvent } from 'react'
-import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import LoadingScreen from './LoadingScreen'
 import { useAuth } from './SupabaseAuthProvider'
 
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
-  defaultMode?: 'signin' | 'signup'
 }
 
 interface FormData {
   email: string
   password: string
-  username: string
-  confirmPassword: string
 }
 
 interface FormErrors {
   email?: string
   password?: string
-  username?: string
-  confirmPassword?: string
 }
 
 /**
@@ -30,22 +25,20 @@ interface FormErrors {
  * @param {Function} props.onClose - Функция закрытия модального окна
  * @param {string} props.defaultMode - Режим по умолчанию ('signin' или 'signup')
  */
-export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) {
-  const [mode, setMode] = useState<'signin' | 'signup'>(defaultMode)
+export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const mode = 'signin'
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    password: '',
-    username: '',
-    confirmPassword: ''
+    password: ''
   })
   const [formErrors, setFormErrors] = useState<FormErrors>({})
-  
-  const { signIn, signUp, loading, error, clearError } = useAuth()
+
+  const { signIn, loading, error, clearError } = useAuth()
 
   // Сброс формы при закрытии
   const handleClose = () => {
-    setFormData({ email: '', password: '', username: '', confirmPassword: '' })
+    setFormData({ email: '', password: '' })
     setFormErrors({})
     clearError()
     onClose()
@@ -84,20 +77,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
       errors.password = 'Пароль должен содержать минимум 6 символов'
     }
 
-    // Дополнительные проверки для регистрации
-    if (mode === 'signup') {
-      if (!formData.username) {
-        errors.username = 'Имя пользователя обязательно'
-      } else if (formData.username.length < 3) {
-        errors.username = 'Имя пользователя должно содержать минимум 3 символа'
-      }
-
-      if (!formData.confirmPassword) {
-        errors.confirmPassword = 'Подтверждение пароля обязательно'
-      } else if (formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = 'Пароли не совпадают'
-      }
-    }
+    // Дополнительные проверки отсутствуют
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -110,11 +90,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
     if (!validateForm()) return
 
     try {
-      if (mode === 'signin') {
-        await signIn(formData.email, formData.password)
-      } else {
-        await signUp(formData.email, formData.password, formData.username)
-      }
+      await signIn(formData.email, formData.password)
       
       // Закрываем модальное окно при успешной аутентификации
       handleClose()
@@ -125,11 +101,6 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
   }
 
   // Переключение режима
-  const toggleMode = () => {
-    setMode(prev => prev === 'signin' ? 'signup' : 'signin')
-    setFormErrors({})
-    clearError()
-  }
 
   if (!isOpen) return null
   if (loading) return <LoadingScreen />
@@ -175,30 +146,6 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
             )}
           </div>
 
-          {/* Username (только для регистрации) */}
-          {mode === 'signup' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Имя пользователя
-              </label>
-              <div className="relative">
-                <User className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                    formErrors.username ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Ваше имя"
-                  disabled={loading}
-                />
-              </div>
-              {formErrors.username && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.username}</p>
-              )}
-            </div>
-          )}
 
           {/* Password */}
           <div>
@@ -230,30 +177,6 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
             )}
           </div>
 
-          {/* Confirm Password (только для регистрации) */}
-          {mode === 'signup' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Подтверждение пароля
-              </label>
-              <div className="relative">
-                <Lock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                    formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Повторите пароль"
-                  disabled={loading}
-                />
-              </div>
-              {formErrors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>
-              )}
-            </div>
-          )}
 
           {/* Error Message */}
           {error && (
@@ -272,23 +195,9 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >
-            {mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}
+            Войти
           </button>
 
-          {/* Mode Toggle */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={toggleMode}
-              className="text-emerald-600 hover:text-emerald-700 font-medium"
-              disabled={loading}
-            >
-              {mode === 'signin' 
-                ? 'Нет аккаунта? Зарегистрироваться' 
-                : 'Уже есть аккаунт? Войти'
-              }
-            </button>
-          </div>
         </form>
       </div>
     </div>
