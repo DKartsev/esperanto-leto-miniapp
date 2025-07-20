@@ -33,6 +33,7 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
+import SplashScreen from './components/SplashScreen';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { supabase } from './services/supabaseClient.js';
@@ -42,6 +43,11 @@ import { isAdmin } from './utils/adminUtils.js';
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashEnd = () => {
+    setShowSplash(false);
+  };
 
   useEffect(() => {
     const isTelegramWebApp = window?.Telegram?.WebApp?.initData;
@@ -472,6 +478,11 @@ function App() {
       </nav>
     );
   };
+
+  // Show intro splash video
+  if (showSplash) {
+    return <SplashScreen onFinish={handleSplashEnd} />;
+  }
 
   // Render Admin Panel
   if (showAdminPanel) {
