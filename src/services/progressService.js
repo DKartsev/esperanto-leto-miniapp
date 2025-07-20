@@ -22,6 +22,9 @@ export async function saveProgress(
   hintsUsed = 0
 ) {
   try {
+    // Отмечаем вызов функции в localStorage для отладки
+    localStorage.setItem('saveProgress_called', new Date().toISOString())
+
     const user = await getCurrentUser()
     if (!user) {
       console.warn('User not authenticated, skipping save')
@@ -54,12 +57,19 @@ export async function saveProgress(
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      localStorage.setItem('saveProgress_error', error.message)
+      throw error
+    }
 
+    // Отмечаем успешное сохранение
+    localStorage.setItem('saveProgress_success', 'ok')
     console.log('✅ Ответ сохранен успешно')
     return data
   } catch (error) {
     console.error('❌ Ошибка сохранения ответа:', error.message)
+    // Сохраняем текст ошибки для отладки
+    localStorage.setItem('saveProgress_error', error.message)
     throw new Error(`Ошибка сохранения ответа: ${error.message}`)
   }
 }
