@@ -169,7 +169,19 @@ export async function ensureUserProfile(user) {
 export async function findOrCreateUserProfile(telegramId, telegramUsername) {
   const uuid = await telegramIdToUUID(telegramId)
 
-  // Проверка в users
+  // Проверяем существующий профиль по telegram_id
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('telegram_id', telegramId)
+    .maybeSingle()
+
+  if (existingProfile?.id) {
+    localStorage.setItem('user_id', existingProfile.id)
+    return existingProfile.id
+  }
+
+  // Создаем запись в users при необходимости
   const { data: existingUser } = await supabase
     .from('users')
     .select('id')
@@ -184,20 +196,13 @@ export async function findOrCreateUserProfile(telegramId, telegramUsername) {
     })
   }
 
-  // Проверка в profiles
-  const { data: existingProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', uuid)
-    .maybeSingle()
-
-  if (!existingProfile) {
-    await supabase.from('profiles').insert({
-      id: uuid,
-      full_name: telegramUsername,
-      created_at: new Date().toISOString()
-    })
-  }
+  // Создаем профиль
+  await supabase.from('profiles').insert({
+    id: uuid,
+    username: telegramUsername,
+    telegram_id: telegramId,
+    created_at: new Date().toISOString()
+  })
 
   localStorage.setItem('user_id', uuid)
   return uuid
