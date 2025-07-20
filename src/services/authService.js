@@ -1,71 +1,6 @@
 import { supabase } from './supabaseClient.js'
 
-const PASSWORD_SUFFIX = '_tg'
-
-/**
- * Регистрация нового пользователя
- * @param {string} email - Email пользователя
- * @param {string} password - Пароль
- * @param {string} username - Имя пользователя
- * @returns {Promise<Object>} Данные пользователя
- */
-export async function signUp(email, password, username) {
-  try {
-    console.log('📝 Регистрация пользователя:', { email, username })
-    
-    // Регистрируем пользователя в Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username: username,
-          display_name: username
-        }
-      }
-    })
-
-    if (error) throw error
-
-    // Если подтверждение email отключено, сессия создается автоматически. В противном
-    // случае она может быть null. Для вставки в таблицу с включенной RLS
-    // необходима действующая сессия, иначе политика auth.uid() не пропустит запрос.
-    let session = data.session
-    if (!session) {
-      const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({ email, password })
-      if (signInError) throw signInError
-      session = signInData.session
-    }
-
-    const userId = session?.user?.id || data.user?.id
-    if (!userId) throw new Error('Не удалось получить ID пользователя')
-
-    // Создаём профиль пользователя после появления сессии, чтобы удовлетворить RLS
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([
-        {
-          id: userId,
-          username: username,
-          email: email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ])
-
-    if (profileError) {
-      console.error('Ошибка создания профиля:', profileError)
-      // Не бросаем ошибку, так как пользователь уже создан
-    }
-
-    console.log('✅ Пользователь зарегистрирован успешно')
-    return data
-  } catch (error) {
-    console.error('❌ Ошибка регистрации:', error.message)
-    throw new Error(`Ошибка регистрации: ${error.message}`)
-  }
-}
+// Телеграм-вход не требует регистрации через Supabase Auth
 
 /**
  * Вход пользователя
@@ -122,19 +57,6 @@ export async function getCurrentUser() {
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.user) {
       return session.user
-    }
-
-    const email = localStorage.getItem('user_email')
-    const password = localStorage.getItem('user_password')
-
-    if (email && password) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      if (!error) {
-        return data.user
-      }
     }
 
     const storedId = localStorage.getItem('user_id')
@@ -263,33 +185,7 @@ export async function findOrCreateUserProfile(telegramId, username = null) {
     }
 
     const email = `${telegramId}@telegram.local`
-    const password = String(telegramId) + PASSWORD_SUFFIX
-
-    let authUserId
-    try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password
-      })
-      if (signUpError && !signUpError.message.includes('User already registered')) {
-        throw signUpError
-      }
-      if (signUpData?.user) {
-        authUserId = signUpData.user.id
-      } else {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        })
-        if (signInError) throw signInError
-        authUserId = signInData.user.id
-      }
-    } catch (err) {
-      console.error('❌ Ошибка входа через Supabase:', err)
-      return null
-    }
-
-    if (!authUserId) return null
+    const authUserId = crypto.randomUUID()
 
     const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
       uid: authUserId,
@@ -301,8 +197,6 @@ export async function findOrCreateUserProfile(telegramId, username = null) {
     if (rpcError) throw rpcError
 
     localStorage.setItem('user_id', authUserId)
-    localStorage.setItem('user_email', email)
-    localStorage.setItem('user_password', password)
     localStorage.setItem('telegram_id', String(telegramId))
 
     return authUserId

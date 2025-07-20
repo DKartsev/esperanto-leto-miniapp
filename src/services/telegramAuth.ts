@@ -50,9 +50,6 @@ export async function ensureUserProfileExists(
   }
 }
 
-const PASSWORD_SUFFIX = '_tg';
-
-
 export async function telegramLogin() {
   if (!window.Telegram?.WebApp) {
     console.error('Telegram SDK not initialized');
@@ -70,34 +67,18 @@ export async function telegramLogin() {
   const telegramId = user.id.toString();
   const username = user.username || `${user.first_name}${user.last_name || ''}`;
   const email = `${telegramId}@telegram.local`;
-  const password = telegramId + PASSWORD_SUFFIX;
-
   let authUserId = null;
 
   try {
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password
-    });
-
-    if (signUpError && !signUpError.message.includes('User already registered')) {
-      throw signUpError;
-    }
-
-    if (signUpData?.user) {
-      authUserId = signUpData.user.id;
-    } else {
-      const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) throw signInError;
-      authUserId = signInData.user.id;
-    }
+    const { data: existing, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('telegram_id', telegramId)
+      .maybeSingle();
+    if (fetchError) throw fetchError;
+    authUserId = existing?.id || crypto.randomUUID();
   } catch (err) {
-    console.error('❌ Ошибка входа через Supabase:', err);
-  }
-
-  if (!authUserId) {
-    console.warn('Supabase auth user not created');
+    console.error('❌ Ошибка получения профиля Telegram:', err);
     return null;
   }
 
@@ -123,8 +104,6 @@ export async function telegramLogin() {
   }
 
   localStorage.setItem('user_id', authUserId);
-  localStorage.setItem('user_email', email);
-  localStorage.setItem('user_password', password);
   localStorage.setItem('telegram_id', telegramId);
   return { id: authUserId, username, email };
 }

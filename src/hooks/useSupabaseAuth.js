@@ -3,7 +3,6 @@ import {
   getUserProfile,
   updateUserProfile as authUpdateUserProfile,
   signIn as authSignIn,
-  signUp as authSignUp,
   signOut as authSignOut
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
@@ -87,22 +86,6 @@ export function useSupabaseAuth() {
     }
   }
 
-  const signUp = async (email, password, username) => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const result = await authSignUp(email, password, username)
-      
-      // Данные пользователя загрузятся автоматически через onAuthStateChange
-      return result
-    } catch (err) {
-      setError(err.message)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const signOut = async () => {
     try {
@@ -169,7 +152,6 @@ export function useSupabaseAuth() {
 
     // Методы
     signIn,
-    signUp,
     signOut,
     updateProfile,
     refreshStats,
