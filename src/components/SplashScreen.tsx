@@ -43,12 +43,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       <video
         ref={videoRef}
         autoPlay
-        playsInline
         muted
+        playsInline
+        preload="auto"
         onEnded={handleEnd}
         className="w-full h-screen object-cover"
-        src="/start-loading.mp4"
-      />
+      >
+        <source src="/start-loading.mp4" type="video/mp4" />
+      </video>
     </div>
   );
 };

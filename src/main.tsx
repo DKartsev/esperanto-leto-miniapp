@@ -20,6 +20,9 @@ function hideLoadingScreen() {
   }
 }
 
+// Expose helper for React components (SplashScreen)
+window.hideLoadingScreen = hideLoadingScreen;
+
 const root = createRoot(document.getElementById('root')!);
 
 root.render(
