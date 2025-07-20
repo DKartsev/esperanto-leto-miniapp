@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
 import { supabase } from '../services/supabaseClient.js';
-import { findOrCreateUserProfile } from '../services/authService.js';
+import { findOrCreateUserProfile, getCurrentUser } from '../services/authService.js';
+import { useAuth } from './SupabaseAuthProvider';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
 import { getNextStep } from '../utils/navigation.js';
@@ -28,6 +29,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   onRetry,
   onNext
 }) => {
+  const { refreshStats } = useAuth();
   const percentage = Math.round((results.correctAnswers / results.totalQuestions) * 100);
   const incorrectCount = results.incorrectAnswers.length;
   const accuracy = results.totalQuestions > 0 ? results.correctAnswers / results.totalQuestions : 0;
@@ -49,6 +51,11 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       let userId: string | null = user?.id || null;
 
+      if (!userId) {
+        const current = await getCurrentUser();
+        userId = current?.id || null;
+      }
+
       const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
       const telegramUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null;
 
@@ -69,10 +76,11 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const upsertData = [
         {
           user_id: userId,
-          section_id: sectionId,
           chapter_id: chapterId,
-          accuracy: percentage,
+          section_id: sectionId,
+          question_id: null,
           completed,
+          accuracy: percentage,
           updated_at: new Date().toISOString()
         }
       ];
@@ -81,12 +89,17 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
       const { error } = await supabase
         .from('user_progress')
-        .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
+        .upsert(upsertData, { onConflict: ['user_id', 'section_id', 'question_id'] });
 
       if (error) {
         console.error('Ошибка сохранения прогресса:', error);
       } else {
         console.log('Прогресс раздела успешно сохранён.');
+        try {
+          await refreshStats();
+        } catch (err) {
+          console.error('Ошибка обновления статистики:', err);
+        }
       }
     };
 
