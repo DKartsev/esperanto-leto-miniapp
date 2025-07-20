@@ -291,14 +291,14 @@ export async function findOrCreateUserProfile(telegramId, username = null) {
 
     if (!authUserId) return null
 
-    const { error: profileInsertError } = await supabase.from('profiles').insert({
-      id: authUserId,
+    const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
+      uid: authUserId,
       username: username || 'User',
       email,
       telegram_id: String(telegramId)
     })
 
-    if (profileInsertError) throw profileInsertError
+    if (rpcError) throw rpcError
 
     localStorage.setItem('user_id', authUserId)
     localStorage.setItem('user_email', email)
