@@ -85,14 +85,16 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         }
       ];
 
-      console.log('📦 upsert data:', upsertData[0]);
+      console.log('upsertData', upsertData);
+      console.log('user_id', userId);
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_progress')
         .upsert(upsertData, { onConflict: ['user_id', 'section_id', 'question_id'] });
 
+      console.log('user_progress upsert result:', data, error);
       if (error) {
-        console.error('Ошибка сохранения прогресса:', error);
+        console.error(error);
       } else {
         console.log('Прогресс раздела успешно сохранён.');
         try {
