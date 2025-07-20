@@ -42,13 +42,21 @@ import { isAdmin } from './utils/adminUtils.js';
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [showStartVideo, setShowStartVideo] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     const isTelegramWebApp = window?.Telegram?.WebApp?.initData;
     if (!isTelegramWebApp) {
       window.location.href = 'https://t.me/EsperantoLetoBot?start=start';
     }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowIntro(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
   }, []);
   
   // Learning interface state
@@ -474,16 +482,16 @@ function App() {
     );
   };
 
-  if (showStartVideo) {
+  if (showIntro) {
     return (
-      <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+      <div className="fixed inset-0 bg-black z-[9999]">
         <video
           src="/start-loading.mp4"
-          className="w-full h-full object-cover"
           autoPlay
-          muted
           playsInline
-          onEnded={() => setShowStartVideo(false)}
+          muted
+          className="w-full h-full object-cover"
+          onEnded={() => setShowIntro(false)}
         />
       </div>
     );
