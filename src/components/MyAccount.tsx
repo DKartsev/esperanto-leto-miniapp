@@ -53,6 +53,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     progressData
   } = useUserProgress(userId)
 
+  // Debug info from localStorage about saveProgress
+  const debugCall = localStorage.getItem('saveProgress_called')
+  const debugStatus = localStorage.getItem('saveProgress_success')
+  const debugError = localStorage.getItem('saveProgress_error')
+
   useEffect(() => {
     setNewUsername(profile?.username || '')
   }, [profile])
@@ -193,6 +198,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       </div>
       <div className="p-6">
         <SummaryCards stats={stats} startDate={startDate} />
+        {/* Debug info to check saveProgress() calls */}
+        <div className="text-sm text-emerald-700 mb-4">
+          <p>⏱️ Save Progress: {debugCall || 'не вызывался'}</p>
+          <p>✅ Статус: {debugStatus || 'нет данных'}</p>
+          <p>❌ Ошибка: {debugError || 'ошибок нет'}</p>
+        </div>
         {progressLoading ? (
           <div className="rounded-2xl p-4 bg-white shadow my-4" />
         ) : (
