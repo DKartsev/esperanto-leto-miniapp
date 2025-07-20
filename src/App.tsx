@@ -33,7 +33,7 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
-import SplashScreen from './components/SplashScreen';
+import StartLoader from './components/StartLoader';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { supabase } from './services/supabaseClient.js';
@@ -43,10 +43,10 @@ import { isAdmin } from './utils/adminUtils.js';
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [showSplash, setShowSplash] = useState(true);
+  const [showLoader, setShowLoader] = useState(true);
 
-  const handleSplashEnd = () => {
-    setShowSplash(false);
+  const handleLoaderFinish = () => {
+    setShowLoader(false);
   };
 
   useEffect(() => {
@@ -479,9 +479,9 @@ function App() {
     );
   };
 
-  // Show intro splash video
-  if (showSplash) {
-    return <SplashScreen onFinish={handleSplashEnd} />;
+  // Show intro loader video
+  if (showLoader) {
+    return <StartLoader onFinish={handleLoaderFinish} />;
   }
 
   // Render Admin Panel
