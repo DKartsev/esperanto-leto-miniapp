@@ -88,10 +88,7 @@ function App() {
     totalQuestions: number,
     timeSpent: number
   ) => {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
-    let userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
+    let userId = localStorage.getItem('user_id') || (profile as any)?.id;
 
     // Если это Telegram ID (число) — ищем или создаём профиль через RPC
     if (userId && /^\d+$/.test(String(userId))) {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import {
   getUserProfile,
   updateUserProfile as authUpdateUserProfile,
-  signIn as authSignIn,
   signOut as authSignOut
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
@@ -68,33 +67,14 @@ export function useSupabaseAuth() {
     }
   }, [])
 
-  // Методы аутентификации
-  const signIn = async (email, password) => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const result = await authSignIn(email, password)
-      
-      // Данные пользователя загрузятся автоматически через onAuthStateChange
-      return result
-    } catch (err) {
-      setError(err.message)
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
-
-
+  // Telegram-only аутентификация
   const signOut = async () => {
     try {
       setLoading(true)
       setError(null)
-      
       await authSignOut()
-      
-      // Состояние очистится автоматически через onAuthStateChange
+      setUser(null)
+      setProfile(null)
     } catch (err) {
       setError(err.message)
       throw err
@@ -151,7 +131,6 @@ export function useSupabaseAuth() {
     isAuthenticated,
 
     // Методы
-    signIn,
     signOut,
     updateProfile,
     refreshStats,
