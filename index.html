@@ -159,15 +159,23 @@
       // Attempt to autoplay the intro video on page load
       document.addEventListener('DOMContentLoaded', function () {
         const video = document.getElementById('loadingVideo');
-        if (video && typeof video.play === 'function') {
+        if (!video || typeof video.play !== 'function') return;
+
+        const tryPlay = () => {
           const playPromise = video.play();
           if (playPromise !== undefined) {
             playPromise.catch((err) => {
               console.error('Intro video failed to play:', err);
-              hideLoadingScreen();
+              // Fallback: play on first user interaction
+              const resume = () => {
+                video.play().catch((err2) => console.error('Retry failed:', err2));
+              };
+              document.addEventListener('click', resume, { once: true });
             });
           }
-        }
+        };
+
+        tryPlay();
       });
 
       // Universal Links Detection and Handling
