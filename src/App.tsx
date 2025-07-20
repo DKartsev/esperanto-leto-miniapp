@@ -33,7 +33,6 @@ import TestResults from './components/TestResults';
 import AIChat from './components/AIChat';
 import MyAccount from './components/MyAccount';
 import AdminPanel from './components/AdminPanel';
-import StartLoader from './components/StartLoader';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { supabase } from './services/supabaseClient.js';
@@ -43,11 +42,7 @@ import { isAdmin } from './utils/adminUtils.js';
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [showLoader, setShowLoader] = useState(true);
-
-  const handleLoaderFinish = () => {
-    setShowLoader(false);
-  };
+  const [showStartVideo, setShowStartVideo] = useState(true);
 
   useEffect(() => {
     const isTelegramWebApp = window?.Telegram?.WebApp?.initData;
@@ -479,9 +474,19 @@ function App() {
     );
   };
 
-  // Show intro loader video
-  if (showLoader) {
-    return <StartLoader onFinish={handleLoaderFinish} />;
+  if (showStartVideo) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+        <video
+          src="/start-loading.mp4"
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          playsInline
+          onEnded={() => setShowStartVideo(false)}
+        />
+      </div>
+    );
   }
 
   // Render Admin Panel
