@@ -4,13 +4,13 @@ import ProgressBar from '../ui/ProgressBar'
 
 interface AccountStatsProps {
   totalTime: number
-  accuracy: number
+  averageAccuracy: number
   progress: number
   completedChapters: number
   totalChapters: number
 }
 
-const AccountStats: FC<AccountStatsProps> = ({ totalTime, accuracy, progress, completedChapters, totalChapters }) => (
+const AccountStats: FC<AccountStatsProps> = ({ totalTime, averageAccuracy, progress, completedChapters, totalChapters }) => (
   <div className="mt-2 bg-neutral-100 rounded p-2 text-sm text-gray-600 space-y-1">
     <div className="flex items-center">
       <Clock className="w-4 h-4 mr-1" />
@@ -18,7 +18,7 @@ const AccountStats: FC<AccountStatsProps> = ({ totalTime, accuracy, progress, co
     </div>
     <div className="flex items-center">
       <Trophy className="w-4 h-4 mr-1" />
-      <span>Средняя точность: {accuracy}%</span>
+      <span>Средняя точность: {averageAccuracy}%</span>
     </div>
     <div className="flex items-center">
       <TrendingUp className="w-4 h-4 mr-1" />

@@ -126,7 +126,7 @@ function App() {
 
     const { error } = await supabase
       .from('user_progress')
-      .upsert(upsertData, { onConflict: ['user_id', 'section_id'] });
+      .upsert(upsertData, { onConflict: 'user_id, section_id' });
 
     if (error) {
       console.error('Ошибка при сохранении прогресса:', error.message);

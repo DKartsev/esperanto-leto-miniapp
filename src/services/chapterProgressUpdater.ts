@@ -46,7 +46,7 @@ export async function updateChapterProgress(
       accuracy: avgAccuracy,
       time_spent: totalTime
     },
-    { onConflict: ['user_id', 'chapter_id', 'section_id'] }
+    { onConflict: 'user_id, chapter_id, section_id' }
   )
 
   await supabase.from('user_chapter_progress').upsert(

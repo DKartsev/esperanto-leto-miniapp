@@ -51,7 +51,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       let userId: string | null = user?.id || null;
 
       if (!userId) {
-        const current = await getCurrentUser();
+        const current = await getCurrentUser() as any;
         userId = current?.id || null;
       }
 
@@ -89,7 +89,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
       const { data, error } = await supabase
         .from('user_progress')
-        .upsert(upsertData, { onConflict: ['user_id', 'section_id', 'question_id'] });
+        .upsert(upsertData, { onConflict: 'user_id, section_id, question_id' });
 
       console.log('user_progress upsert result:', data, error);
       if (error) {

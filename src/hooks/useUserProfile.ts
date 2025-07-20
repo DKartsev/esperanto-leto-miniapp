@@ -27,7 +27,7 @@ const useUserProfile = (userId?: string | null) => {
       }
       setLoading(true)
       const data = await getUserProfile(resolvedId)
-      setProfile(data)
+      setProfile(data as any)
       setLoading(false)
     }
     void load()
