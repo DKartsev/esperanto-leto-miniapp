@@ -33,38 +33,10 @@ export async function saveProgress(
       isCorrect
     })
 
-    // В Supabase отсутствует уникальный индекс по (user_id, question_id),
-    // поэтому стандартный upsert c onConflict вызывает ошибку.
-    // Выполняем проверку существования записи вручную.
-    const { data: existing, error: selectError } = await supabase
+    const { data, error } = await supabase
       .from('user_progress')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('question_id', questionId)
-      .maybeSingle()
-
-    if (selectError) throw selectError
-
-    let query
-    if (existing) {
-      query = supabase
-        .from('user_progress')
-        .update({
-          chapter_id: chapterId,
-          section_id: sectionId,
-          question_id: questionId,
-          selected_answer: selectedAnswer,
-          is_correct: isCorrect,
-          answered_at: new Date().toISOString(),
-          time_spent: timeSpent
-        })
-        .eq('id', existing.id)
-        .select()
-        .single()
-    } else {
-      query = supabase
-        .from('user_progress')
-        .insert({
+      .upsert(
+        {
           user_id: user.id,
           chapter_id: chapterId,
           section_id: sectionId,
@@ -73,12 +45,11 @@ export async function saveProgress(
           is_correct: isCorrect,
           answered_at: new Date().toISOString(),
           time_spent: timeSpent
-        })
-        .select()
-        .single()
-    }
-
-    const { data, error } = await query
+        },
+        { onConflict: ['user_id', 'question_id'] }
+      )
+      .select()
+      .single()
 
     if (error) throw error
 

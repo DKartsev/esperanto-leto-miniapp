@@ -1,4 +1,7 @@
 import { supabase } from './supabaseClient.js'
+import { v5 as uuidv5 } from 'uuid'
+
+const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
 
 /**
  * Регистрация нового пользователя
@@ -231,6 +234,45 @@ export async function ensureUserProfile(user) {
 }
 
 /**
+ * Find or create a user profile by Telegram ID
+ * @param {string|number} telegramId
+ * @param {string|null} username
+ * @returns {Promise<string|null>} profile UUID or null
+ */
+export async function findOrCreateUserProfile(telegramId, username = null) {
+  if (!telegramId) return null
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('telegram_id', String(telegramId))
+      .maybeSingle()
+
+    if (profileError) throw profileError
+
+    if (profile?.id) {
+      return profile.id
+    }
+
+    const userUUID = uuidv5(String(telegramId), TELEGRAM_NAMESPACE)
+    const email = `${telegramId}@telegram.fake`
+
+    const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
+      uid: userUUID,
+      username,
+      email,
+      telegram_id: String(telegramId)
+    })
+    if (rpcError) throw rpcError
+
+    return userUUID
+  } catch (err) {
+    console.error('❌ Ошибка поиска/создания профиля Telegram:', err)
+    return null
+  }
+}
+
+/**
  * Подписка на изменения аутентификации
  * @param {Function} callback - Функция обратного вызова
  * @returns {Object} Объект подписки
@@ -241,3 +283,4 @@ export function onAuthStateChange(callback) {
     callback(event, session)
   })
 }
+

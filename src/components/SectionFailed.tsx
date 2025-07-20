@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import videoFile from '../assets/Failed.mp4';
 
-const SectionFailed = ({ sectionId }: { sectionId: string }) => {
+interface SectionFailedProps { sectionId: string; delay?: number }
+
+const SectionFailed = ({ sectionId, delay = 2000 }: SectionFailedProps) => {
   const [showRetry, setShowRetry] = useState(false);
   const [dots, setDots] = useState('');
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
     const timeout = setTimeout(() => {
       clearInterval(dotInterval);
       setShowRetry(true);
-    }, 2000);
+    }, delay);
 
     return () => {
       clearInterval(dotInterval);
@@ -29,7 +31,7 @@ const SectionFailed = ({ sectionId }: { sectionId: string }) => {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-black z-50">
+    <div className="fixed inset-0 min-h-screen w-screen overflow-hidden bg-black z-50">
       <video
         src={videoFile}
         autoPlay

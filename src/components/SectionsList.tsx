@@ -4,6 +4,8 @@ import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
 import { getSectionProgressPercent } from '../services/progressService';
 import { supabase } from '../services/supabaseClient.js';
+import { useLoadData } from '../hooks/useLoadData';
+import ProgressBar from './ui/ProgressBar';
 
 interface Section {
   id: number;
@@ -28,55 +30,47 @@ interface SectionsListProps {
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
   const [expandedTheory, setExpandedTheory] = useState<number | null>(null);
   const [sections, setSections] = useState<Section[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, loading, error } = useLoadData(async () => {
+    const data = await fetchSections(chapterId)
+    const processed: Section[] = []
+    for (const sec of data as Array<{ id: number; title: string }>) {
+      const progress = await getSectionProgressPercent(chapterId, sec.id)
+      processed.push({
+        id: sec.id,
+        title: sec.title || 'Нет названия',
+        progress,
+        duration: '',
+        isCompleted: progress === 100,
+        theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
+      })
+    }
+    return processed
+  }, [chapterId])
   const [progressBySectionId, setProgressBySectionId] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        const data = await fetchSections(chapterId)
-        const processed: Section[] = []
+    if (data) setSections(data)
+  }, [data])
 
-        for (const sec of data as Array<{ id: number; title: string }>) {
-          const progress = await getSectionProgressPercent(chapterId, sec.id)
-
-          processed.push({
-            id: sec.id,
-            title: sec.title || 'Нет названия',
-            progress,
-            duration: '',
-            isCompleted: progress === 100,
-            theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
-          })
-        }
-
-        setSections(processed)
-
-        const user_id = localStorage.getItem('user_id')
-        if (user_id) {
-          const { data: progressData } = await supabase
+  useEffect(() => {
+    const loadProgress = async () => {
+      const user_id = localStorage.getItem('user_id')
+      if (user_id) {
+        const { data: progressData } = await supabase
             .from('user_progress')
             .select('section_id, accuracy, completed')
             .eq('user_id', user_id)
 
-          if (progressData) {
-            const map: Record<number, { accuracy: number; completed: boolean }> = {}
-            progressData.forEach((row: any) => {
-              map[row.section_id] = { accuracy: row.accuracy, completed: row.completed }
-            })
-            setProgressBySectionId(map)
-          }
+        if (progressData) {
+          const map: Record<number, { accuracy: number; completed: boolean }> = {}
+          progressData.forEach((row: any) => {
+            map[row.section_id] = { accuracy: row.accuracy, completed: row.completed }
+          })
+          setProgressBySectionId(map)
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Ошибка загрузки'
-        setError(message)
-      } finally {
-        setLoading(false)
       }
     }
-    load()
+    loadProgress()
   }, [chapterId])
 
   const getChapterTitle = (chapterId: number): string => {
@@ -223,20 +217,13 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                   <span className="text-sm text-emerald-700">Прогресс</span>
                   <span className="text-sm font-semibold text-emerald-600">{section.progress}%</span>
                 </div>
-                <div className="w-full bg-emerald-200 rounded-full h-2">
-                  <div
-                    className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${section.progress}%` }}
-                  ></div>
-                </div>
+                <ProgressBar percent={section.progress} />
                 {progressBySectionId[section.id] && (
                   <>
-                    <div className="h-2 w-full bg-neutral-200 rounded mt-2">
-                      <div
-                        className={`h-full rounded transition-all duration-300 ${
-                          progressBySectionId[section.id].accuracy >= 70 ? 'bg-green-500' : 'bg-gray-300'
-                        }`}
-                        style={{ width: `${progressBySectionId[section.id].accuracy}%` }}
+                    <div className="mt-2">
+                      <ProgressBar
+                        percent={progressBySectionId[section.id].accuracy}
+                        color={progressBySectionId[section.id].accuracy >= 70 ? 'bg-green-500' : 'bg-gray-300'}
                       />
                     </div>
                     <div className="flex items-center text-xs text-gray-600 mt-1">
