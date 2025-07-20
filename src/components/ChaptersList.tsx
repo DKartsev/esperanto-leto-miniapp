@@ -193,7 +193,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   }
 
   return (
-    <div className="p-6 pt-2 space-y-6 mx-auto max-w-screen-sm">
+    <div className="min-h-screen mx-auto max-w-screen-sm p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
@@ -246,16 +246,16 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
           </div>
           <div>
             <h4
-              className="font-semibold text-emerald-900 break-words"
+              className="font-semibold text-emerald-900 break-words text-ellipsis"
               style={{ textWrap: 'balance' }}
             >
               {recommendedChapter.title}
             </h4>
-            <p className="text-sm text-emerald-700 break-words">{recommendedChapter.description}</p>
+            <p className="text-sm text-emerald-700 break-words text-ellipsis">{recommendedChapter.description}</p>
           </div>
           <button
             onClick={() => onChapterSelect(recommendedChapter.id)}
-            className="w-full py-2 px-4 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
+            className="max-w-xs w-full px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
           >
             <Play className="w-4 h-4" />
             <span>Начать</span>
@@ -319,7 +319,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                 {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-6 h-6" /> : chapter.id}
               </div>
 
-              <h3 className="text-lg font-semibold text-emerald-900 break-words" style={{ textWrap: 'balance' }}>
+              <h3 className="text-lg font-semibold text-emerald-900 break-words text-ellipsis" style={{ textWrap: 'balance' }}>
                 {chapter.title}
               </h3>
 
@@ -334,7 +334,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   onChapterSelect(chapter.id);
                 }}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`w-full py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
+                className={`max-w-xs w-full px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-600 text-white shadow hover:bg-green-700 hover:scale-105 active:scale-100'
@@ -363,7 +363,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   {sectionsByChapter[chapter.id]?.map((section) => (
                     <li
                       key={section.id}
-                      className="max-w-[90%] ml-4 border-l-4 border-green-400 rounded-lg bg-gray-50 shadow-sm px-3 py-2 text-sm text-emerald-800"
+                      className="max-w-[90%] ml-4 border-l-4 border-green-400 rounded-lg bg-gray-50 shadow-sm px-3 py-2 text-sm text-emerald-800 text-ellipsis"
                     >
                       {section.title}
                     </li>
