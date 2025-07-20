@@ -371,8 +371,8 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
 
   const handleResetUserProgress = (userId: string) => {
     if (confirm('Вы уверены, что хотите сбросить прогресс этого пользователя?')) {
-      setUsers(prev => prev.map(user => 
-        user.userId === userId 
+      setUsers(prev => prev.map(user =>
+        user.userId === userId
           ? { ...user, totalProgress: 0, chaptersCompleted: 0, testsCompleted: 0, currentChapter: 1, currentSection: 1 }
           : user
       ));
@@ -380,6 +380,14 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
         `User progress reset for ${userId} by admin ${currentUser || currentEmail}`
       );
     }
+  };
+
+  const handleResetAllUsers = () => {
+    alert('Функциональность пока недоступна');
+  };
+
+  const handleExportLogs = () => {
+    alert('Функциональность пока недоступна');
   };
 
   const filteredChapters = chapters.filter(chapter =>
@@ -894,10 +902,16 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
                 <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold text-red-900 mb-4">Опасная зона</h3>
                   <div className="space-y-3">
-                    <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button
+                      onClick={handleResetAllUsers}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
                       Сбросить все данные пользователей
                     </button>
-                    <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button
+                      onClick={handleExportLogs}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
                       Экспорт и очистка логов
                     </button>
                   </div>
