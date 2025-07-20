@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../services/supabaseClient.js';
 import { useAuth } from './SupabaseAuthProvider';
+import { findOrCreateUserProfile } from '../services/authService.js';
 import LoadingScreen from './LoadingScreen';
 
 const TelegramLoginRedirect = () => {
@@ -22,16 +22,8 @@ const TelegramLoginRedirect = () => {
 
     const initProfile = async () => {
       try {
-        const { error } = await supabase.rpc('create_user_from_telegram', {
-          uid: userId,
-          username: firstName,
-          email: `${userId}@telegram`,
-          telegram_id: userId,
-        });
-
-        if (error) throw error;
-
-        localStorage.setItem('user_id', userId);
+        const uuid = await findOrCreateUserProfile(userId, telegramUser.username || firstName);
+        localStorage.setItem('user_id', uuid);
         setLoading(false);
       } catch (err) {
         console.error('Ошибка входа:', err);

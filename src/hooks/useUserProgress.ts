@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../services/supabaseClient.js'
+import { findOrCreateUserProfile } from '../services/authService.js'
 
 export interface ChapterProgress {
   chapterId: number
@@ -10,6 +11,7 @@ export interface ChapterProgress {
 }
 
 export const useUserProgress = (userId?: string | null) => {
+  const [resolvedId, setResolvedId] = useState<string | null>(null)
   const [progressLoading, setProgressLoading] = useState(true)
   const [startDate, setStartDate] = useState<string | null>(null)
   const [completedChapters, setCompletedChapters] = useState(0)
@@ -21,12 +23,29 @@ export const useUserProgress = (userId?: string | null) => {
   const [sectionProgressMap, setSectionProgressMap] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
+    const resolve = async () => {
+      if (!userId) {
+        setResolvedId(null)
+        return
+      }
+      if (/^\d+$/.test(String(userId))) {
+        const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        const uuid = await findOrCreateUserProfile(String(userId), username)
+        setResolvedId(uuid)
+      } else {
+        setResolvedId(userId)
+      }
+    }
+    void resolve()
+  }, [resolvedId])
+
+  useEffect(() => {
     const fetchStart = async () => {
-      if (!userId) return
+      if (!resolvedId) return
       const { data, error } = await supabase
         .from('user_progress')
         .select('answered_at')
-        .eq('user_id', userId)
+        .eq('user_id', resolvedId)
         .order('answered_at', { ascending: true })
         .limit(1)
         .maybeSingle()
@@ -36,21 +55,21 @@ export const useUserProgress = (userId?: string | null) => {
       }
     }
     fetchStart()
-  }, [userId])
+  }, [resolvedId])
 
   useEffect(() => {
     const fetchActualProgress = async () => {
       setProgressLoading(true)
-      if (!userId) {
+      if (!resolvedId) {
         setProgressLoading(false)
         return
       }
 
-      console.log('📊 Запрос расчета прогресса для', userId)
+      console.log('📊 Запрос расчета прогресса для', resolvedId)
       const { data: progress, error } = await supabase
         .from('user_progress')
         .select('chapter_id, section_id, is_correct, time_spent, answered_at')
-        .eq('user_id', userId)
+        .eq('user_id', resolvedId)
 
       if (error) {
         console.log('❌ Ошибка загрузки прогресса:', error)
@@ -136,16 +155,16 @@ export const useUserProgress = (userId?: string | null) => {
     }
 
     fetchActualProgress()
-  }, [userId])
+  }, [resolvedId])
 
   useEffect(() => {
     const fetchProgress = async () => {
-      if (!userId) return
-      console.log('🔄 Запрос прогресса для userId:', userId)
+      if (!resolvedId) return
+      console.log('🔄 Запрос прогресса для userId:', resolvedId)
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', resolvedId)
       if (error) {
         console.log('❌ Ошибка загрузки прогресса:', error)
       }
@@ -158,7 +177,7 @@ export const useUserProgress = (userId?: string | null) => {
       }
     }
     fetchProgress()
-  }, [userId])
+  }, [resolvedId])
 
   useEffect(() => {
     const map: Record<number, { accuracy: number; completed: boolean }> = {}
@@ -175,7 +194,7 @@ export const useUserProgress = (userId?: string | null) => {
 
   useEffect(() => {
     const fetchChapterProgress = async () => {
-      if (!userId) return
+      if (!resolvedId) return
 
       const { data: chapters } = await supabase
         .from('chapters')
@@ -190,7 +209,7 @@ export const useUserProgress = (userId?: string | null) => {
       const { data: completed } = await supabase
         .from('user_progress')
         .select('chapter_id, section_id')
-        .eq('user_id', userId)
+        .eq('user_id', resolvedId)
         .eq('completed', true)
 
       const sectionsByChapter = new Map<number, number>()
@@ -226,7 +245,7 @@ export const useUserProgress = (userId?: string | null) => {
     }
 
     fetchChapterProgress()
-  }, [userId])
+  }, [resolvedId])
 
   useEffect(() => {
     if (chapterProgress && chapterProgress.length > 0) {

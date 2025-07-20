@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../services/supabaseClient.js'
+import { findOrCreateUserProfile } from '../services/authService.js'
 
 export interface ChapterStats {
   totalTime: number
@@ -10,16 +11,34 @@ export interface ChapterStats {
 }
 
 export const useChapterStats = (userId?: string | null) => {
+  const [resolvedId, setResolvedId] = useState<string | null>(null)
   const [stats, setStats] = useState<ChapterStats | null>(null)
 
   useEffect(() => {
+    const resolve = async () => {
+      if (!userId) {
+        setResolvedId(null)
+        return
+      }
+      if (/^\d+$/.test(String(userId))) {
+        const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        const uuid = await findOrCreateUserProfile(String(userId), username)
+        setResolvedId(uuid)
+      } else {
+        setResolvedId(userId)
+      }
+    }
+    void resolve()
+  }, [resolvedId])
+
+  useEffect(() => {
     const load = async () => {
-      if (!userId) return
+      if (!resolvedId) return
 
       const { data: chapters, error } = await supabase
         .from('user_chapter_progress')
         .select('average_accuracy, total_time, completed')
-        .eq('user_id', userId)
+        .eq('user_id', resolvedId)
 
       if (error) {
         console.error('Ошибка загрузки прогресса глав:', error)
@@ -60,7 +79,7 @@ export const useChapterStats = (userId?: string | null) => {
     }
 
     load()
-  }, [userId])
+  }, [resolvedId])
 
   return stats
 }
