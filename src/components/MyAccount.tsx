@@ -115,8 +115,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       return
     }
 
-    // ✅ сохраняем telegram_id
-    localStorage.setItem('user_id', tgUser.id.toString())
+    // ✅ сохраняем uuid пользователя
+    localStorage.setItem('user_id', userId)
 
     navigate('/')
   }
