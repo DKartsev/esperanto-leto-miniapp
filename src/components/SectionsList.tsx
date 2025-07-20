@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import LoadingVideo from './LoadingVideo';
+import LoadingScreen from './LoadingScreen';
 import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
 import { useLoadData } from '../hooks/useLoadData';
@@ -84,7 +84,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   const chapterTitle = getChapterTitle(chapterId);
 
   if (loading) {
-    return <LoadingVideo />;
+    return <LoadingScreen />;
   }
 
   if (error) {

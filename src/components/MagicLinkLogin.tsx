@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Mail } from 'lucide-react'
-import LoadingVideo from './LoadingVideo'
+import LoadingScreen from './LoadingScreen'
 import { supabase } from '../services/supabaseClient.js'
 import { ADMIN_EMAIL } from '../utils/adminUtils.js'
 
@@ -80,7 +80,7 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
   }
 
   if (!isOpen) return null
-  if (loading) return <LoadingVideo />
+  if (loading) return <LoadingScreen />
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

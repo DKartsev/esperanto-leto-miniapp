@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient.js';
 import { useAuth } from './SupabaseAuthProvider';
-import LoadingVideo from './LoadingVideo';
+import LoadingScreen from './LoadingScreen';
 
 const TelegramLoginRedirect = () => {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ const TelegramLoginRedirect = () => {
   if (!loading) return null;
 
   return (
-    <LoadingVideo />
+    <LoadingScreen />
   );
 };
 

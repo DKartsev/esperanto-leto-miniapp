@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
-import LoadingVideo from './LoadingVideo'
+import LoadingScreen from './LoadingScreen'
 import { useAuth } from './SupabaseAuthProvider'
 
 interface AuthModalProps {
@@ -132,7 +132,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
   }
 
   if (!isOpen) return null
-  if (loading) return <LoadingVideo />
+  if (loading) return <LoadingScreen />
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
