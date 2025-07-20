@@ -36,6 +36,7 @@ import AdminPanel from './components/AdminPanel';
 import { useAuth } from './components/SupabaseAuthProvider';
 import { saveTestResults } from './services/progressService';
 import { supabase } from './services/supabaseClient.js';
+import { findOrCreateUserProfile } from './services/authService.js';
 import { isAdmin } from './utils/adminUtils.js';
 
 function App() {
@@ -84,40 +85,18 @@ function App() {
     } = await supabase.auth.getUser();
     let userId = user?.id || localStorage.getItem('user_id') || (profile as any)?.id;
 
-    // Если это Telegram ID (число) — ищем или создаём профиль
+    // Если это Telegram ID (число) — ищем или создаём профиль через RPC
     if (userId && /^\d+$/.test(String(userId))) {
       const telegramId = String(userId);
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('telegram_id', telegramId)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error('Ошибка поиска профиля:', profileError.message);
+      const newId = await findOrCreateUserProfile(
+        telegramId,
+        window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+      );
+      if (!newId) {
+        console.error('Не удалось создать профиль через RPC');
+        return;
       }
-
-      if (profileData?.id) {
-        userId = profileData.id;
-      } else {
-        const { data: newProfile, error: insertError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              telegram_id: telegramId,
-              username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
-            }
-          ])
-          .select('id')
-          .single();
-
-        if (insertError || !newProfile) {
-          console.error('Ошибка создания профиля:', insertError?.message);
-          return;
-        }
-
-        userId = newProfile.id;
-      }
+      userId = newId;
     }
 
     if (!userId || /^\d+$/.test(String(userId))) {
