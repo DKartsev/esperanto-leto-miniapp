@@ -41,9 +41,4 @@ root.render(
   </StrictMode>
 );
 
-// Hide loading screen after React renders
-window.setTimeout(hideLoadingScreen, 100);
-
-// Remove start video loader once React has mounted
-const startLoader = document.getElementById('start-loader');
-if (startLoader) startLoader.remove();
+// Loading screen is hidden after the intro video ends
