@@ -132,6 +132,7 @@
         autoplay
         muted
         playsinline
+        preload="auto"
         onended="window.hideLoadingScreen()"
         style="width: 100%; height: 100%; object-fit: cover"
       ></video>
@@ -160,10 +161,11 @@
       document.addEventListener('DOMContentLoaded', function () {
         const video = document.getElementById('loadingVideo');
         if (!video) {
+          hideLoadingScreen();
           return;
         }
 
-        const tryPlay = () => {
+        const startVideo = () => {
           const playPromise = video.play();
           if (playPromise !== undefined) {
             playPromise.catch((err) => {
@@ -173,11 +175,18 @@
           }
         };
 
-        if (video.readyState >= 1) {
-          tryPlay();
+        if (video.readyState >= 3) {
+          startVideo();
         } else {
-          video.addEventListener('loadedmetadata', tryPlay, { once: true });
+          video.addEventListener('canplay', startVideo, { once: true });
         }
+
+        // Fallback: hide loader if video hasn't started in 5 seconds
+        window.setTimeout(() => {
+          if (video.paused) {
+            hideLoadingScreen();
+          }
+        }, 5000);
       });
 
       // Universal Links Detection and Handling
