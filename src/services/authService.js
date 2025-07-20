@@ -77,7 +77,7 @@ export async function getUserProfile(userId) {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, username, telegram_id')
       .eq('id', userId)
       .maybeSingle()
 
@@ -127,7 +127,7 @@ export async function ensureUserProfile(user) {
   try {
     const { data: existingProfile, error: fetchError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, username, telegram_id')
       .eq('id', user.id)
       .single()
 
