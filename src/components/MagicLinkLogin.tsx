@@ -1,6 +1,7 @@
 import { useState, type FC } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Mail, Loader } from 'lucide-react'
+import { X, Mail } from 'lucide-react'
+import LoadingVideo from './LoadingVideo'
 import { supabase } from '../services/supabaseClient.js'
 import { ADMIN_EMAIL } from '../utils/adminUtils.js'
 
@@ -79,6 +80,7 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
   }
 
   if (!isOpen) return null
+  if (loading) return <LoadingVideo />
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -121,7 +123,7 @@ const MagicLinkLogin: FC<MagicLinkLoginProps> = ({
                 loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'
               }`}
             >
-              {loading ? <Loader className="w-5 h-5 animate-spin mx-auto" /> : buttonLabel}
+              {buttonLabel}
             </button>
           </form>
         )}

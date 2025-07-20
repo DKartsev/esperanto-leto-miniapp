@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { X, Mail, Lock, User, Eye, EyeOff, Loader } from 'lucide-react'
+import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import LoadingVideo from './LoadingVideo'
 import { useAuth } from './SupabaseAuthProvider'
 
 interface AuthModalProps {
@@ -131,6 +132,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
   }
 
   if (!isOpen) return null
+  if (loading) return <LoadingVideo />
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -270,14 +272,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: AuthModal
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >
-            {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <Loader className="w-5 h-5 animate-spin" />
-                <span>{mode === 'signin' ? 'Вход...' : 'Регистрация...'}</span>
-              </div>
-            ) : (
-              mode === 'signin' ? 'Войти' : 'Зарегистрироваться'
-            )}
+            {mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}
           </button>
 
           {/* Mode Toggle */}
