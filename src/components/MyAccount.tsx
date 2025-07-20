@@ -24,7 +24,6 @@ import AccountHeader from './account/AccountHeader';
 import AccountStats from './account/AccountStats';
 import AccountProgress from './account/AccountProgress';
 import AccountAvatarUpload from './account/AccountAvatarUpload';
-import { useAccountData } from '../hooks/useAccountData';
 
 interface MyAccountProps {
   onBackToHome: () => void;
