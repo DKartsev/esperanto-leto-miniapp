@@ -1,4 +1,18 @@
 import { supabase } from './supabaseClient.js'
+import { createHash } from 'crypto'
+
+export function telegramIdToUUID(telegramId) {
+  const hash = createHash('sha256')
+  hash.update(String(telegramId))
+  const hex = hash.digest('hex').slice(0, 32)
+  return [
+    hex.substring(0, 8),
+    hex.substring(8, 12),
+    hex.substring(12, 16),
+    hex.substring(16, 20),
+    hex.substring(20)
+  ].join('-')
+}
 
 // Телеграм-вход не требует регистрации через Supabase Auth
 
@@ -140,41 +154,41 @@ export async function ensureUserProfile(user) {
  * @param {string|null} username
  * @returns {Promise<string|null>} profile UUID or null
  */
-export async function findOrCreateUserProfile(telegramId, username = null) {
-  if (!telegramId) return null
-  try {
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('telegram_id', String(telegramId))
-      .maybeSingle()
+export async function findOrCreateUserProfile(telegramId, telegramUsername) {
+  const uuid = telegramIdToUUID(telegramId)
 
-    if (profileError) throw profileError
+  // Проверка в users
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', uuid)
+    .maybeSingle()
 
-    if (profile?.id) {
-      return profile.id
-    }
-
-    const email = `${telegramId}@telegram.local`
-    const authUserId = crypto.randomUUID()
-
-    const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
-      uid: authUserId,
-      username: username || 'User',
-      email,
-      telegram_id: String(telegramId)
+  if (!existingUser) {
+    await supabase.from('users').insert({
+      id: uuid,
+      telegram_id: telegramId,
+      username: telegramUsername
     })
-
-    if (rpcError) throw rpcError
-
-    localStorage.setItem('user_id', authUserId)
-    localStorage.setItem('telegram_id', String(telegramId))
-
-    return authUserId
-  } catch (err) {
-    console.error('❌ Ошибка поиска/создания профиля Telegram:', err)
-    return null
   }
+
+  // Проверка в profiles
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', uuid)
+    .maybeSingle()
+
+  if (!existingProfile) {
+    await supabase.from('profiles').insert({
+      id: uuid,
+      full_name: telegramUsername,
+      created_at: new Date().toISOString()
+    })
+  }
+
+  localStorage.setItem('user_id', uuid)
+  return uuid
 }
 
 /**
