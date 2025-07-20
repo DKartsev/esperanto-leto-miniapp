@@ -104,7 +104,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     // ✅ сохраняем telegram_id
     localStorage.setItem('user_id', tgUser.id.toString())
 
-    window.location.reload()
+    navigate('/')
   }
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user
