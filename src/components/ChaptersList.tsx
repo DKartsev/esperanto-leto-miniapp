@@ -1,9 +1,9 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield } from 'lucide-react';
+import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield, ChevronDown } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService.js'
-import { getChapterProgressPercent } from '../services/progressService'
+import { getChapterProgressPercent, getSectionProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
 import { supabase } from '../services/supabaseClient.js'
 
@@ -27,6 +27,7 @@ interface Chapter {
 interface Section {
   id: number;
   title: string;
+  progress?: number;
 }
 
 interface ChaptersListProps {
@@ -176,7 +177,13 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     if (!sectionsByChapter[chapterId]) {
       try {
         const data = await fetchSections(chapterId);
-        setSectionsByChapter(prev => ({ ...prev, [chapterId]: data as Section[] }));
+        const withProgress = await Promise.all(
+          (data as Section[]).map(async (sec) => ({
+            ...sec,
+            progress: await getSectionProgressPercent(chapterId, sec.id),
+          }))
+        );
+        setSectionsByChapter((prev) => ({ ...prev, [chapterId]: withProgress }));
       } catch (err) {
         console.error('Ошибка загрузки разделов:', err);
       }
@@ -302,31 +309,47 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       </div>
 
       {/* Chapters Grid */}
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         {filteredChapters.map((chapter) => (
           <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
             <div
-              onClick={() => handleToggleChapter(chapter)}
-              className={`rounded-2xl bg-white shadow p-4 text-center space-y-2 cursor-pointer ${
-                chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''
-              }`}
+              className={`bg-white rounded-lg shadow p-3 space-y-2 ${chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''}`}
             >
-              <div
-                className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                  chapter.isLocked && !hasAdminAccess() ? 'bg-gray-400' : 'bg-emerald-600'
-                }`}
+              <button
+                type="button"
+                onClick={() => handleToggleChapter(chapter)}
+                className="w-full flex items-center justify-between"
               >
-                {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-6 h-6" /> : chapter.id}
-              </div>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                      chapter.isLocked && !hasAdminAccess() ? 'bg-gray-400' : 'bg-emerald-600'
+                    }`}
+                  >
+                    {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-4 h-4" /> : chapter.id}
+                  </div>
+                  <h3 className="text-sm font-semibold text-emerald-900 truncate">{chapter.title}</h3>
+                </div>
+                <ChevronDown
+                  className={`w-4 h-4 text-emerald-600 transition-transform ${openChapterId === chapter.id ? 'rotate-180' : ''}`}
+                />
+              </button>
 
-              <h3 className="text-lg font-semibold text-emerald-900 break-words text-ellipsis" style={{ textWrap: 'balance' }}>
-                {chapter.title}
-              </h3>
-
-              <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(chapter.badge)}`}>
-                {getBadgeIcon(chapter.badge)}
-                <span>{chapter.badge}</span>
-              </div>
+              {openChapterId === chapter.id && (
+                <ul className="mt-2 space-y-1">
+                  {sectionsByChapter[chapter.id]?.map((section) => (
+                    <li
+                      key={section.id}
+                      className="flex justify-between items-center text-sm bg-emerald-50 rounded-md px-3 py-1 text-emerald-800"
+                    >
+                      <span className="truncate">{`Раздел ${section.id} — ${section.title}`}</span>
+                      <span className="ml-2 whitespace-nowrap">
+                        {section.progress && section.progress >= 100 ? '✅' : `${section.progress ?? 0}%`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               <button
                 onClick={(e) => {
@@ -334,42 +357,29 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   onChapterSelect(chapter.id);
                 }}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`max-w-xs w-full px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition-transform duration-200 box-border ${
+                className={`mt-2 max-w-xs w-full px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold transition-colors duration-200 box-border ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white shadow hover:bg-green-700 hover:scale-105 active:scale-100'
+                    : 'bg-green-600 text-white shadow hover:bg-green-700'
                 } ${hasAdminAccess() && chapter.isLocked ? 'border-2 border-emerald-400' : ''}`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (
                   <>
-                    <Lock className="w-5 h-5" />
+                    <Lock className="w-4 h-4" />
                     <span>Заблокировано</span>
                   </>
                 ) : hasAdminAccess() && chapter.isLocked ? (
                   <>
-                    <Shield className="w-5 h-5" />
+                    <Shield className="w-4 h-4" />
                     <span>Открыть (Админ)</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-5 h-5" />
+                    <Play className="w-4 h-4" />
                     <span>{chapter.isStarted ? 'Продолжить' : 'Начать'}</span>
                   </>
                 )}
               </button>
-
-              {openChapterId === chapter.id && (
-                <ul className="mt-4 space-y-2 text-left">
-                  {sectionsByChapter[chapter.id]?.map((section) => (
-                    <li
-                      key={section.id}
-                      className="max-w-[90%] ml-4 border-l-4 border-green-400 rounded-lg bg-gray-50 shadow-sm px-3 py-2 text-sm text-emerald-800 text-ellipsis"
-                    >
-                      {section.title}
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           </div>
         ))}

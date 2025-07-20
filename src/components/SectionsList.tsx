@@ -1,24 +1,15 @@
 import { useState, useEffect, type FC } from 'react';
 import LoadingScreen from './LoadingScreen';
-import { Play, Clock, Book, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Play, CheckCircle2, Book } from 'lucide-react';
 import { fetchSections } from '../services/courseService.js';
 import { useLoadData } from '../hooks/useLoadData';
-import useUserProgress from '../hooks/useUserProgress'
-import useUserProfile from '../hooks/useUserProfile'
-import ProgressBar from './ui/ProgressBar';
+import { getSectionProgressPercent } from '../services/progressService'
 
 interface Section {
   id: number;
   title: string;
   progress: number;
-  duration: string;
   isCompleted: boolean;
-  theory?: {
-    title: string;
-    content: string;
-    examples: string[];
-    keyTerms: string[];
-  };
 }
 
 interface SectionsListProps {
@@ -28,36 +19,28 @@ interface SectionsListProps {
 }
 
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
-  const [expandedTheory, setExpandedTheory] = useState<number | null>(null);
   const [sections, setSections] = useState<Section[]>([])
-  const { userId } = useUserProfile()
-  const { sectionProgressMap } = useUserProgress(userId)
   const { data, loading, error } = useLoadData(async () => {
-    const data = await fetchSections(chapterId)
-    return (data as Array<{ id: number; title: string }>).map(sec => ({
-      id: sec.id,
-      title: sec.title || 'Нет названия',
-      progress: 0,
-      duration: '',
-      isCompleted: false,
-      theory: { title: '', content: 'Нет данных', examples: [], keyTerms: [] }
-    }))
+    const fetched = await fetchSections(chapterId)
+    return Promise.all(
+      (fetched as Array<{ id: number; title: string }>).map(async (sec) => ({
+        id: sec.id,
+        title: sec.title || 'Нет названия',
+        progress: await getSectionProgressPercent(chapterId, sec.id),
+        isCompleted: false,
+      }))
+    )
   }, [chapterId])
-  const [progressBySectionId, setProgressBySectionId] = useState<Record<number, { accuracy: number; completed: boolean }>>({})
 
   useEffect(() => {
     if (!data) return
-    const updated = (data as Section[]).map(sec => {
-      const prog = sectionProgressMap[sec.id]
-      return {
+    setSections(
+      (data as Section[]).map((sec) => ({
         ...sec,
-        progress: prog ? (prog.completed ? 100 : 0) : 0,
-        isCompleted: prog?.completed ?? false
-      }
-    })
-    setSections(updated)
-    setProgressBySectionId(sectionProgressMap)
-  }, [data, sectionProgressMap])
+        isCompleted: sec.progress >= 100,
+      }))
+    )
+  }, [data])
 
 
   const getChapterTitle = (chapterId: number): string => {
@@ -75,10 +58,6 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
       case 11: return "Итоговый тест";
       default: return `Глава ${chapterId}`;
     }
-  };
-
-  const toggleTheory = (sectionId: number) => {
-    setExpandedTheory(expandedTheory === sectionId ? null : sectionId);
   };
 
   const chapterTitle = getChapterTitle(chapterId);
@@ -108,131 +87,21 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
         </div>
       </div>
 
-      <div className="grid gap-4">
+      <div className="space-y-2">
         {sections.map((section) => (
-          <div key={section.id} className="w-full max-w-sm mx-auto px-4">
-            <div className="bg-white rounded-xl shadow-md px-4 py-4 mb-4">
-            {/* Theory Block */}
-            {section.theory && (
-              <div className="border-b border-emerald-200">
-                <button
-                  onClick={() => toggleTheory(section.id)}
-                  className="w-full p-5 text-left hover:bg-emerald-50 transition-colors duration-200"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <Book className="w-4 h-4 text-emerald-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-emerald-900">Теория</h3>
-                        <p className="text-sm text-emerald-600">{section.theory.title}</p>
-                      </div>
-                    </div>
-                    <div className={`transform transition-transform duration-200 ${
-                      expandedTheory === section.id ? 'rotate-180' : ''
-                    }`}>
-                      <ChevronDown className="w-5 h-5 text-emerald-600" />
-                    </div>
-                  </div>
-                </button>
-
-                {expandedTheory === section.id && (
-                  <div className="px-5 pb-5">
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                      <p className="text-emerald-800 mb-4 leading-relaxed">
-                        {section.theory.content}
-                      </p>
-                      
-                      {/* Examples */}
-                      <div className="mb-4">
-                        <h4 className="font-semibold text-emerald-900 mb-2">Примеры:</h4>
-                        <div className="space-y-1">
-                          {section.theory.examples.map((example, index) => (
-                            <div key={index} className="text-sm text-emerald-700 font-mono bg-white px-3 py-2 rounded border">
-                              {example}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Key Terms */}
-                      <div>
-                        <h4 className="font-semibold text-emerald-900 mb-2">Ключевые термины:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {section.theory.keyTerms.map((term, index) => (
-                            <span key={index} className="bg-emerald-200 text-emerald-800 px-2 py-1 rounded-full text-xs font-medium">
-                              {term}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Section Content */}
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {section.id}
-                  </div>
-                  <div>
-                    <h3
-                      className="text-lg font-semibold text-emerald-900 break-words text-ellipsis"
-                      style={{ textWrap: 'balance' }}
-                    >
-                      {section.title}
-                    </h3>
-                    <div className="flex items-center space-x-2 text-sm text-emerald-700">
-                      <Clock className="w-4 h-4" />
-                      <span>{section.duration}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {section.isCompleted && (
-                  <CheckCircle2 className="text-green-500 w-5 h-5" />
-                )}
-              </div>
-
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-emerald-700">Прогресс</span>
-                  <span className="text-sm font-semibold text-emerald-600">{section.progress}%</span>
-                </div>
-                <ProgressBar percent={section.progress} />
-                {progressBySectionId[section.id] && (
-                  <>
-                    <div className="mt-2">
-                      <ProgressBar
-                        percent={progressBySectionId[section.id].accuracy}
-                        color={progressBySectionId[section.id].accuracy >= 70 ? 'bg-green-500' : 'bg-gray-300'}
-                      />
-                    </div>
-                    <div className="flex items-center text-xs text-gray-600 mt-1">
-                      <span>{progressBySectionId[section.id].accuracy}% верно</span>
-                      {progressBySectionId[section.id].completed && (
-                        <CheckCircle2 className="w-4 h-4 text-green-600 ml-2" />
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <button
-                onClick={() => onSectionSelect(section.id)}
-                className="w-full max-w-xs py-2 px-4 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
-              >
-                <Play className="w-5 h-5" />
-                <span>Начать изучение</span>
-              </button>
-            </div>
-          </div>
-        </div>
+          <button
+            key={section.id}
+            onClick={() => onSectionSelect(section.id)}
+            className="w-full bg-white rounded-lg shadow px-3 py-2 flex items-center justify-between"
+          >
+            <span className="text-sm text-emerald-900 truncate">
+              {`Раздел ${section.id} — ${section.title}`}
+            </span>
+            <span className="flex items-center gap-1 text-sm text-emerald-700">
+              {section.isCompleted && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+              {section.progress}%
+            </span>
+          </button>
         ))}
       </div>
 
