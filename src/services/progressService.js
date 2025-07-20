@@ -31,17 +31,14 @@ export async function saveProgress(
       return null
     }
 
-    let userId = user.id
-
-    if (/^\d+$/.test(String(userId))) {
-      const tgUsername =
-        window?.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
-      const mappedId = await findOrCreateUserProfile(String(userId), tgUsername)
-      if (!mappedId) {
-        console.warn('Could not resolve Telegram ID to UUID')
-        return null
-      }
-      userId = mappedId
+    const telegramId = user.id
+    const tgUsername =
+      window?.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+    const profileId = await findOrCreateUserProfile(telegramId, tgUsername)
+    if (!profileId) {
+      console.warn('Could not resolve Telegram ID to UUID')
+      localStorage.setItem('saveProgress_error', 'profile_not_found')
+      return null
     }
 
     console.log('💾 Сохранение ответа:', {
@@ -55,7 +52,7 @@ export async function saveProgress(
       .from('user_progress')
       .insert([
         {
-          user_id: userId,
+          user_id: profileId,
           chapter_id: chapterId,
           section_id: sectionId,
           question_id: questionId,
