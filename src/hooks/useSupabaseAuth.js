@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   getUserProfile,
   updateUserProfile as authUpdateUserProfile,
-  onAuthStateChange,
   signIn as authSignIn,
   signUp as authSignUp,
-  signOut as authSignOut,
-  ensureUserProfile
+  signOut as authSignOut
 } from '../services/authService.js'
 import { supabase } from '../services/supabaseClient.js'
 import { getUserStats, getUserAchievements } from '../services/progressService'
@@ -22,11 +20,10 @@ export function useSupabaseAuth() {
   const [achievements, setAchievements] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const profileCheckedRef = useRef(false)
 
-  // Загрузка данных пользователя
-  const loadUserData = async (currentUser) => {
-    if (!currentUser) {
+  // Загрузка данных пользователя по telegram_id
+  const loadUserData = async (identifier) => {
+    if (!identifier) {
       setUser(null)
       setProfile(null)
       setStats(null)
@@ -38,19 +35,21 @@ export function useSupabaseAuth() {
       setLoading(true)
       setError(null)
 
-      if (!profileCheckedRef.current && currentUser.email) {
-        profileCheckedRef.current = true
-        await ensureUserProfile(currentUser)
-      }
+      // Загружаем профиль по telegram_id
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('telegram_id', identifier)
+        .single()
 
-      // Загружаем профиль, статистику и достижения параллельно
-      const [userProfile, userStats, userAchievements] = await Promise.all([
-        getUserProfile(currentUser.id),
-        getUserStats(),
-        getUserAchievements()
+      if (profileError) throw profileError
+
+      const [userStats, userAchievements] = await Promise.all([
+        getUserStats(userProfile.id),
+        getUserAchievements(userProfile.id)
       ])
 
-      setUser(currentUser)
+      setUser({ id: identifier })
       setProfile(userProfile)
       setStats(userStats)
       setAchievements(userAchievements)
@@ -64,71 +63,9 @@ export function useSupabaseAuth() {
 
   // Инициализация при монтировании
   useEffect(() => {
-    let mounted = true
-
-    const initAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-
-        if (error) throw error
-
-        const currentUser = session?.user || null
-
-        if (mounted) {
-          await loadUserData(currentUser)
-        }
-      } catch (err) {
-        if (mounted) {
-          setError(err.message)
-          setLoading(false)
-        }
-      }
-    }
-
-    initAuth()
-
-    const storedId = localStorage.getItem('user_id')
-    if (storedId && mounted) {
-      loadUserData({ id: storedId })
-    }
-
-    // Подписка на изменения аутентификации
-    const { data: { subscription } } = onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event)
-      
-      if (mounted) {
-        if (event === 'SIGNED_IN' && session?.user) {
-          await loadUserData(session.user)
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null)
-          setProfile(null)
-          setStats(null)
-          setLoading(false)
-        }
-      }
-    })
-
-    const handleStorage = async (e) => {
-      if (e.key === 'supabase_session_updated') {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (mounted) {
-          await loadUserData(session?.user || null)
-        }
-      }
-
-      if (e.key === 'user_id' && e.newValue) {
-        if (mounted) {
-          await loadUserData({ id: e.newValue })
-        }
-      }
-    }
-
-    window.addEventListener('storage', handleStorage)
-
-    return () => {
-      mounted = false
-      subscription?.unsubscribe()
-      window.removeEventListener('storage', handleStorage)
+    const storedTelegramId = localStorage.getItem('user_id')
+    if (storedTelegramId) {
+      loadUserData(storedTelegramId)
     }
   }, [])
 
