@@ -1,6 +1,6 @@
 import { FC, useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Shield, LogOut, Check } from 'lucide-react'
+import { User, Shield, LogOut, Check, Trophy } from 'lucide-react'
 import { useAuth } from './SupabaseAuthProvider'
 import { isAdmin } from '../utils/adminUtils.js'
 import { findOrCreateUserProfile } from '../services/authService.js'

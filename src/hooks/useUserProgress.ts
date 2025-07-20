@@ -120,7 +120,7 @@ export const useUserProgress = (userId?: string | null) => {
       setCompletedChapters(completed)
       setTotalStudyMinutes(Math.round(totalTimeSec / 60))
       setAverageAccuracy(avgAccuracy)
-      setStartDate(firstDate ? firstDate.toISOString() : null)
+      setStartDate(firstDate ? (firstDate as Date).toISOString() : null)
       setProgressLoading(false)
     }
 
