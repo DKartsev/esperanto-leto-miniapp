@@ -132,6 +132,7 @@
         autoplay
         muted
         playsinline
+        preload="auto"
         onended="window.hideLoadingScreen()"
         style="width: 100%; height: 100%; object-fit: cover"
       ></video>
@@ -175,7 +176,11 @@
           }
         };
 
-        tryPlay();
+        if (video.readyState >= 2) {
+          tryPlay();
+        } else {
+          video.addEventListener('canplay', tryPlay, { once: true });
+        }
       });
 
       // Universal Links Detection and Handling
