@@ -348,13 +348,6 @@ function App() {
     setSectionStartTime(null);
     setCurrentView('section-complete');
   };
-  const handleRetryIncorrect = () => {
-    setCurrentView('questions');
-  };
-
-  const handleCompleteChapter = () => {
-    setCurrentView('chapter-complete');
-  };
 
   const handleNextChapter = () => {
     if (selectedChapter) {
@@ -599,9 +592,6 @@ function App() {
               results={sectionResults!}
               chapterId={selectedChapter!}
               sectionId={selectedSection!}
-              achievements={earnedAchievements}
-              onRetryIncorrect={handleRetryIncorrect}
-              onCompleteChapter={handleCompleteChapter}
             />
             <NavigationBar />
           </>
