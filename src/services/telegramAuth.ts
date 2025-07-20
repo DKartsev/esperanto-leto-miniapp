@@ -52,24 +52,17 @@ export async function telegramLogin() {
     return null;
   }
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        id: authUserId,
-        telegram_id: telegramId,
-        username: username || `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-        email
-      },
-      {
-        onConflict: ['telegram_id']
-      }
-    );
+  const { error: rpcError } = await supabase.rpc('create_user_from_telegram', {
+    uid: authUserId,
+    username: username || `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+    email,
+    telegram_id: telegramId
+  });
 
-  if (error) {
-    console.error('❌ Ошибка при сохранении профиля в Supabase:', error.message);
+  if (rpcError) {
+    console.error('❌ Ошибка при сохранении профиля в Supabase:', rpcError.message);
   } else {
-    console.log('✅ Профиль создан или обновлён:', data);
+    console.log('✅ Профиль создан или обновлён через RPC');
   }
 
   localStorage.setItem('user_id', authUserId);
