@@ -1,5 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield } from 'lucide-react';
+import LoadingVideo from './LoadingVideo';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService.js'
 import { getChapterProgressPercent } from '../services/progressService'
@@ -184,7 +185,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   };
 
   if (loading) {
-    return <div className="p-6">Загрузка...</div>
+    return <LoadingVideo />;
   }
 
   if (error) {
