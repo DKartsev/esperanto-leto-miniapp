@@ -65,6 +65,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [averageAccuracy, setAverageAccuracy] = useState(0);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [progressLoading, setProgressLoading] = useState(true);
+  const [userStats, setUserStats] = useState({
+    completedSections: 0,
+    averageAccuracy: 0,
+    totalTimeSpent: 0
+  });
 
   useEffect(() => {
     const fetchStartDate = async () => {
@@ -766,6 +771,18 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
             <div className="flex items-center space-x-2">
               <TrendingUp className="w-4 h-4 text-emerald-600" />
               <span>Точность ответов: {averageAccuracy}%</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <span>Разделов завершено: {userStats.completedSections}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Trophy className="w-4 h-4 text-emerald-600" />
+              <span>Средняя точность: {userStats.averageAccuracy}%</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-emerald-600" />
+              <span>Время в разделах: {formatHoursMinutes(Math.round(userStats.totalTimeSpent / 60))}</span>
             </div>
             {startDate && (
               <div className="flex items-center space-x-2">
