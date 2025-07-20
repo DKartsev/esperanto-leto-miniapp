@@ -22,26 +22,14 @@ const TelegramLoginRedirect = () => {
 
     const initProfile = async () => {
       try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('id, username')
-          .eq('id', userId)
-          .maybeSingle();
+        const { error } = await supabase.rpc('create_user_from_telegram', {
+          uid: userId,
+          username: firstName,
+          email: `${userId}@telegram`,
+          telegram_id: userId,
+        });
 
-        if (!data) {
-          await supabase.from('profiles').insert({
-            id: userId,
-            username: firstName,
-            email: `${userId}@telegram`,
-            telegram_id: userId,
-            created_at: new Date().toISOString(),
-          });
-        } else if (!data.username) {
-          await supabase
-            .from('profiles')
-            .update({ username: firstName })
-            .eq('id', userId);
-        }
+        if (error) throw error;
 
         localStorage.setItem('user_id', userId);
         setLoading(false);
