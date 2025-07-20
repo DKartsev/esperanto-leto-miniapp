@@ -47,13 +47,9 @@ const SectionComplete: FC<SectionCompleteProps> = ({
     const saveSectionProgress = async () => {
       const completed = percentage >= 70;
 
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      let userId: string | null = user?.id || null;
-
-      if (!userId) {
-        const current = await getCurrentUser() as any;
-        userId = current?.id || null;
-      }
+      let userId: string | null = null;
+      const current = await getCurrentUser() as any;
+      userId = current?.id || null;
 
       const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
       const telegramUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null;
@@ -62,7 +58,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         userId = await findOrCreateUserProfile(String(telegramId), telegramUsername);
       }
 
-      if (userError || !userId || /^\d+$/.test(String(userId))) {
+      if (!userId || /^\d+$/.test(String(userId))) {
         console.error('❌ Ошибка получения пользователя или профиля');
         return;
       }

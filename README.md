@@ -110,13 +110,12 @@ npm run diagnostics
 import { useAuth } from './src/components/SupabaseAuthProvider'
 
 function MyComponent() {
-  const { user, signIn, signUp, signOut, loading } = useAuth()
-  
-  // Проверка аутентификации
+  const { user, loading } = useAuth()
+
   if (!user) {
-    return <LoginForm />
+    return null
   }
-  
+
   return <AuthenticatedContent />
 }
 ```

@@ -8,26 +8,9 @@ import { supabase } from './supabaseClient.js'
  * @param {string} password - Пароль
  * @returns {Promise<Object>} Данные сессии
  */
-export async function signIn(email, password) {
-  try {
-    console.log('🔐 Вход пользователя:', email)
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
-
-    if (error) throw error
-
-    console.log('✅ Вход выполнен успешно')
-    return data
-  } catch (error) {
-    console.error('❌ Ошибка входа:', error.message)
-    if (error.code === 'invalid_credentials' || error.message === 'Invalid login credentials') {
-      throw new Error('Неверный email или пароль')
-    }
-    throw new Error(`Ошибка входа: ${error.message}`)
-  }
+// Раньше здесь был вход через Supabase Auth
+export async function signIn(_email, _password) {
+  throw new Error('Email/пароль вход отключён')
 }
 
 /**
@@ -35,17 +18,10 @@ export async function signIn(email, password) {
  * @returns {Promise<void>}
  */
 export async function signOut() {
-  try {
-    console.log('🚪 Выход пользователя')
-    
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    
-    console.log('✅ Выход выполнен успешно')
-  } catch (error) {
-    console.error('❌ Ошибка выхода:', error.message)
-    throw new Error(`Ошибка выхода: ${error.message}`)
-  }
+  console.log('🚪 Выход пользователя')
+  localStorage.removeItem('user_id')
+  localStorage.removeItem('telegram_id')
+  console.log('✅ Выход выполнен успешно')
 }
 
 /**
@@ -53,22 +29,17 @@ export async function signOut() {
  * @returns {Promise<Object|null>} Данные пользователя или null
  */
 export async function getCurrentUser() {
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session?.user) {
-      return session.user
-    }
-
-    const storedId = localStorage.getItem('user_id')
-    if (storedId) {
-      return { id: storedId }
-    }
-
-    return null
-  } catch (error) {
-    console.error('❌ Ошибка получения пользователя:', error.message)
-    return null
+  const storedId = localStorage.getItem('user_id')
+  if (storedId) {
+    return { id: storedId }
   }
+
+  const tgId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+  if (tgId) {
+    return { id: String(tgId) }
+  }
+
+  return null
 }
 
 /**
