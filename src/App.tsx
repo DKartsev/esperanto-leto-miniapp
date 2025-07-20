@@ -214,7 +214,6 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {  }, []);
 
   const location = useLocation();
 

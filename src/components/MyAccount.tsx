@@ -14,12 +14,17 @@ import {
   X,
   Check
 } from 'lucide-react';
-import { v5 as uuidv5 } from 'uuid';
 import { useAuth } from './SupabaseAuthProvider';
 import { supabase } from '../services/supabaseClient.js';
 import { isAdmin } from '../utils/adminUtils.js';
+import { findOrCreateUserProfile } from '../services/authService.js';
 import AdminPanelButton from '../components/AdminPanelButton';
 import LoadingVideo from './LoadingVideo';
+import AccountHeader from './account/AccountHeader';
+import AccountStats from './account/AccountStats';
+import AccountProgress from './account/AccountProgress';
+import AccountAvatarUpload from './account/AccountAvatarUpload';
+import { useAccountData } from '../hooks/useAccountData';
 
 interface MyAccountProps {
   onBackToHome: () => void;
@@ -115,7 +120,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     setIsEditingUsername(false);
   };
 
-  const TELEGRAM_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
   useEffect(() => {
     const fetchActualProgress = async () => {
@@ -269,26 +273,17 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     }
 
     setLoginLoading(true);
-    const userUUID = uuidv5(tgUser.id.toString(), TELEGRAM_NAMESPACE);
     const username = tgUser.username || `${tgUser.first_name}${tgUser.last_name || ''}`;
-    const email = `${tgUser.username || tgUser.id}@telegram.fake`;
+    const userId = await findOrCreateUserProfile(tgUser.id.toString(), username);
 
-    const { error } = await supabase.rpc('create_user_from_telegram', {
-      uid: userUUID,
-      username,
-      email,
-      telegram_id: tgUser.id.toString()
-    });
-
-    if (error) {
-      console.error('Ошибка создания профиля:', error);
+    if (!userId) {
       setLoginError('Ошибка создания профиля');
     } else {
-      localStorage.setItem('user_id', userUUID);
+      localStorage.setItem('user_id', userId);
       await loadChapterStats();
+      await refreshStats();
     }
     setLoginLoading(false);
-    await refreshStats();
   };
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;

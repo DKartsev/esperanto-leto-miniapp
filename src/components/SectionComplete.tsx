@@ -1,9 +1,10 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
 import { supabase } from '../services/supabaseClient.js';
+import { findOrCreateUserProfile } from '../services/authService.js';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
-import { getChapterById } from '../data/esperantoData';
+import { getNextStep } from '../utils/navigation.js';
 
 interface SectionResults {
   totalQuestions: number;
@@ -27,15 +28,15 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   const incorrectCount = results.incorrectAnswers.length;
   const accuracy = results.totalQuestions > 0 ? results.correctAnswers / results.totalQuestions : 0;
 
-  const chapter = getChapterById(chapterId);
-  const sectionIndex = chapter?.sections.findIndex(s => s.id === sectionId) ?? -1;
-  const nextSection =
-    chapter && sectionIndex >= 0 && sectionIndex + 1 < chapter.sections.length
-      ? chapter.sections[sectionIndex + 1]
-      : undefined;
-  const nextSectionId = nextSection ? String(nextSection.id) : undefined;
-  const nextChapter = nextSection ? undefined : getChapterById(chapterId + 1);
-  const nextChapterId = nextChapter ? String(nextChapter.id) : undefined;
+  const [nextSectionId, setNextSectionId] = useState<string | undefined>(undefined);
+  const [nextChapterId, setNextChapterId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    getNextStep(sectionId).then(step => {
+      setNextSectionId(step.nextSectionId);
+      setNextChapterId(step.nextChapterId);
+    });
+  }, [sectionId]);
 
   useEffect(() => {
     const saveSectionProgress = async () => {
@@ -44,54 +45,16 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       let userId: string | null = user?.id || null;
 
-      // Получаем Telegram ID из WebApp, если есть
       const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+      const telegramUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null;
 
       if (!userId && telegramId) {
-        userId = String(telegramId);
+        userId = await findOrCreateUserProfile(String(telegramId), telegramUsername);
       }
 
-      if (userError || !userId) {
-        console.error('Ошибка получения пользователя или Telegram ID:', userError);
+      if (userError || !userId || /^\d+$/.test(String(userId))) {
+        console.error('❌ Ошибка получения пользователя или профиля');
         return;
-      }
-
-      // Если userId — это числовой Telegram ID, конвертируем в UUID из таблицы profiles
-      if (/^\d+$/.test(userId)) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('telegram_id', String(userId))
-          .maybeSingle();
-
-        if (profileError) {
-          console.error('Ошибка поиска профиля:', profileError);
-        }
-
-        if (profile?.id) {
-          userId = profile.id as string;
-        } else {
-          console.warn('⚠️ UUID не найден, создаём профиль');
-
-          const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .insert([
-              {
-                telegram_id: String(userId),
-                username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
-              }
-            ])
-            .select('id')
-            .single();
-
-          if (insertError || !newProfile) {
-            console.error('❌ Ошибка создания нового профиля:', insertError);
-            return;
-          }
-
-          userId = newProfile.id as string;
-          console.log('✅ Профиль создан. UUID:', userId);
-        }
       }
 
       if (!userId || /^\d+$/.test(userId)) {

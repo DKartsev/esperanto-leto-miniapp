@@ -4,6 +4,7 @@ import LoadingVideo from './LoadingVideo';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
 import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
+import { useLoadData } from '../hooks/useLoadData';
 
 
 export interface QuestionResultItem {
@@ -47,15 +48,9 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
   const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>>([])
   const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[]; difficulty: string }>>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        const theory = await fetchTheoryBlocks(sectionId)
-        const qData = await fetchQuestions(sectionId)
+  const { loading, error, data } = useLoadData(async () => {
+    const theory = await fetchTheoryBlocks(sectionId)
+    const qData = await fetchQuestions(sectionId)
         console.log('Loaded questions count:', qData.length)
         const formatted = (qData as Array<{
           id: number
@@ -76,22 +71,9 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
           hints: q.hints,
           difficulty: q.difficulty
         }))
-        setTheoryBlocks(theory as Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>)
-        setQuestions(formatted)
-        if ((theory as []).length === 0) {
-          console.warn('Данные не найдены в theory_blocks для section', sectionId)
-        }
-        if (formatted.length === 0) {
-          console.warn('Данные не найдены в questions для section', sectionId)
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Ошибка загрузки'
-        setError(message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
+    setTheoryBlocks(theory as Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>)
+    setQuestions(formatted)
+    return true
   }, [chapterId, sectionId])
 
   const totalQuestions = questions.length

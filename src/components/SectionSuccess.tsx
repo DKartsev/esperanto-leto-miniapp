@@ -6,12 +6,14 @@ interface SectionSuccessProps {
   sectionId: string;
   nextSectionId?: string;
   nextChapterId?: string;
+  delay?: number;
 }
 
 const SectionSuccess = ({
   sectionId,
   nextSectionId,
-  nextChapterId
+  nextChapterId,
+  delay = 2000
 }: SectionSuccessProps) => {
   const [ready, setReady] = useState(false);
   const [dots, setDots] = useState('');
@@ -25,7 +27,7 @@ const SectionSuccess = ({
     const timeout = setTimeout(() => {
       clearInterval(dotInterval);
       setReady(true);
-    }, 2000);
+    }, delay);
 
     return () => {
       clearInterval(dotInterval);
@@ -45,7 +47,7 @@ const SectionSuccess = ({
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-black z-50">
+    <div className="fixed inset-0 min-h-screen w-screen overflow-hidden bg-black z-50">
       <video
         src={videoFile}
         autoPlay

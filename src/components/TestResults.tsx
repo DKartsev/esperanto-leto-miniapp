@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import ProgressBar from './ui/ProgressBar';
 import { Trophy, RotateCcw, Save, Star, TrendingUp, BookOpen, Target } from 'lucide-react';
 import type { TestResults as TestResultsData, TestAnswer } from './TestInterface';
 
@@ -161,11 +162,12 @@ const TestResults: FC<TestResultsProps> = ({ results, onSaveResults, onRetakeTes
                 <div className="w-40 text-sm font-medium text-emerald-800">
                   {skill.name}
                 </div>
-                <div className="flex-1 bg-emerald-200 rounded-full h-4">
-                  <div
-                    className={`h-4 rounded-full ${skill.color} transition-all duration-1000`}
-                    style={{ width: `${sectionScores[skill.key as keyof typeof sectionScores]}%` }}
-                  ></div>
+                <div className="flex-1">
+                  <ProgressBar
+                    percent={sectionScores[skill.key as keyof typeof sectionScores]}
+                    color={skill.color}
+                    height="h-4"
+                  />
                 </div>
                 <div className="w-16 text-right font-semibold text-emerald-900">
                   {sectionScores[skill.key as keyof typeof sectionScores]}%
