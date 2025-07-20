@@ -7,7 +7,7 @@ interface SectionFailedProps {
   onRetry?: () => void;
 }
 
-const SectionFailed = ({ sectionId, delay = 2000, onRetry }: SectionFailedProps) => {
+const SectionFailed = ({ delay = 2000, onRetry }: SectionFailedProps) => {
   const [showRetry, setShowRetry] = useState(false);
   const [dots, setDots] = useState('');
 

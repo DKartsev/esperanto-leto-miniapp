@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
@@ -48,7 +48,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
   const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>>([])
   const [questions, setQuestions] = useState<Array<{ id: number; type: string; question: string; options: string[]; correctAnswer: string; explanation: string; hints: string[]; difficulty: string }>>([])
-  const { loading, error, data } = useLoadData(async () => {
+  const { loading, error } = useLoadData(async () => {
     const theory = await fetchTheoryBlocks(sectionId)
     const qData = await fetchQuestions(sectionId)
         console.log('Loaded questions count:', qData.length)

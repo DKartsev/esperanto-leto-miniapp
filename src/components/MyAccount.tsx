@@ -1,6 +1,6 @@
 import { FC, useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Shield, LogOut, Pencil, Check, X } from 'lucide-react'
+import { User, Shield, LogOut, Check } from 'lucide-react'
 import { useAuth } from './SupabaseAuthProvider'
 import { isAdmin } from '../utils/adminUtils.js'
 import { findOrCreateUserProfile } from '../services/authService.js'
@@ -30,7 +30,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     signOut,
     isAuthenticated,
     updateProfile,
-    refreshStats
   } = useAuth() as any
 
   const navigate = useNavigate()
@@ -108,7 +107,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   }
 
   const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user
-  const isTelegramUser = Boolean(telegramUser)
 
   useEffect(() => {
     if (!isAuthenticated && telegramUser) {

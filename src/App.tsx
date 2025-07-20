@@ -64,7 +64,6 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [sectionResults, setSectionResults] = useState<QuestionResults | null>(null);
-  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([]);
 
   // Test interface state
   const [testView, setTestView] = useState<'intro' | 'test' | 'results'>('intro');
@@ -319,14 +318,13 @@ function App() {
           results.totalQuestions,
           timeSpent
         );
-        const { achievements } = await (saveTestResults(
+        await saveTestResults(
           selectedChapter,
           selectedSection,
           results.correctAnswers,
           results.totalQuestions,
           timeSpent
-        ) as any);
-        setEarnedAchievements(achievements);
+        );
         await refreshStats();
       } catch (err) {
         console.error('Ошибка сохранения результатов раздела:', err);
