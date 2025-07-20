@@ -9,20 +9,6 @@ import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
 import AuthCallback from './pages/AuthCallback';
 import TelegramLoginRedirect from './components/TelegramLoginRedirect';
 
-// Hide loading screen when React app mounts
-function hideLoadingScreen() {
-  const loadingElement = document.getElementById('loading');
-  if (loadingElement) {
-    loadingElement.classList.add('hidden');
-    window.setTimeout(() => {
-      loadingElement.style.display = 'none';
-    }, 300);
-  }
-}
-
-// Expose helper for React components (StartLoader)
-window.hideLoadingScreen = hideLoadingScreen;
-
 const root = createRoot(document.getElementById('root')!);
 
 root.render(
