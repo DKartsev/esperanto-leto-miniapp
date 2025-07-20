@@ -1,5 +1,12 @@
-export const ADMIN_USERNAMES = ['admin5050', 'admin', 'administrator'];
-export const ADMIN_EMAILS = ['admin5050@gmail.com'];
+const USERNAME_ENV = import.meta.env.VITE_ADMIN_USERNAME || ''
+const EMAIL_ENV = import.meta.env.VITE_ADMIN_EMAIL || ''
+
+export const ADMIN_USERNAMES = USERNAME_ENV
+  ? USERNAME_ENV.split(',').map((u) => u.trim().toLowerCase())
+  : []
+export const ADMIN_EMAILS = EMAIL_ENV
+  ? EMAIL_ENV.split(',').map((e) => e.trim().toLowerCase())
+  : []
 
 export function isAdmin(username?: string | null, email?: string | null): boolean {
   const uname = username?.toLowerCase() || '';

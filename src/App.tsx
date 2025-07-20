@@ -274,7 +274,7 @@ function App() {
     { id: 'account', label: 'Мой аккаунт', icon: User }
   ];
 
-  // Добавляем кнопку "Админ" только для admin5050
+  // Добавляем кнопку "Админ" только для пользователей из ADMIN_USERNAMES
   const navigationItems = hasAdminAccess() 
     ? [...baseNavigationItems, { id: 'admin', label: 'Админ', icon: Settings }]
     : baseNavigationItems;
