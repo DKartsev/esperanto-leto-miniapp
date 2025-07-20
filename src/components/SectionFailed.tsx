@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import videoFile from '../assets/Failed.mp4';
 
-interface SectionFailedProps { sectionId: string; delay?: number }
+interface SectionFailedProps {
+  sectionId: string;
+  delay?: number;
+  onRetry?: () => void;
+}
 
-const SectionFailed = ({ sectionId, delay = 2000 }: SectionFailedProps) => {
+const SectionFailed = ({ sectionId, delay = 2000, onRetry }: SectionFailedProps) => {
   const [showRetry, setShowRetry] = useState(false);
   const [dots, setDots] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const dotInterval = setInterval(() => {
@@ -25,9 +27,9 @@ const SectionFailed = ({ sectionId, delay = 2000 }: SectionFailedProps) => {
     };
   }, []);
 
-  // При нажатии — переход к разделу
+  // При нажатии вызываем переданный callback
   const handleRetry = () => {
-    navigate(`/section/${sectionId}`);
+    if (onRetry) onRetry();
   };
 
   return (
