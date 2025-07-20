@@ -36,7 +36,7 @@ export function useSupabaseAuth() {
       // Загружаем профиль по telegram_id
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, username, telegram_id')
         .eq('telegram_id', identifier)
         .single()
 
