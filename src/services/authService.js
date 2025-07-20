@@ -1,10 +1,22 @@
 import { supabase } from './supabaseClient.js'
-import { createHash } from 'crypto'
 
-export function telegramIdToUUID(telegramId) {
-  const hash = createHash('sha256')
-  hash.update(String(telegramId))
-  const hex = hash.digest('hex').slice(0, 32)
+/**
+ * Deterministically convert a Telegram numeric ID into a UUID using
+ * the Web Crypto API. This avoids the Node `crypto` module which is not
+ * available in the browser.
+ *
+ * @param {string|number} telegramId Telegram user id
+ * @returns {Promise<string>} UUID derived from the id
+ */
+export async function telegramIdToUUID(telegramId) {
+  const data = new TextEncoder().encode(String(telegramId))
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hex = hashArray
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32)
+
   return [
     hex.substring(0, 8),
     hex.substring(8, 12),
@@ -155,7 +167,7 @@ export async function ensureUserProfile(user) {
  * @returns {Promise<string|null>} profile UUID or null
  */
 export async function findOrCreateUserProfile(telegramId, telegramUsername) {
-  const uuid = telegramIdToUUID(telegramId)
+  const uuid = await telegramIdToUUID(telegramId)
 
   // Проверка в users
   const { data: existingUser } = await supabase
