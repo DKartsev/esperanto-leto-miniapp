@@ -46,10 +46,21 @@ export const useUserProgress = (userId?: string | null) => {
         return
       }
 
+      console.log('📊 Запрос расчета прогресса для', userId)
       const { data: progress, error } = await supabase
         .from('user_progress')
         .select('chapter_id, section_id, is_correct, time_spent, answered_at')
         .eq('user_id', userId)
+
+      if (error) {
+        console.log('❌ Ошибка загрузки прогресса:', error)
+      }
+      if (progress) {
+        console.log('📥 Получены данные для расчета:', progress)
+        if (progress.length === 0) {
+          console.log('❗ Прогресс не найден')
+        }
+      }
 
       if (error || !progress) {
         if (error) console.error('Ошибка загрузки прогресса:', error)
@@ -130,11 +141,21 @@ export const useUserProgress = (userId?: string | null) => {
   useEffect(() => {
     const fetchProgress = async () => {
       if (!userId) return
+      console.log('🔄 Запрос прогресса для userId:', userId)
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
         .eq('user_id', userId)
-      if (!error && data) setProgressData(data as any[])
+      if (error) {
+        console.log('❌ Ошибка загрузки прогресса:', error)
+      }
+      if (data) {
+        console.log('📥 Результат user_progress:', data)
+        if (data.length === 0) {
+          console.log('❗ Прогресс не найден')
+        }
+        setProgressData(data as any[])
+      }
     }
     fetchProgress()
   }, [userId])

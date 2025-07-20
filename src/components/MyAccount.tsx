@@ -23,7 +23,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const {
     user,
     profile,
-    stats,
     achievements,
     loading,
     signOut,
@@ -38,9 +37,22 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
 
-  const userId = user?.id || localStorage.getItem('user_id')
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null)
 
-  const chapterStats = useChapterStats(userId)
+  useEffect(() => {
+    const resolveUserId = async () => {
+      let id: string | null = user?.id || localStorage.getItem('user_id')
+      if (id && /^\d+$/.test(String(id))) {
+        const tgUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        id = await findOrCreateUserProfile(String(id), tgUsername)
+      }
+      setResolvedUserId(id)
+      console.log('🆔 ID в MyAccount:', id)
+    }
+    resolveUserId()
+  }, [user])
+
+  const chapterStats = useChapterStats(resolvedUserId)
   const {
     startDate,
     completedChapters,
@@ -49,7 +61,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     chapterProgress,
     recommendedChapter,
     progressData
-  } = useUserProgress(userId)
+  } = useUserProgress(resolvedUserId)
 
   // Debug info from localStorage about saveProgress
   const debugCall = localStorage.getItem('saveProgress_called')
