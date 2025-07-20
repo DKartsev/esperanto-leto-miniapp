@@ -92,7 +92,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   }
 
   return (
-    <div className="w-full max-w-screen-sm mx-auto px-4 space-y-4 pt-20">
+    <div className="min-h-screen w-full max-w-screen-sm mx-auto px-4 sm:px-6 pt-20 space-y-4">
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={onBackToChapters}
@@ -182,7 +182,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
                   </div>
                   <div>
                     <h3
-                      className="text-lg font-semibold text-emerald-900 break-words"
+                      className="text-lg font-semibold text-emerald-900 break-words text-ellipsis"
                       style={{ textWrap: 'balance' }}
                     >
                       {section.title}
