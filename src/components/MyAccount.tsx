@@ -4,7 +4,7 @@ import { User, Shield, LogOut, Pencil, Check, X } from 'lucide-react'
 import { useAuth } from './SupabaseAuthProvider'
 import { isAdmin } from '../utils/adminUtils.js'
 import { findOrCreateUserProfile } from '../services/authService.js'
-import LoadingVideo from './LoadingVideo'
+import LoadingScreen from './LoadingScreen'
 import AdminPanelButton from './AdminPanelButton'
 import AccountHeader from './account/AccountHeader'
 import AccountStats from './account/AccountStats'
@@ -125,12 +125,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const hasAdminAccess = () => isAdmin(profile?.username, user?.email)
 
   if (loading) {
-    return <LoadingVideo />
+    return <LoadingScreen />
   }
 
   if (!isAuthenticated) {
     if (loginLoading) {
-      return <LoadingVideo />
+      return <LoadingScreen />
     }
 
     return (

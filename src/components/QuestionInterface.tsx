@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
-import LoadingVideo from './LoadingVideo';
+import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
 import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
@@ -80,7 +80,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const currentQuestionData = questions[currentQuestion]
 
   if (loading) {
-    return <LoadingVideo />;
+    return <LoadingScreen />;
   }
 
   if (error) {
