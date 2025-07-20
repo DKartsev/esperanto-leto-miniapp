@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient.js'
-import { getCurrentUser } from './authService.js'
+import { getCurrentUser, findOrCreateUserProfile } from './authService.js'
 
 /**
  * Сохранить ответ пользователя
@@ -31,6 +31,19 @@ export async function saveProgress(
       return null
     }
 
+    let userId = user.id
+
+    if (/^\d+$/.test(String(userId))) {
+      const tgUsername =
+        window?.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+      const mappedId = await findOrCreateUserProfile(String(userId), tgUsername)
+      if (!mappedId) {
+        console.warn('Could not resolve Telegram ID to UUID')
+        return null
+      }
+      userId = mappedId
+    }
+
     console.log('💾 Сохранение ответа:', {
       chapterId,
       sectionId,
@@ -40,20 +53,19 @@ export async function saveProgress(
 
     const { data, error } = await supabase
       .from('user_progress')
-      .upsert(
+      .insert([
         {
-          user_id: user.id,
+          user_id: userId,
           chapter_id: chapterId,
           section_id: sectionId,
           question_id: questionId,
           selected_answer: selectedAnswer,
           is_correct: isCorrect,
-          answered_at: new Date().toISOString(),
           time_spent: timeSpent,
-          hints_used: hintsUsed
-        },
-        { onConflict: ['user_id', 'question_id'] }
-      )
+          hints_used: hintsUsed,
+          answered_at: new Date().toISOString()
+        }
+      ])
       .select()
       .single()
 
