@@ -127,10 +127,12 @@
     <!-- Start video loader -->
     <div id="start-loader" style="position: fixed; inset: 0; z-index: 9999; background: black;">
       <video
+        id="loadingVideo"
         src="/start-loading.mp4"
         autoplay
         muted
         playsinline
+        onended="window.hideLoadingScreen()"
         style="width: 100%; height: 100%; object-fit: cover"
       ></video>
     </div>
@@ -138,7 +140,7 @@
     <div id="root"></div>
     
     <script>
-      // Hide loading screen when React app loads
+      // Hide loading screen and start video when animation ends
       function hideLoadingScreen() {
         const loadingElement = document.getElementById('loading');
         if (loadingElement) {
@@ -146,6 +148,11 @@
           window.setTimeout(() => {
             loadingElement.style.display = 'none';
           }, 300);
+        }
+
+        const startLoader = document.getElementById('start-loader');
+        if (startLoader) {
+          startLoader.remove();
         }
       }
 
@@ -244,14 +251,8 @@
         });
       }
 
-      // Hide loading screen after a maximum of 3 seconds
-      window.setTimeout(hideLoadingScreen, 3000);
-      
-      // Hide loading screen when DOM is loaded
-      document.addEventListener('DOMContentLoaded', hideLoadingScreen);
-      
-      // Hide loading screen when window is loaded
-      window.addEventListener('load', hideLoadingScreen);
+      // Loading screen will be hidden automatically when the intro
+      // video finishes playing.
     </script>
     
     <script type="module" src="/src/main.tsx"></script>
