@@ -142,7 +142,8 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
         currentQuestionData.id,
         answer,
         correct,
-        0
+        0,
+        hintsUsed
       )
       await refreshStats()
     } catch (err) {

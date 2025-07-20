@@ -9,6 +9,7 @@ import { getCurrentUser } from './authService.js'
  * @param {boolean} isCorrect - Правильность ответа
  * @param {string} selectedAnswer - Выбранный ответ
  * @param {number} timeSpent - Время на ответ (в секундах)
+ * @param {number} hintsUsed - Количество использованных подсказок
  * @returns {Promise<Object>} Сохраненный ответ
  */
 export async function saveProgress(
@@ -17,7 +18,8 @@ export async function saveProgress(
   questionId,
   selectedAnswer,
   isCorrect,
-  timeSpent = 0
+  timeSpent = 0,
+  hintsUsed = 0
 ) {
   try {
     const user = await getCurrentUser()
@@ -44,7 +46,8 @@ export async function saveProgress(
           selected_answer: selectedAnswer,
           is_correct: isCorrect,
           answered_at: new Date().toISOString(),
-          time_spent: timeSpent
+          time_spent: timeSpent,
+          hints_used: hintsUsed
         },
         { onConflict: ['user_id', 'question_id'] }
       )
@@ -229,6 +232,7 @@ export async function getUserStats() {
     const totalAnswers = progress.length
     const correctAnswers = progress.filter(p => p.is_correct).length
     const totalTimeSpent = progress.reduce((sum, p) => sum + (p.time_spent || 0), 0)
+    const totalHintsUsed = progress.reduce((sum, p) => sum + (p.hints_used || 0), 0)
     
     // Подсчет завершенных глав и разделов
     const completedSections = new Set()
@@ -248,6 +252,7 @@ export async function getUserStats() {
       correctAnswers,
       accuracy,
       totalTimeSpent,
+      totalHintsUsed,
       averageTimePerQuestion,
       completedSections: completedSections.size,
       completedChapters: completedChapters.size,
@@ -528,6 +533,7 @@ function getDefaultStats() {
     correctAnswers: 0,
     accuracy: 0,
     totalTimeSpent: 0,
+    totalHintsUsed: 0,
     averageTimePerQuestion: 0,
     completedSections: 0,
     completedChapters: 0,
