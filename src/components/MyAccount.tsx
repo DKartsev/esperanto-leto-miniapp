@@ -13,7 +13,6 @@ import SectionProgressList from './account/SectionProgressList'
 import SummaryCards from './account/SummaryCards'
 import useChapterStats from '../hooks/useChapterStats'
 import useUserProgress from '../hooks/useUserProgress'
-import { formatHoursMinutes } from '../utils/formatTime'
 
 interface MyAccountProps {
   onBackToHome: () => void
@@ -43,7 +42,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
   const chapterStats = useChapterStats(userId)
   const {
-    progressLoading,
     startDate,
     completedChapters,
     totalStudyMinutes,
@@ -129,6 +127,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
   const hasAdminAccess = () => isAdmin(profile?.username, user?.email)
 
+  // Метрики прогресса
+  const totalChapters = chapterStats?.totalChapters || chapterProgress.length
+  const completedChaptersCount = chapterStats?.completedChapters ?? completedChapters
+  const totalSections = chapterProgress.reduce((sum, cp) => sum + cp.totalSections, 0)
+  const completedSections = chapterProgress.reduce((sum, cp) => sum + cp.completedSections, 0)
+
   if (loading) {
     return <LoadingScreen />
   }
@@ -197,28 +201,22 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         </div>
       </div>
       <div className="p-6">
-        <SummaryCards stats={stats} startDate={startDate} />
+        <SummaryCards
+          completedChapters={completedChaptersCount}
+          totalChapters={totalChapters}
+          completedSections={completedSections}
+          totalSections={totalSections}
+          totalTimeMinutes={totalStudyMinutes}
+          averageAccuracy={averageAccuracy}
+          startDate={startDate}
+        />
         {/* Debug info to check saveProgress() calls */}
         <div className="text-sm text-emerald-700 mb-4">
           <p>⏱️ Save Progress: {debugCall || 'не вызывался'}</p>
           <p>✅ Статус: {debugStatus || 'нет данных'}</p>
           <p>❌ Ошибка: {debugError || 'ошибок нет'}</p>
         </div>
-        {progressLoading ? (
-          <div className="rounded-2xl p-4 bg-white shadow my-4" />
-        ) : (
-          <div className="rounded-2xl p-4 bg-white shadow my-4 space-y-2">
-            <div className="flex items-center space-x-2">
-              <span className="text-emerald-600">Глав завершено: {completedChapters}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-emerald-600">Обучение: {formatHoursMinutes(totalStudyMinutes)}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-emerald-600">Точность ответов: {averageAccuracy}%</span>
-            </div>
-          </div>
-        )}
+
         {achievements && achievements.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-yellow-200 p-6 mb-6">
             <h2 className="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
