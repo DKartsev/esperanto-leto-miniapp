@@ -31,7 +31,6 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 }) => {
   const { refreshStats } = useAuth();
   const percentage = Math.round((results.correctAnswers / results.totalQuestions) * 100);
-  const incorrectCount = results.incorrectAnswers.length;
   const accuracy = results.totalQuestions > 0 ? results.correctAnswers / results.totalQuestions : 0;
 
   const [nextSectionId, setNextSectionId] = useState<string | undefined>(undefined);

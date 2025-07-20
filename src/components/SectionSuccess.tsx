@@ -10,7 +10,6 @@ interface SectionSuccessProps {
 }
 
 const SectionSuccess = ({
-  sectionId,
   nextSectionId,
   nextChapterId,
   delay = 2000,
