@@ -197,6 +197,16 @@ export const useUserProgress = (userId?: string | null) => {
   }, [progressData])
 
   useEffect(() => {
+    if (progressData.length > 0) {
+      const totalTime = progressData.reduce(
+        (sum: number, p: any) => sum + (p.time_spent || 0),
+        0
+      )
+      setTotalStudyMinutes(Math.floor(totalTime / 60))
+    }
+  }, [progressData])
+
+  useEffect(() => {
     const fetchChapterProgress = async () => {
       if (!resolvedId) return
 
