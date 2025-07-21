@@ -201,22 +201,23 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="bg-white border rounded-lg shadow-sm mx-4 p-3 text-sm text-left space-y-1">
-          <h3 className="text-sm font-semibold text-emerald-900">Рекомендуется изучить</h3>
-          <div>
-            <h4 className="font-semibold text-emerald-900 break-words" style={{ textWrap: 'balance' }}>
-              {recommendedChapter.title}
-            </h4>
-            {recommendedChapter.description && recommendedChapter.description !== 'Нет данных' && (
-              <p className="text-emerald-700 break-words">{recommendedChapter.description}</p>
-            )}
-          </div>
+        <div className="bg-emerald-50 rounded-xl shadow p-4 mb-4 mx-4 text-left">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-800 mb-2">
+            📚 Рекомендуется изучить
+          </h3>
+          <p className="text-base font-semibold text-gray-900 mb-1 break-words" style={{ textWrap: 'balance' }}>
+            {recommendedChapter.title}
+          </p>
+          {recommendedChapter.description && recommendedChapter.description !== 'Нет данных' && (
+            <p className="text-sm text-gray-600 mb-3 break-words">
+              {recommendedChapter.description}
+            </p>
+          )}
           <button
             onClick={() => onChapterSelect(recommendedChapter.id)}
-            className="px-3 py-1 rounded-md flex items-center gap-2 bg-green-600 text-white text-sm shadow-sm hover:bg-green-700"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg transition"
           >
-            <Play className="w-4 h-4" />
-            <span>Начать</span>
+            Начать обучение
           </button>
         </div>
       )}
