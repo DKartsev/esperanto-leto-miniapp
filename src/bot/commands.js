@@ -33,13 +33,12 @@ import {
 /**
  * Handle the /start command
  * ИСПРАВЛЕНО: Улучшенная обработка ошибок и логирование
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleStartCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const firstName = msg.from.first_name;
+export function handleStartCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
+  const firstName = ctx.from.first_name;
   
   console.log(`🚀 Обработка команды /start для пользователя ${userId} (${firstName})`);
   
@@ -49,9 +48,9 @@ export function handleStartCommand(bot, msg) {
     
     const newUser = initializeUser(userId, {
       first_name: firstName,
-      last_name: msg.from.last_name,
-      username: msg.from.username,
-      language_code: msg.from.language_code
+      last_name: ctx.from.last_name,
+      username: ctx.from.username,
+      language_code: ctx.from.language_code
     });
     
     console.log(`✅ Пользователь ${userId} инициализирован с прогрессом: ${newUser.stats.progress}%`);
@@ -93,7 +92,7 @@ export function handleStartCommand(bot, msg) {
     
     console.log(`📤 Отправка приветственного сообщения пользователю ${userId}...`);
     
-    bot.sendMessage(chatId, welcomeMessage, { 
+    ctx.telegram.sendMessage(chatId, welcomeMessage, { 
       parse_mode: 'Markdown',
       reply_markup: getMainMenuInlineKeyboard()
     }).then(() => {
@@ -104,7 +103,7 @@ export function handleStartCommand(bot, msg) {
       console.error(`❌ Ошибка отправки сообщения пользователю ${userId}:`, error);
       
       // Попытка отправить упрощенное сообщение
-      bot.sendMessage(chatId, `Привет, ${firstName}! Добро пожаловать в бот для изучения эсперанто! 🌟`).catch(fallbackError => {
+      ctx.telegram.sendMessage(chatId, `Привет, ${firstName}! Добро пожаловать в бот для изучения эсперанто! 🌟`).catch(fallbackError => {
         console.error(`❌ Критическая ошибка отправки сообщения ${userId}:`, fallbackError);
       });
     });
@@ -114,7 +113,7 @@ export function handleStartCommand(bot, msg) {
     console.error(`❌ Критическая ошибка в handleStartCommand для пользователя ${userId}:`, error);
     
     // Отправляем сообщение об ошибке пользователю
-    bot.sendMessage(chatId, `❌ Произошла ошибка при инициализации. Попробуйте команду /start еще раз.
+    ctx.telegram.sendMessage(chatId, `❌ Произошла ошибка при инициализации. Попробуйте команду /start еще раз.
 
 Если проблема повторяется, обратитесь к администратору.
 
@@ -126,12 +125,11 @@ export function handleStartCommand(bot, msg) {
 
 /**
  * Handle the /help command
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleHelpCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleHelpCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`📖 Обработка команды /help для пользователя ${userId}`);
   
@@ -168,7 +166,7 @@ export function handleHelpCommand(bot, msg) {
 Напишите "помощь" или используйте команду /help
     `;
     
-    bot.sendMessage(chatId, helpMessage, { 
+    ctx.telegram.sendMessage(chatId, helpMessage, { 
       parse_mode: 'Markdown',
       reply_markup: getWebAppKeyboard()
     }).then(() => {
@@ -182,18 +180,17 @@ export function handleHelpCommand(bot, msg) {
   } catch (error) {
     logger.error(`Error in handleHelpCommand for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleHelpCommand для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle the /webapp command
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleWebAppCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleWebAppCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`🌐 Обработка команды /webapp для пользователя ${userId}`);
   
@@ -201,7 +198,7 @@ export function handleWebAppCommand(bot, msg) {
     // Убеждаемся, что пользователь инициализирован
     getUserState(userId);
 
-    bot.sendMessage(chatId, 'Откройте мини-приложение:', {
+    ctx.telegram.sendMessage(chatId, 'Откройте мини-приложение:', {
       reply_markup: {
         inline_keyboard: [
           [
@@ -225,18 +222,17 @@ export function handleWebAppCommand(bot, msg) {
   } catch (error) {
     logger.error(`Error in handleWebAppCommand for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleWebAppCommand для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle the /chapters command
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleChaptersCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleChaptersCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`📚 Обработка команды /chapters для пользователя ${userId}`);
   
@@ -255,7 +251,7 @@ export function handleChaptersCommand(bot, msg) {
     const message = formatChapterList(esperantoChapters);
     
     // Send message with chapters keyboard
-    bot.sendMessage(chatId, message, {
+    ctx.telegram.sendMessage(chatId, message, {
       parse_mode: 'Markdown',
       reply_markup: getChaptersKeyboard(esperantoChapters)
     }).then(() => {
@@ -269,18 +265,17 @@ export function handleChaptersCommand(bot, msg) {
   } catch (error) {
     logger.error(`Error in handleChaptersCommand for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleChaptersCommand для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка при загрузке глав. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка при загрузке глав. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle the /test command
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleTestCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleTestCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`📝 Обработка команды /test для пользователя ${userId}`);
   
@@ -311,7 +306,7 @@ export function handleTestCommand(bot, msg) {
 Готовы начать?
     `;
     
-    bot.sendMessage(chatId, testIntroMessage, {
+    ctx.telegram.sendMessage(chatId, testIntroMessage, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
@@ -342,19 +337,18 @@ export function handleTestCommand(bot, msg) {
   } catch (error) {
     logger.error(`Error in handleTestCommand for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleTestCommand для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка при загрузке теста. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка при загрузке теста. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle the /profile command
  * ИСПРАВЛЕНО: Показываем реальный прогресс пользователя
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleProfileCommand(bot, msg) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleProfileCommand(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`👤 Обработка команды /profile для пользователя ${userId}`);
   
@@ -367,9 +361,9 @@ export function handleProfileCommand(bot, msg) {
     console.log(`📊 Статистика пользователя ${userId}:`, stats);
     
     // Format profile message
-    const profileMessage = formatUserProfile(msg.from, stats);
+    const profileMessage = formatUserProfile(ctx.from, stats);
     
-    bot.sendMessage(chatId, profileMessage, {
+    ctx.telegram.sendMessage(chatId, profileMessage, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
@@ -397,16 +391,16 @@ export function handleProfileCommand(bot, msg) {
   } catch (error) {
     logger.error(`Error in handleProfileCommand for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleProfileCommand для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка при загрузке профиля. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка при загрузке профиля. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle callback queries
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} callbackQuery - The callback query object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  */
-export function handleCallbackQuery(bot, callbackQuery) {
+export function handleCallbackQuery(ctx) {
+  const callbackQuery = ctx.callbackQuery;
   const chatId = callbackQuery.message.chat.id;
   const userId = callbackQuery.from.id;
   const data = callbackQuery.data;
@@ -415,7 +409,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
   
   try {
     // Answer the callback query
-    bot.answerCallbackQuery(callbackQuery.id);
+    ctx.answerCbQuery(callbackQuery.id);
     
     // Убеждаемся, что пользователь инициализирован
     getUserState(userId);
@@ -423,7 +417,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
     switch (data) {
       case 'chapters':
         console.log(`📚 Переход к главам для пользователя ${userId}`);
-        handleChaptersCommand(bot, { chat: { id: chatId }, from: { id: userId } });
+        await handleChaptersCommand(ctx);
         break;
         
       case 'ai_help':
@@ -441,7 +435,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
 • Как спрягаются глаголы в настоящем времени?
         `;
         
-        bot.sendMessage(chatId, aiHelpMessage, {
+        ctx.telegram.sendMessage(chatId, aiHelpMessage, {
           parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
@@ -463,19 +457,19 @@ export function handleCallbackQuery(bot, callbackQuery) {
         
       case 'test':
         console.log(`📝 Переход к тесту для пользователя ${userId}`);
-        handleTestCommand(bot, { chat: { id: chatId }, from: { id: userId } });
+        await handleTestCommand(ctx);
         break;
         
       case 'profile':
         console.log(`👤 Переход к профилю для пользователя ${userId}`);
-        handleProfileCommand(bot, { chat: { id: chatId }, from: { id: userId } });
+        await handleProfileCommand(ctx);
         break;
         
       case 'start_test':
         console.log(`▶️ Начало теста для пользователя ${userId}`);
         // Start test in bot
         updateUserState(userId, { currentState: 'quiz' });
-        bot.sendMessage(chatId, '📝 Тест начинается...', {
+        ctx.telegram.sendMessage(chatId, '📝 Тест начинается...', {
           reply_markup: {
             keyboard: [
               [{ text: '🔙 Назад в меню' }]
@@ -487,15 +481,7 @@ export function handleCallbackQuery(bot, callbackQuery) {
         
       case 'back_to_menu':
         console.log(`🔙 Возврат в меню для пользователя ${userId}`);
-        handleStartCommand(bot, { 
-          chat: { id: chatId }, 
-          from: { 
-            id: userId, 
-            first_name: callbackQuery.from.first_name,
-            last_name: callbackQuery.from.last_name,
-            username: callbackQuery.from.username
-          } 
-        });
+        await handleStartCommand(ctx);
         break;
         
       default:
@@ -509,19 +495,18 @@ export function handleCallbackQuery(bot, callbackQuery) {
   } catch (error) {
     logger.error(`Error in handleCallbackQuery for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleCallbackQuery для пользователя ${userId}:`, error);
-    bot.answerCallbackQuery(callbackQuery.id, { text: '❌ Произошла ошибка' });
+    ctx.answerCbQuery(callbackQuery.id, { text: '❌ Произошла ошибка' });
   }
 }
 
 /**
  * Handle chapter selection
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  * @param {number} chapterId - Selected chapter ID
  */
-export function handleChapterSelection(bot, msg, chapterId) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleChapterSelection(ctx, chapterId) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`📖 Выбор главы ${chapterId} пользователем ${userId}`);
   
@@ -534,7 +519,7 @@ export function handleChapterSelection(bot, msg, chapterId) {
     
     if (!chapter) {
       console.log(`❌ Глава ${chapterId} не найдена`);
-      bot.sendMessage(chatId, 'Глава не найдена. Пожалуйста, выберите главу из списка.');
+      ctx.telegram.sendMessage(chatId, 'Глава не найдена. Пожалуйста, выберите главу из списка.');
       return;
     }
     
@@ -549,7 +534,7 @@ export function handleChapterSelection(bot, msg, chapterId) {
     const message = formatSectionList(chapter);
     
     // Send message with sections keyboard and WebApp option
-    bot.sendMessage(chatId, message, {
+    ctx.telegram.sendMessage(chatId, message, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
@@ -580,20 +565,19 @@ export function handleChapterSelection(bot, msg, chapterId) {
   } catch (error) {
     logger.error(`Error in handleChapterSelection for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleChapterSelection для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка при выборе главы. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка при выборе главы. Попробуйте еще раз.');
   }
 }
 
 /**
  * Handle section selection
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import("telegraf").Context} ctx - Telegraf context
  * @param {number} chapterId - Chapter ID
  * @param {number} sectionId - Selected section ID
  */
-export function handleSectionSelection(bot, msg, chapterId, sectionId) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
+export function handleSectionSelection(ctx, chapterId, sectionId) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   
   console.log(`📑 Выбор раздела ${chapterId}.${sectionId} пользователем ${userId}`);
   
@@ -606,7 +590,7 @@ export function handleSectionSelection(bot, msg, chapterId, sectionId) {
     
     if (!chapter) {
       console.log(`❌ Глава ${chapterId} не найдена`);
-      bot.sendMessage(chatId, 'Глава не найдена. Пожалуйста, выберите главу из списка.');
+      ctx.telegram.sendMessage(chatId, 'Глава не найдена. Пожалуйста, выберите главу из списка.');
       return;
     }
     
@@ -614,7 +598,7 @@ export function handleSectionSelection(bot, msg, chapterId, sectionId) {
     
     if (!section) {
       console.log(`❌ Раздел ${sectionId} не найден в главе ${chapterId}`);
-      bot.sendMessage(chatId, 'Раздел не найден. Пожалуйста, выберите раздел из списка.');
+      ctx.telegram.sendMessage(chatId, 'Раздел не найден. Пожалуйста, выберите раздел из списка.');
       return;
     }
     
@@ -637,7 +621,7 @@ export function handleSectionSelection(bot, msg, chapterId, sectionId) {
     };
     
     // Send section content with WebApp option
-    bot.sendMessage(chatId, `
+    ctx.telegram.sendMessage(chatId, `
 *📖 Глава ${chapterId}, Раздел ${sectionId}: ${section.title}*
 
 ${content.content}
@@ -675,6 +659,6 @@ ${content.content}
   } catch (error) {
     logger.error(`Error in handleSectionSelection for user ${userId}:`, error);
     console.error(`❌ Ошибка в handleSectionSelection для пользователя ${userId}:`, error);
-    bot.sendMessage(chatId, '❌ Произошла ошибка при выборе раздела. Попробуйте еще раз.');
+    ctx.telegram.sendMessage(chatId, '❌ Произошла ошибка при выборе раздела. Попробуйте еще раз.');
   }
 }
