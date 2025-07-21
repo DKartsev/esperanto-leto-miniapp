@@ -11,7 +11,7 @@ import {
 
 /**
  * Start a quiz for a user
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function startQuiz(ctx) {
   const chatId = ctx.chat.id;
@@ -32,7 +32,7 @@ export function startQuiz(ctx) {
 
 /**
  * Send a quiz question to the user
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function sendQuizQuestion(ctx) {
   const chatId = ctx.chat.id;
@@ -65,7 +65,7 @@ export function sendQuizQuestion(ctx) {
 
 /**
  * Handle a quiz answer
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleQuizAnswer(ctx) {
   const chatId = ctx.chat.id;
@@ -119,7 +119,7 @@ export function handleQuizAnswer(ctx) {
 
 /**
  * Finish a quiz and show results
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function finishQuiz(ctx) {
   const chatId = ctx.chat.id;

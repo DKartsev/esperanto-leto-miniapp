@@ -11,7 +11,7 @@ import { esperantoChapters, basicPhrases } from './data/esperantoData.js';
 
 /**
  * Handle incoming messages
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  * @param {Object} openAIService - The OpenAI service
  */
 export async function handleMessage(ctx, openAIService) {
@@ -104,7 +104,7 @@ export async function handleMessage(ctx, openAIService) {
 
 /**
  * Process message with OpenAI
- * @param {import('telegraf').Context} ctx - Telegraf context
+ * @param {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  * @param {Object} openAIService - The OpenAI service
  * @param {number} userId - User ID
  * @param {number} chatId - Chat ID

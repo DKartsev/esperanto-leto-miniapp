@@ -33,7 +33,7 @@ import {
 /**
  * Handle the /start command
  * ИСПРАВЛЕНО: Улучшенная обработка ошибок и логирование
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleStartCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -125,7 +125,7 @@ export function handleStartCommand(ctx) {
 
 /**
  * Handle the /help command
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleHelpCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -186,7 +186,7 @@ export function handleHelpCommand(ctx) {
 
 /**
  * Handle the /webapp command
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleWebAppCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -228,7 +228,7 @@ export function handleWebAppCommand(ctx) {
 
 /**
  * Handle the /chapters command
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleChaptersCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -271,7 +271,7 @@ export function handleChaptersCommand(ctx) {
 
 /**
  * Handle the /test command
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleTestCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -344,7 +344,7 @@ export function handleTestCommand(ctx) {
 /**
  * Handle the /profile command
  * ИСПРАВЛЕНО: Показываем реальный прогресс пользователя
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  */
 export function handleProfileCommand(ctx) {
   const chatId = ctx.chat.id;
@@ -397,7 +397,7 @@ export function handleProfileCommand(ctx) {
 
 /**
  * Handle callback queries
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { callbackQuery: import('@telegraf/types').CallbackQuery.DataCallbackQuery }} ctx - Telegraf context
  */
 export function handleCallbackQuery(ctx) {
   const callbackQuery = ctx.callbackQuery;
@@ -501,7 +501,7 @@ export function handleCallbackQuery(ctx) {
 
 /**
  * Handle chapter selection
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  * @param {number} chapterId - Selected chapter ID
  */
 export function handleChapterSelection(ctx, chapterId) {
@@ -571,7 +571,7 @@ export function handleChapterSelection(ctx, chapterId) {
 
 /**
  * Handle section selection
- * @param {import("telegraf").Context} ctx - Telegraf context
+ * @param {import("telegraf").Context & { message: import('@telegraf/types').Message.TextMessage }} ctx - Telegraf context
  * @param {number} chapterId - Chapter ID
  * @param {number} sectionId - Selected section ID
  */

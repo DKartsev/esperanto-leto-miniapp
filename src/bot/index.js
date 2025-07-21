@@ -203,7 +203,7 @@ async function setupBotCommands() {
 }
 
 // Enhanced command handlers with better error handling
-bot.hears(/\/start/, async (ctx) => {
+bot.hears(/\/start/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   const userId = msg.from.id;
   const userName = msg.from.first_name;
@@ -225,7 +225,7 @@ bot.hears(/\/start/, async (ctx) => {
   }
 });
 
-bot.hears(/\/help/, async (ctx) => {
+bot.hears(/\/help/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /help от пользователя ${msg.from.id}`);
   try {
@@ -237,7 +237,7 @@ bot.hears(/\/help/, async (ctx) => {
   }
 });
 
-bot.hears(/\/webapp/, async (ctx) => {
+bot.hears(/\/webapp/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /webapp от пользователя ${msg.from.id}`);
   try {
@@ -249,7 +249,7 @@ bot.hears(/\/webapp/, async (ctx) => {
   }
 });
 
-bot.hears(/\/chapters/, async (ctx) => {
+bot.hears(/\/chapters/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /chapters от пользователя ${msg.from.id}`);
   try {
@@ -261,7 +261,7 @@ bot.hears(/\/chapters/, async (ctx) => {
   }
 });
 
-bot.hears(/\/test/, async (ctx) => {
+bot.hears(/\/test/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /test от пользователя ${msg.from.id}`);
   try {
@@ -273,7 +273,7 @@ bot.hears(/\/test/, async (ctx) => {
   }
 });
 
-bot.hears(/\/profile/, async (ctx) => {
+bot.hears(/\/profile/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /profile от пользователя ${msg.from.id}`);
   try {
@@ -286,7 +286,7 @@ bot.hears(/\/profile/, async (ctx) => {
 });
 
 // Enhanced debug command
-bot.hears(/\/debug/, async (ctx) => {
+bot.hears(/\/debug/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   console.log(`📨 Получена команда /debug от пользователя ${msg.from.id}`);
   try {
@@ -327,7 +327,7 @@ bot.hears(/\/debug/, async (ctx) => {
 });
 
 // Enhanced callback query handler
-bot.on('callback_query', async (ctx) => {
+bot.on('callback_query', async (/** @type {import('telegraf').Context & { callbackQuery: import('@telegraf/types').CallbackQuery.DataCallbackQuery }} */ ctx) => {
   const callbackQuery = ctx.callbackQuery;
   console.log(`🔘 Получен callback query: ${callbackQuery.data} от пользователя ${callbackQuery.from.id}`);
   try {
@@ -340,7 +340,7 @@ bot.on('callback_query', async (ctx) => {
 });
 
 // Enhanced WebApp data handler
-bot.on('message', async (ctx) => {
+bot.on('message', async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   if (ctx.message.web_app_data?.data) {
     console.log(`🌐 Получены данные WebApp от пользователя ${ctx.from.id}`);
     try {
@@ -386,7 +386,7 @@ ${webAppData.score >= 80 ? '🏆 Отличный результат!' :
 });
 
 // Handle chapter selection by number
-bot.hears(/^([1-9]|1[0-4])$/, async (ctx) => {
+bot.hears(/^([1-9]|1[0-4])$/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   const match = ctx.match;
   console.log(`📖 Выбор главы ${match[1]} пользователем ${msg.from.id}`);
@@ -401,7 +401,7 @@ bot.hears(/^([1-9]|1[0-4])$/, async (ctx) => {
 });
 
 // Handle section selection (format: chapter.section, e.g., "1.2")
-bot.hears(/^([1-9]|1[0-4])\.([1-5])$/, async (ctx) => {
+bot.hears(/^([1-9]|1[0-4])\.([1-5])$/, async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   const match = ctx.match;
   console.log(`📑 Выбор раздела ${match[1]}.${match[2]} пользователем ${msg.from.id}`);
@@ -417,7 +417,7 @@ bot.hears(/^([1-9]|1[0-4])\.([1-5])$/, async (ctx) => {
 });
 
 // Handle all other messages
-bot.on('message', async (ctx) => {
+bot.on('message', async (/** @type {import('telegraf').Context & { message: import('@telegraf/types').Message.TextMessage }} */ ctx) => {
   const msg = ctx.message;
   // Skip command messages and handled patterns
   if (msg.text && (
