@@ -1,13 +1,5 @@
 // Диагностический скрипт для проверки Telegram бота
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Загружаем переменные окружения
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+import 'dotenv/config';
 
 console.log('🔍 ДИАГНОСТИКА TELEGRAM БОТА');
 console.log('=' .repeat(50));

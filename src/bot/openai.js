@@ -1,8 +1,6 @@
 import OpenAI from 'openai';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { logger } from './utils/logger.js';
-
-dotenv.config();
 
 // Rate limiting configuration
 const rateLimit = {
