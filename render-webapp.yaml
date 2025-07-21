@@ -1,0 +1,13 @@
+services:
+  - type: static
+    name: esperanto-leto-miniapp
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+
+    envVars:
+      - key: VITE_SUPABASE_URL
+        value: https://your-project.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: your-anon-key
