@@ -1,15 +1,15 @@
-import { useState, useEffect, type FC } from 'react';
-import LoadingScreen from './LoadingScreen';
-import { CheckCircle2, Book } from 'lucide-react';
-import { fetchSections } from '../services/courseService';
-import { useLoadData } from '../hooks/useLoadData';
-import { getSectionProgressPercent } from '../services/progressService'
+import { type FC } from 'react'
+import clsx from 'clsx'
+import LoadingScreen from './LoadingScreen'
+import { CheckCircle2, Book } from 'lucide-react'
+import { fetchSections } from '../services/courseService'
+import { useLoadData } from '../hooks/useLoadData'
+import useUserProgress from '../hooks/useUserProgress'
+import { useAuth } from './SupabaseAuthProvider'
 
 interface Section {
-  id: number;
-  title: string;
-  progress: number;
-  isCompleted: boolean;
+  id: number
+  title: string
 }
 
 interface SectionsListProps {
@@ -19,28 +19,27 @@ interface SectionsListProps {
 }
 
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
-  const [sections, setSections] = useState<Section[]>([])
+  const { profile } = useAuth()
+  const { sectionProgressMap } = useUserProgress(profile?.id)
+
   const { data, loading, error } = useLoadData(async () => {
     const fetched = await fetchSections(chapterId)
-    return Promise.all(
-      (fetched as Array<{ id: number; title: string }>).map(async (sec) => ({
-        id: sec.id,
-        title: sec.title || 'Нет названия',
-        progress: await getSectionProgressPercent(chapterId, sec.id),
-        isCompleted: false,
-      }))
-    )
+    return (fetched as Array<{ id: number; title: string }>).map((sec) => ({
+      id: sec.id,
+      title: sec.title || 'Нет названия',
+    }))
   }, [chapterId])
 
-  useEffect(() => {
-    if (!data) return
-    setSections(
-      (data as Section[]).map((sec) => ({
-        ...sec,
-        isCompleted: sec.progress >= 100,
-      }))
-    )
-  }, [data])
+  const sections: Array<Section & { progress: number; isCompleted: boolean }> =
+    (data as Section[] | null)?.map((sec) => {
+      const progressInfo = sectionProgressMap[sec.id] || {
+        accuracy: 0,
+        completed: false,
+      }
+      const progress = Math.round(progressInfo.accuracy)
+      const isCompleted = progressInfo.completed || progress >= 70
+      return { ...sec, progress, isCompleted }
+    }) || []
 
 
   const getChapterTitle = (chapterId: number): string => {
@@ -94,9 +93,29 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
             onClick={() => onSectionSelect(section.id)}
             className="w-full bg-white rounded-lg shadow px-3 py-2 flex items-center justify-between"
           >
-            <span className="text-sm text-emerald-900 truncate">
-              {`Раздел ${section.id} — ${section.title}`}
-            </span>
+            <div className="flex flex-col items-start flex-grow pr-2">
+              <span
+                className={clsx(
+                  'text-sm truncate',
+                  section.isCompleted ? 'text-emerald-800 font-semibold' : 'text-emerald-900'
+                )}
+              >
+                {`Раздел ${section.id} — ${section.title}`}
+              </span>
+              <div className="w-full bg-gray-200 h-1 rounded-full mt-1">
+                <div
+                  className={clsx(
+                    'h-1 rounded-full transition-all',
+                    section.progress <= 30
+                      ? 'bg-red-400'
+                      : section.progress < 70
+                        ? 'bg-yellow-400'
+                        : 'bg-green-500'
+                  )}
+                  style={{ width: `${section.progress}%` }}
+                />
+              </div>
+            </div>
             <span className="flex items-center gap-1 text-sm text-emerald-700">
               {section.isCompleted && <CheckCircle2 className="w-4 h-4 text-green-600" />}
               {section.progress}%
