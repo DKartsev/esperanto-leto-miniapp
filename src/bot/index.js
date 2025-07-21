@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 // Load environment variables from the root .env file
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-import TelegramBot from 'node-telegram-bot-api';
+import TelegrafWrapper from './telegrafWrapper.js';
 import express from 'express';
 import crypto from 'crypto';
 
@@ -114,16 +114,7 @@ if (!tokenPattern.test(token)) {
 // Create bot instance with enhanced error handling
 let bot;
 try {
-  bot = new TelegramBot(token, { 
-    polling: {
-      interval: 300,
-      autoStart: false, // Start manually after validation
-      params: {
-        timeout: 10,
-        allowed_updates: ['message', 'callback_query', 'web_app_data']
-      }
-    }
-  });
+  bot = new TelegrafWrapper(token);
   console.log('✅ Экземпляр бота создан успешно');
 } catch (error) {
   console.error('❌ Ошибка создания бота:', error);
