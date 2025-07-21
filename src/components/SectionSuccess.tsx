@@ -32,7 +32,7 @@ const SectionSuccess = ({
       clearInterval(dotInterval);
       clearTimeout(timeout);
     };
-  }, []);
+  }, [delay]);
 
   const handleNext = () => {
     if (!ready) return;

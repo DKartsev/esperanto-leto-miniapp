@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from 'react';
+import { useEffect, useState, useCallback, type FC } from 'react';
 import { supabase } from '../../services/supabaseClient';
 
 interface LogEntry {
@@ -16,7 +16,7 @@ const LogsView: FC<LogsViewProps> = ({ devMode }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [logPage, setLogPage] = useState(1);
 
-  const loadLogs = async (page: number) => {
+  const loadLogs = useCallback(async (page: number) => {
     if (devMode) return;
     const from = (page - 1) * 20;
     const to = from + 19;
@@ -31,7 +31,7 @@ const LogsView: FC<LogsViewProps> = ({ devMode }) => {
       setLogs(prev => [...prev, ...data]);
       setLogPage(page + 1);
     }
-  };
+  }, [devMode]);
 
   useEffect(() => {
     void loadLogs(1);

@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, useEffect, useCallback, type FC } from 'react';
 import { Volume2, ArrowRight, Clock, X } from 'lucide-react';
 
 interface Question {
@@ -208,7 +208,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
     }
   };
 
-  function handleComplete() {
+  const handleComplete = useCallback(() => {
     const sectionResults = {
       reading: answers.filter(a => a.section === 'reading'),
       writing: answers.filter(a => a.section === 'writing'),
@@ -222,7 +222,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
       sectionResults,
       timeSpent: (30 * 60) - timeRemaining
     });
-  }
+  }, [answers, onComplete, timeRemaining]);
 
   const handleExit = () => {
     if (confirm('Вы уверены, что хотите выйти из теста? Прогресс будет потерян.')) {

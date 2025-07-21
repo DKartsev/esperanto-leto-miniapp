@@ -25,7 +25,7 @@ const SectionFailed = ({ delay = 2000, onRetry }: SectionFailedProps) => {
       clearInterval(dotInterval);
       clearTimeout(timeout);
     };
-  }, []);
+  }, [delay]);
 
   // При нажатии вызываем переданный callback
   const handleRetry = () => {

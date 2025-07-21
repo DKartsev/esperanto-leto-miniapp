@@ -103,7 +103,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
     };
 
     saveSectionProgress();
-  }, []);
+  }, [chapterId, sectionId, percentage, refreshStats]);
 
   if (accuracy < 0.7) {
     return <SectionFailed sectionId={String(sectionId)} onRetry={onRetry} />;
