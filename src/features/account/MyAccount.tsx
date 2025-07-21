@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect } from 'react'
+import { FC, useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User, Shield, LogOut, Check, Trophy } from 'lucide-react'
 import { useAuth } from '../../components/SupabaseAuthProvider'
@@ -128,7 +128,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     setIsEditingUsername(false)
   }
 
-  const handleTelegramLogin = async () => {
+  const handleTelegramLogin = useCallback(async () => {
     const tgUser = getTelegramUser()
     if (!tgUser) {
       console.warn('Пользователь Telegram не найден')
@@ -149,7 +149,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     localStorage.setItem('user_id', userId)
 
     navigate('/')
-  }
+  }, [navigate])
 
   const telegramUser = getTelegramUser()
 

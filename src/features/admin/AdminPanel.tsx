@@ -95,7 +95,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
     setAdminUsers(mockAdminUsers);
   };
 
-  const loadAnalytics = () => {
+  const loadAnalytics = useCallback(() => {
     const totalQuestions = chapters.reduce((total, chapter) => total + chapter.sections.reduce((s, sec) => s + (sec.questions?.length || 0), 0), 0);
     const stats: SystemStats = {
       totalUsers: users.length,
@@ -106,7 +106,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
       completionRate: users.filter(u => u.totalProgress >= 80).length / (users.length || 1) * 100
     };
     setSystemStats(stats);
-  };
+  }, [chapters, users]);
 
   useEffect(() => {
     checkAdminAccess();
