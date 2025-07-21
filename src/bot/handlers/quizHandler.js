@@ -11,11 +11,11 @@ import {
 
 /**
  * Start a quiz for a user
- * @param {TelegramBot} bot - The bot instance
- * @param {number} chatId - Chat ID
- * @param {number} userId - User ID
+ * @param {import('telegraf').Context} ctx - Telegraf context
  */
-export function startQuiz(bot, chatId, userId) {
+export function startQuiz(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   // Initialize quiz state
   updateUserState(userId, {
     currentState: 'quiz',
@@ -25,24 +25,24 @@ export function startQuiz(bot, chatId, userId) {
   });
   
   // Send first question
-  sendQuizQuestion(bot, chatId, userId);
+  sendQuizQuestion(ctx);
   
   logger.info(`User ${userId} started a quiz`);
 }
 
 /**
  * Send a quiz question to the user
- * @param {TelegramBot} bot - The bot instance
- * @param {number} chatId - Chat ID
- * @param {number} userId - User ID
+ * @param {import('telegraf').Context} ctx - Telegraf context
  */
-export function sendQuizQuestion(bot, chatId, userId) {
+export function sendQuizQuestion(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   const userState = getUserState(userId);
   const { currentQuestionIndex } = userState;
   
   // Check if we've reached the end of the quiz
   if (currentQuestionIndex >= quizQuestions.length) {
-    finishQuiz(bot, chatId, userId);
+    finishQuiz(ctx);
     return;
   }
   
@@ -57,7 +57,7 @@ export function sendQuizQuestion(bot, chatId, userId) {
   );
   
   // Send question with options keyboard
-  bot.sendMessage(chatId, message, {
+  ctx.telegram.sendMessage(chatId, message, {
     parse_mode: 'Markdown',
     reply_markup: getQuizKeyboard(question.options)
   });
@@ -65,12 +65,11 @@ export function sendQuizQuestion(bot, chatId, userId) {
 
 /**
  * Handle a quiz answer
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - Message object
- * @param {number} userId - User ID
+ * @param {import('telegraf').Context} ctx - Telegraf context
  */
-export function handleQuizAnswer(bot, msg, userId) {
-  const chatId = msg.chat.id;
+export function handleQuizAnswer(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   const userState = getUserState(userId);
   const { currentQuestionIndex } = userState;
   
@@ -78,14 +77,14 @@ export function handleQuizAnswer(bot, msg, userId) {
   const question = quizQuestions[currentQuestionIndex];
   
   // Parse answer (format: "A. Option text")
-  const answerText = msg.text;
+  const answerText = ctx.message.text;
   const answerLetter = answerText.charAt(0).toUpperCase();
   const answerIndex = answerLetter.charCodeAt(0) - 65; // Convert A-D to 0-3
   
   // Check if answer is valid
   if (answerIndex < 0 || answerIndex >= question.options.length) {
-    bot.sendMessage(
-      chatId, 
+    ctx.telegram.sendMessage(
+      chatId,
       'Пожалуйста, выберите один из предложенных вариантов ответа.'
     );
     return;
@@ -106,25 +105,25 @@ export function handleQuizAnswer(bot, msg, userId) {
     feedbackMessage = `❌ Неправильно. Правильный ответ: *${String.fromCharCode(65 + question.correctAnswer)}. ${correctOption}*`;
   }
   
-  bot.sendMessage(chatId, feedbackMessage, { parse_mode: 'Markdown' })
+  ctx.telegram.sendMessage(chatId, feedbackMessage, { parse_mode: 'Markdown' })
     .then(() => {
       // Move to next question
       updateUserState(userId, { currentQuestionIndex: currentQuestionIndex + 1 });
       
       // Short delay before next question
       setTimeout(() => {
-        sendQuizQuestion(bot, chatId, userId);
+        sendQuizQuestion(ctx);
       }, 1000);
     });
 }
 
 /**
  * Finish a quiz and show results
- * @param {TelegramBot} bot - The bot instance
- * @param {number} chatId - Chat ID
- * @param {number} userId - User ID
+ * @param {import('telegraf').Context} ctx - Telegraf context
  */
-export function finishQuiz(bot, chatId, userId) {
+export function finishQuiz(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
   const userState = getUserState(userId);
   const { quizScore } = userState;
   
@@ -135,7 +134,7 @@ export function finishQuiz(bot, chatId, userId) {
   completeQuiz(userId);
   
   // Send results
-  bot.sendMessage(chatId, resultMessage, {
+  ctx.telegram.sendMessage(chatId, resultMessage, {
     parse_mode: 'Markdown',
     reply_markup: {
       keyboard: [

@@ -11,14 +11,13 @@ import { esperantoChapters, basicPhrases } from './data/esperantoData.js';
 
 /**
  * Handle incoming messages
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import('telegraf').Context} ctx - Telegraf context
  * @param {Object} openAIService - The OpenAI service
  */
-export async function handleMessage(bot, msg, openAIService) {
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  const messageText = msg.text;
+export async function handleMessage(ctx, openAIService) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
+  const messageText = ctx.message.text;
   
   // Skip empty messages
   if (!messageText) return;
@@ -28,9 +27,8 @@ export async function handleMessage(bot, msg, openAIService) {
   
   // Handle custom keyboard buttons
   if (messageText === '📚 Главы') {
-    bot.sendMessage(chatId, 'Загружаю список глав...').then(() => {
-      bot.sendCommand(chatId, 'chapters');
-    });
+    await ctx.telegram.sendMessage(chatId, 'Загружаю список глав...');
+    await ctx.telegram.sendMessage(chatId, '/chapters');
     return;
   }
   
@@ -49,17 +47,17 @@ export async function handleMessage(bot, msg, openAIService) {
     `;
     
     updateUserState(userId, { currentState: 'ai_chat' });
-    bot.sendMessage(chatId, aiHelpMessage, { parse_mode: 'Markdown' });
+    await ctx.telegram.sendMessage(chatId, aiHelpMessage, { parse_mode: 'Markdown' });
     return;
   }
   
   if (messageText === '📝 Тест') {
-    bot.sendCommand(chatId, 'test');
+    await ctx.telegram.sendMessage(chatId, '/test');
     return;
   }
   
   if (messageText === '👤 Мой профиль') {
-    bot.sendCommand(chatId, 'profile');
+    await ctx.telegram.sendMessage(chatId, '/profile');
     return;
   }
   
@@ -71,8 +69,8 @@ export async function handleMessage(bot, msg, openAIService) {
       currentSection: null
     });
     
-    bot.sendMessage(
-      chatId, 
+    await ctx.telegram.sendMessage(
+      chatId,
       'Вернулись в главное меню. Чем я могу помочь?',
       { reply_markup: getMainMenuKeyboard() }
     );
@@ -81,7 +79,7 @@ export async function handleMessage(bot, msg, openAIService) {
   
   // If user is in AI chat mode, process with OpenAI
   if (userState.currentState === 'ai_chat') {
-    await processAIMessage(bot, msg, openAIService, userId, chatId, messageText);
+    await processAIMessage(ctx, openAIService, userId, chatId, messageText);
     return;
   }
   
@@ -92,28 +90,27 @@ export async function handleMessage(bot, msg, openAIService) {
   );
   
   if (phraseMatch) {
-    bot.sendMessage(
+    await ctx.telegram.sendMessage(
       chatId,
       `*${phraseMatch.esperanto}* — ${phraseMatch.russian}`,
       { parse_mode: 'Markdown' }
     );
     return;
   }
-  
+
   // If no specific handler matched, process with AI
-  await processAIMessage(bot, msg, openAIService, userId, chatId, messageText);
+  await processAIMessage(ctx, openAIService, userId, chatId, messageText);
 }
 
 /**
  * Process message with OpenAI
- * @param {TelegramBot} bot - The bot instance
- * @param {Object} msg - The message object
+ * @param {import('telegraf').Context} ctx - Telegraf context
  * @param {Object} openAIService - The OpenAI service
  * @param {number} userId - User ID
  * @param {number} chatId - Chat ID
  * @param {string} messageText - Message text
  */
-async function processAIMessage(bot, msg, openAIService, userId, chatId, messageText) {
+async function processAIMessage(ctx, openAIService, userId, chatId, messageText) {
   // Add user message to conversation history
   addToConversationHistory(userId, 'user', messageText);
   
@@ -121,13 +118,13 @@ async function processAIMessage(bot, msg, openAIService, userId, chatId, message
   const conversationHistory = getConversationHistory(userId);
   
   // Send typing action
-  bot.sendChatAction(chatId, 'typing');
+  await ctx.telegram.sendChatAction(chatId, 'typing');
   
   try {
     // Check if OpenAI is configured
     if (!openAIService.isConfigured()) {
-      bot.sendMessage(
-        chatId, 
+      await ctx.telegram.sendMessage(
+        chatId,
         'Извините, AI-помощник временно недоступен. Пожалуйста, попробуйте позже.'
       );
       return;
@@ -145,7 +142,7 @@ async function processAIMessage(bot, msg, openAIService, userId, chatId, message
     // Format and send the response
     const formattedResponse = formatAIResponse(response);
     
-    bot.sendMessage(chatId, formattedResponse, { parse_mode: 'Markdown' });
+    await ctx.telegram.sendMessage(chatId, formattedResponse, { parse_mode: 'Markdown' });
     
     logger.info(`Sent AI response to user ${userId}`);
     
@@ -153,7 +150,7 @@ async function processAIMessage(bot, msg, openAIService, userId, chatId, message
     logger.error(`Error sending AI response: ${error.message}`);
     
     // Send error message to user
-    bot.sendMessage(
+    await ctx.telegram.sendMessage(
       chatId,
       `Извините, произошла ошибка: ${error.message}\n\nПожалуйста, попробуйте позже.`
     );
