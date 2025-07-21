@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../components/SupabaseAuthProvider'
 import { getUserProfile, findOrCreateUserProfile } from '../services/authService'
+import { getTelegramUser } from '../utils/telegram'
 
 export interface UserProfile {
   id: string
@@ -25,7 +26,8 @@ const useUserProfile = (userId?: string | null) => {
         return
       }
       if (/^\d+$/.test(String(id))) {
-        const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        const tgUser = getTelegramUser()
+        const username = tgUser?.username || null
         const uuid = await findOrCreateUserProfile(String(id), username)
         setResolvedId(uuid)
       } else {

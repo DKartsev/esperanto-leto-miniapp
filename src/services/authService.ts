@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { getTelegramUser } from '../utils/telegram'
 
 /**
  * Deterministically convert a Telegram numeric ID into a UUID using
@@ -60,9 +61,9 @@ export async function getCurrentUser() {
     return { id: storedId }
   }
 
-  const tgId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-  if (tgId) {
-    return { id: String(tgId) }
+  const tgUser = getTelegramUser()
+  if (tgUser?.id) {
+    return { id: String(tgUser.id) }
   }
 
   return null

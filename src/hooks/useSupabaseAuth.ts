@@ -4,6 +4,7 @@ import {
   signOut as authSignOut,
   findOrCreateUserProfile
 } from '../services/authService'
+import { getTelegramUser } from '../utils/telegram'
 import { supabase } from '../services/supabaseClient'
 import { getUserStats, getUserAchievements } from '../services/progressService'
 
@@ -101,8 +102,8 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
   // Инициализация при монтировании через Telegram WebApp
   useEffect(() => {
     const init = async () => {
-      const tgUser = window?.Telegram?.WebApp?.initDataUnsafe?.user
-      if (!tgUser?.id) {
+      const tgUser = getTelegramUser()
+      if (!tgUser) {
         setLoading(false)
         return
       }
