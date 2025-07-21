@@ -8,7 +8,7 @@ import { useAuth } from '../components/SupabaseAuthProvider';
 const TestPage = () => {
   const [testView, setTestView] = useState<'intro' | 'test' | 'results'>('intro');
   const [testResults, setTestResults] = useState<FullTestResults | null>(null);
-  const { profile, refreshStats } = useAuth();
+  const { refreshStats } = useAuth();
 
   const handleStartTest = () => {
     setTestView('test');

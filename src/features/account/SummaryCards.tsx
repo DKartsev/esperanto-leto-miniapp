@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { BookOpen, CheckCircle, Clock, Target, Calendar } from 'lucide-react'
-import Card from '../ui/Card'
+import Card from '../../components/ui/Card'
 import { formatHoursMinutes } from '../../utils/formatTime'
 
 interface SummaryCardsProps {

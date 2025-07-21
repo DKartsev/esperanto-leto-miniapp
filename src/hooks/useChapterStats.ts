@@ -29,7 +29,7 @@ export const useChapterStats = (userId?: string | null) => {
       }
     }
     void resolve()
-  }, [resolvedId])
+  }, [userId])
 
   useEffect(() => {
     const load = async () => {

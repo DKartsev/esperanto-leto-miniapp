@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { Clock, Trophy, TrendingUp, CheckCircle } from 'lucide-react'
-import ProgressBar from '../ui/ProgressBar'
+import ProgressBar from '../../components/ui/ProgressBar'
 
 interface AccountStatsProps {
   totalTime: number

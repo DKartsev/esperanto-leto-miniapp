@@ -40,7 +40,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const [loginError, setLoginError] = useState<string | null>(null)
 
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(null)
-  const [fullProgress, setFullProgress] = useState<any[]>([])
   const [progressStats, setProgressStats] = useState({
     correct: 0,
     incorrect: 0,
@@ -78,7 +77,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       if (!user) return
 
       const progress = await getFullUserProgress(user.id)
-      setFullProgress(progress)
 
       if (progress && progress.length > 0) {
         const correct = progress.filter(p => p.is_correct).length
@@ -159,7 +157,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     if (!isAuthenticated && telegramUser) {
       handleTelegramLogin()
     }
-  }, [isAuthenticated, telegramUser])
+  }, [isAuthenticated, telegramUser, handleTelegramLogin])
 
   const navigateRef = useRef(false)
   useEffect(() => {

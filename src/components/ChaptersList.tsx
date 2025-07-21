@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield, ChevronDown } from 'lucide-react';
+import { Play, Lock, TrendingUp, Award, Shield, ChevronDown } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
@@ -129,25 +129,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   }, [chapterProgress, chapters])
 
 
-  const getBadgeIcon = (badge: string) => {
-    switch (badge) {
-      case 'Мастер': return <Trophy className="w-4 h-4" />;
-      case 'Эксперт': return <Star className="w-4 h-4" />;
-      case 'Продвинутый': return <CheckCircle className="w-4 h-4" />;
-      default: return <BookOpen className="w-4 h-4" />;
-    }
-  };
-
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case 'Мастер': return 'bg-emerald-600 text-white';
-      case 'Эксперт': return 'bg-green-600 text-white';
-      case 'Продвинутый': return 'bg-emerald-500 text-white';
-      case 'Ученик': return 'bg-green-500 text-white';
-      case 'Начинающий': return 'bg-emerald-400 text-emerald-900';
-      default: return 'bg-emerald-300 text-emerald-800';
-    }
-  };
 
   const getOverallProgress = () => {
     if (chapters.length === 0) return 0

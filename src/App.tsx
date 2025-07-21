@@ -1,6 +1,6 @@
 import { Home, FileText, Bot, User } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
-import NavigationBar, { NavigationItem } from './components/NavigationBar';
+import type { NavigationItem } from './components/NavigationBar';
 import MainLayout from './layout/MainLayout';
 import LearningPage from './pages/LearningPage';
 import TestPage from './pages/TestPage';

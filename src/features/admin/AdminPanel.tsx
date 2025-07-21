@@ -116,7 +116,7 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
 
   useEffect(() => {
     loadAnalytics();
-  }, [chapters, users]);
+  }, [chapters, users, loadAnalytics]);
 
   if (!isAuthorized) {
     return (

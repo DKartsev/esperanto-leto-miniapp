@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from './supabaseClient'
 
 export async function fetchChapters() {
@@ -11,7 +10,7 @@ export async function fetchChapters() {
   return data || []
 }
 
-export async function fetchSections(chapterId) {
+export async function fetchSections(chapterId: number) {
   const { data, error } = await supabase
     .from('sections')
     .select('id, title')
@@ -22,7 +21,7 @@ export async function fetchSections(chapterId) {
   return data || []
 }
 
-export async function fetchTheoryBlocks(sectionId) {
+export async function fetchTheoryBlocks(sectionId: number) {
   const { data, error } = await supabase
     .from('theory_blocks')
     .select('id, title, content, examples, key_terms')
@@ -52,7 +51,7 @@ export async function fetchTheoryBlocks(sectionId) {
   }))
 }
 
-export async function fetchQuestions(sectionId) {
+export async function fetchQuestions(sectionId: number) {
   const { data, error } = await supabase
     .from('questions')
     .select(

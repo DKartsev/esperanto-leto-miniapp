@@ -35,7 +35,7 @@ const LogsView: FC<LogsViewProps> = ({ devMode }) => {
 
   useEffect(() => {
     void loadLogs(1);
-  }, []);
+  }, [loadLogs]);
 
   return (
     <div className="p-6 h-full overflow-y-auto">

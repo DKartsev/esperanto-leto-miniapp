@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import ProgressBar from '../ui/ProgressBar'
+import ProgressBar from '../../components/ui/ProgressBar'
 
 interface ChapterProgressItem {
   chapterId: number

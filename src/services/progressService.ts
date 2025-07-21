@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from './supabaseClient'
 import { getCurrentUser, findOrCreateUserProfile } from './authService'
 
@@ -14,14 +13,14 @@ import { getCurrentUser, findOrCreateUserProfile } from './authService'
  * @returns {Promise<Object>} Сохраненный ответ
  */
 export async function saveProgress(
-  chapterId,
-  sectionId,
-  questionId,
-  selectedAnswer,
-  isCorrect,
-  timeSpent = 0,
-  hintsUsed = 0
-) {
+  chapterId: number,
+  sectionId: number,
+  questionId: number | null,
+  selectedAnswer: string,
+  isCorrect: boolean,
+  timeSpent: number = 0,
+  hintsUsed: number = 0
+): Promise<any> {
   try {
     // Отмечаем вызов функции в localStorage для отладки
     localStorage.setItem('saveProgress_called', new Date().toISOString())
@@ -91,7 +90,7 @@ export const saveAnswer = saveProgress
  * Получить весь прогресс пользователя
  * @returns {Promise<Array>} Массив ответов пользователя
  */
-export async function getUserProgress() {
+export async function getUserProgress(): Promise<any[]> {
   try {
     const user = await getCurrentUser()
     if (!user) return []
@@ -112,7 +111,7 @@ export async function getUserProgress() {
 }
 
 // Получить подробный прогресс пользователя по разделам и главам
-export async function getFullUserProgress(userId) {
+export async function getFullUserProgress(userId: string): Promise<any[]> {
   try {
     const { data, error } = await supabase
       .from('user_progress')
@@ -132,7 +131,7 @@ export async function getFullUserProgress(userId) {
     }
 
     return data
-  } catch (e) {
+  } catch (e: any) {
     console.error('Критическая ошибка запроса прогресса:', e.message)
     return []
   }
@@ -143,7 +142,7 @@ export async function getFullUserProgress(userId) {
  * @param {number} chapterId - ID главы
  * @returns {Promise<Array>} Прогресс по главе
  */
-export async function getChapterProgress(chapterId) {
+export async function getChapterProgress(chapterId: number): Promise<any[]> {
   try {
     const user = await getCurrentUser()
     if (!user) return []
@@ -170,7 +169,10 @@ export async function getChapterProgress(chapterId) {
  * @param {number} sectionId - ID раздела
  * @returns {Promise<Array>} Прогресс по разделу
  */
-export async function getSectionProgress(chapterId, sectionId) {
+export async function getSectionProgress(
+  chapterId: number,
+  sectionId: number
+): Promise<any[]> {
   try {
     const user = await getCurrentUser()
     if (!user) return []
@@ -198,7 +200,10 @@ export async function getSectionProgress(chapterId, sectionId) {
  * @param {number} sectionId - ID раздела
  * @returns {Promise<number>} Процент завершения
  */
-export async function getSectionProgressPercent(chapterId, sectionId) {
+export async function getSectionProgressPercent(
+  chapterId: number,
+  sectionId: number
+): Promise<number> {
   try {
     const user = await getCurrentUser()
     if (!user) return 0
@@ -221,7 +226,7 @@ export async function getSectionProgressPercent(chapterId, sectionId) {
 
     if (!totalQuestions || totalQuestions === 0) return 0
 
-    return Math.round((answeredCount / totalQuestions) * 100)
+    return Math.round(((answeredCount || 0) / totalQuestions) * 100)
   } catch (error: any) {
     console.error('❌ Ошибка получения процента прогресса раздела:', error.message)
     return 0
@@ -233,7 +238,7 @@ export async function getSectionProgressPercent(chapterId, sectionId) {
  * @param {number} chapterId - ID главы
  * @returns {Promise<number>} Процент завершения
  */
-export async function getChapterProgressPercent(chapterId) {
+export async function getChapterProgressPercent(chapterId: number): Promise<number> {
   try {
     const user = await getCurrentUser()
     if (!user) return 0
@@ -269,7 +274,7 @@ export async function getChapterProgressPercent(chapterId) {
  * Получить статистику пользователя
  * @returns {Promise<Object>} Статистика пользователя
  */
-export async function getUserStats() {
+export async function getUserStats(): Promise<any> {
   try {
     const user = await getCurrentUser()
     if (!user) return getDefaultStats()
@@ -317,7 +322,7 @@ export async function getUserStats() {
  * @param {Object} testResult - Результат теста
  * @returns {Promise<Object>} Сохраненный результат
  */
-export async function saveTestResult(testResult) {
+export async function saveTestResult(testResult: any): Promise<any> {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error('Пользователь не авторизован')
@@ -353,7 +358,7 @@ export async function saveTestResult(testResult) {
  * Получить результаты тестов пользователя
  * @returns {Promise<Array>} Результаты тестов
  */
-export async function getUserTestResults() {
+export async function getUserTestResults(): Promise<any[]> {
   try {
     const user = await getCurrentUser()
     if (!user) return []
@@ -383,12 +388,12 @@ export async function getUserTestResults() {
  * @returns {Promise<Object>} сохраненный результат и список новых достижений
  */
 export async function saveTestResults(
-  chapterId,
-  sectionId,
-  correctAnswers,
-  totalQuestions,
-  timeSpent = 0
-) {
+  chapterId: number,
+  sectionId: number,
+  correctAnswers: number,
+  totalQuestions: number,
+  timeSpent: number = 0
+): Promise<{ result: any; achievements: string[] }> {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error('Пользователь не авторизован')
@@ -428,7 +433,7 @@ export async function saveTestResults(
  * Получить список достижений пользователя
  * @returns {Promise<Array>}
  */
-export async function getUserAchievements() {
+export async function getUserAchievements(): Promise<any[]> {
   try {
     const user = await getCurrentUser()
     if (!user) return []
@@ -550,7 +555,7 @@ export async function checkAndAssignAchievements(
  * Сбросить прогресс пользователя
  * @returns {Promise<void>}
  */
-export async function resetUserProgress() {
+export async function resetUserProgress(): Promise<void> {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error('Пользователь не авторизован')
@@ -594,7 +599,7 @@ function getDefaultStats() {
   }
 }
 
-function calculateLevel(accuracy, totalAnswers) {
+function calculateLevel(accuracy: number, totalAnswers: number): string {
   if (totalAnswers < 10) return 'Начинающий'
   if (accuracy >= 90) return 'Эксперт'
   if (accuracy >= 80) return 'Продвинутый'
@@ -603,7 +608,7 @@ function calculateLevel(accuracy, totalAnswers) {
   return 'Начинающий'
 }
 
-function calculateOverallProgress(completedChapters) {
+function calculateOverallProgress(completedChapters: number): number {
   const totalChapters = 14 // Общее количество глав в курсе
   return Math.round((completedChapters / totalChapters) * 100)
 }
