@@ -66,7 +66,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const {
     startDate,
     completedChapters,
-    totalStudyMinutes,
     averageAccuracy,
     chapterProgress,
     recommendedChapter,
@@ -241,7 +240,15 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
               <span>Выйти</span>
             </button>
           </div>
-          {chapterStats && <AccountStats {...chapterStats} />}
+          {chapterStats && (
+            <AccountStats
+              averageAccuracy={chapterStats.averageAccuracy}
+              progress={chapterStats.progress}
+              completedChapters={chapterStats.completedChapters}
+              totalChapters={chapterStats.totalChapters}
+              startDate={startDate}
+            />
+          )}
         </div>
       </div>
       <div className="p-6">
@@ -250,9 +257,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           totalChapters={totalChapters}
           completedSections={completedSections}
           totalSections={totalSections}
-          totalTimeMinutes={totalStudyMinutes}
           averageAccuracy={averageAccuracy}
-          startDate={startDate}
         />
         <ProgressSummary
           correct={progressStats.correct}
