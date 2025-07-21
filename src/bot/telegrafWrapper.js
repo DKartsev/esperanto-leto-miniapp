@@ -44,6 +44,10 @@ export default class TelegrafWrapper {
     return this.bot.telegram.answerCbQuery(...args)
   }
 
+  sendChatAction(...args) {
+    return this.bot.telegram.sendChatAction(...args)
+  }
+
   setMyCommands(...args) {
     return this.bot.telegram.setMyCommands(...args)
   }
