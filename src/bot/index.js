@@ -10,6 +10,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 import TelegramBot from 'node-telegram-bot-api';
+import express from 'express';
+import crypto from 'crypto';
 
 // Import handlers
 import { 
@@ -26,6 +28,43 @@ import {
 
 import { handleMessage } from './messageHandler.js';
 import { logger } from './utils/logger.js';
+
+// Simple API server for WebApp integration
+const app = express();
+app.use(express.json());
+
+app.post('/api/verifyTelegram', (req, res) => {
+  const { initData } = req.body || {};
+  if (!initData) return res.status(400).json({ ok: false });
+
+  const params = new URLSearchParams(initData);
+  const hash = params.get('hash');
+  if (!hash) return res.status(400).json({ ok: false });
+  params.delete('hash');
+
+  const dataCheckString = Array.from(params.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`)
+    .join('\n');
+
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim() || '';
+  const secret = crypto.createHmac('sha256', 'WebAppData').update(token).digest();
+  const computedHash = crypto
+    .createHmac('sha256', secret)
+    .update(dataCheckString)
+    .digest('hex');
+
+  if (computedHash !== hash) {
+    return res.status(401).json({ ok: false });
+  }
+
+  res.json({ ok: true });
+});
+
+const API_PORT = process.env.API_PORT || 3001;
+app.listen(API_PORT, () => {
+  console.log(`📡 API server running on port ${API_PORT}`);
+});
 
 // Enhanced validation and diagnostics
 console.log('🔍 ЗАПУСК ДИАГНОСТИКИ БОТА...');
