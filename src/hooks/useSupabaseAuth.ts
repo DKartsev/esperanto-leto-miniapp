@@ -10,6 +10,7 @@ import { getUserStats, getUserAchievements } from '../services/progressService'
 
 export interface AuthUser {
   id: string
+  email?: string | null
 }
 
 export interface UserProfile {
@@ -82,10 +83,10 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
 
       if (profileError) throw profileError
 
-      const [userStats, userAchievements] = await Promise.all([
-        getUserStats(userProfile.id) as Promise<UserStats>,
-        getUserAchievements(userProfile.id)
-      ])
+        const [userStats, userAchievements] = await Promise.all([
+          getUserStats() as Promise<UserStats>,
+          getUserAchievements()
+        ])
 
       setUser({ id: identifier })
       setProfile(userProfile)
@@ -93,7 +94,7 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
       setAchievements(userAchievements)
     } catch (err) {
       console.error('Ошибка загрузки данных пользователя:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : String(err))
     } finally {
       setLoading(false)
     }
@@ -113,7 +114,9 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
           String(tgUser.id),
           tgUser.username || tgUser.first_name || null
         )
-        localStorage.setItem('user_id', uuid)
+        if (uuid) {
+          localStorage.setItem('user_id', uuid)
+        }
         localStorage.setItem('telegram_id', String(tgUser.id))
         await loadUserData(String(tgUser.id))
       } catch (err) {
@@ -135,7 +138,7 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
       setUser(null)
       setProfile(null)
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : String(err))
       throw err
     } finally {
       setLoading(false)
@@ -157,7 +160,7 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
       setProfile(updated)
       return updated
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : String(err))
       throw err
     } finally {
       setLoading(false)

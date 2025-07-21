@@ -140,6 +140,22 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
   const fullQuestions = generateFullQuestionSet();
   const currentQuestionData = fullQuestions[currentQuestion];
 
+  const handleComplete = useCallback(() => {
+    const sectionResults = {
+      reading: answers.filter(a => a.section === 'reading'),
+      writing: answers.filter(a => a.section === 'writing'),
+      listening: answers.filter(a => a.section === 'listening'),
+      grammar: answers.filter(a => a.section === 'grammar')
+    };
+
+    onComplete({
+      totalQuestions: 40,
+      answers,
+      sectionResults,
+      timeSpent: 30 * 60 - timeRemaining
+    });
+  }, [answers, onComplete, timeRemaining]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
@@ -208,21 +224,6 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
     }
   };
 
-  const handleComplete = useCallback(() => {
-    const sectionResults = {
-      reading: answers.filter(a => a.section === 'reading'),
-      writing: answers.filter(a => a.section === 'writing'),
-      listening: answers.filter(a => a.section === 'listening'),
-      grammar: answers.filter(a => a.section === 'grammar')
-    };
-
-    onComplete({
-      totalQuestions: 40,
-      answers,
-      sectionResults,
-      timeSpent: (30 * 60) - timeRemaining
-    });
-  }, [answers, onComplete, timeRemaining]);
 
   const handleExit = () => {
     if (confirm('Вы уверены, что хотите выйти из теста? Прогресс будет потерян.')) {
