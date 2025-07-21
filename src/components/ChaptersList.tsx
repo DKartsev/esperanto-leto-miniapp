@@ -224,30 +224,30 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-emerald-800">Сложность:</span>
+        <div className="flex items-center gap-3 flex-nowrap">
+          <label className="flex items-center text-sm font-medium text-emerald-800">
+            <span className="mr-2">Сложность:</span>
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="border border-emerald-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-emerald-500 text-emerald-800"
+              className="ml-1 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-400"
             >
               <option value="all">Все</option>
               <option value="Легкий">Легкий</option>
               <option value="Средний">Средний</option>
               <option value="Сложный">Сложный</option>
             </select>
-          </div>
-          
+          </label>
+
           {!hasAdminAccess() && (
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center ml-4 text-sm font-medium text-emerald-800">
               <input
                 type="checkbox"
                 checked={showOnlyAvailable}
                 onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-                className="rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
+                className="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
               />
-              <span className="text-sm text-emerald-800">Только доступные</span>
+              <span className="ml-2">Только доступные</span>
             </label>
           )}
           
