@@ -30,7 +30,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     signOut,
     isAuthenticated,
     updateProfile,
-  } = useAuth() as any
+  } = useAuth()
 
   const navigate = useNavigate()
 

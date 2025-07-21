@@ -5,7 +5,7 @@ import { isAdmin } from '../utils/adminUtils';
 
 const LandingPage = () => {
   const { profile } = useAuth();
-  const isAdminUser = isAdmin((profile as any)?.username, (profile as any)?.email);
+  const isAdminUser = isAdmin(profile?.username, profile?.email as string | undefined);
 
   const isTelegramWebApp = !!window?.Telegram?.WebApp?.initData;
 

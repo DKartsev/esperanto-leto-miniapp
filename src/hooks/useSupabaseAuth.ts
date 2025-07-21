@@ -1,26 +1,64 @@
 import { useState, useEffect } from 'react'
 import {
-  getUserProfile,
   updateUserProfile as authUpdateUserProfile,
   signOut as authSignOut
 } from '../services/authService'
 import { supabase } from '../services/supabaseClient'
 import { getUserStats, getUserAchievements } from '../services/progressService'
 
+export interface AuthUser {
+  id: string
+}
+
+export interface UserProfile {
+  id: string
+  username: string | null
+  telegram_id: string | null
+  is_admin?: boolean
+  [key: string]: any
+}
+
+export interface UserStats {
+  totalAnswers: number
+  correctAnswers: number
+  accuracy: number
+  totalTimeSpent: number
+  totalHintsUsed: number
+  averageTimePerQuestion: number
+  completedSections: number
+  completedChapters: number
+  level: string
+  progress: number
+}
+
+export interface UseSupabaseAuthResult {
+  user: AuthUser | null
+  profile: UserProfile | null
+  stats: UserStats | null
+  achievements: any[]
+  loading: boolean
+  error: string | null
+  isAuthenticated: boolean
+  signOut: () => Promise<void>
+  updateProfile: (updates: Record<string, any>) => Promise<UserProfile | null>
+  refreshStats: () => Promise<void>
+  clearError: () => void
+}
+
 /**
  * Хук для работы с аутентификацией Supabase
  * @returns {Object} Объект с состоянием аутентификации и методами
  */
-export function useSupabaseAuth() {
-  const [user, setUser] = useState(null)
-  const [profile, setProfile] = useState(null)
-  const [stats, setStats] = useState(null)
-  const [achievements, setAchievements] = useState([])
+export function useSupabaseAuth(): UseSupabaseAuthResult {
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [stats, setStats] = useState<UserStats | null>(null)
+  const [achievements, setAchievements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   // Загрузка данных пользователя по telegram_id
-  const loadUserData = async (identifier) => {
+  const loadUserData = async (identifier: string | null) => {
     if (!identifier) {
       setUser(null)
       setProfile(null)
@@ -38,12 +76,12 @@ export function useSupabaseAuth() {
         .from('profiles')
         .select('id, username, telegram_id')
         .eq('telegram_id', identifier)
-        .single()
+        .single<UserProfile>()
 
       if (profileError) throw profileError
 
       const [userStats, userAchievements] = await Promise.all([
-        getUserStats(userProfile.id),
+        getUserStats(userProfile.id) as Promise<UserStats>,
         getUserAchievements(userProfile.id)
       ])
 
@@ -68,7 +106,7 @@ export function useSupabaseAuth() {
   }, [])
 
   // Telegram-only аутентификация
-  const signOut = async () => {
+  const signOut = async (): Promise<void> => {
     try {
       setLoading(true)
       setError(null)
@@ -83,13 +121,18 @@ export function useSupabaseAuth() {
     }
   }
 
-  const updateProfile = async (updates) => {
+  const updateProfile = async (
+    updates: Record<string, any>
+  ): Promise<UserProfile | null> => {
     if (!user) return null
     try {
       setLoading(true)
       setError(null)
 
-      const updated = await authUpdateUserProfile(user.id, updates)
+      const updated = (await authUpdateUserProfile(
+        user.id,
+        updates
+      )) as UserProfile
       setProfile(updated)
       return updated
     } catch (err) {
@@ -101,12 +144,12 @@ export function useSupabaseAuth() {
   }
 
   // Обновление статистики
-  const refreshStats = async () => {
+  const refreshStats = async (): Promise<void> => {
     if (!user) return
 
     try {
       const [userStats, userAchievements] = await Promise.all([
-        getUserStats(),
+        getUserStats() as Promise<UserStats>,
         getUserAchievements()
       ])
       setStats(userStats)
@@ -137,7 +180,7 @@ export function useSupabaseAuth() {
     
     // Утилиты
     clearError: () => setError(null)
-  }
+  } as UseSupabaseAuthResult
 }
 
 export default useSupabaseAuth
