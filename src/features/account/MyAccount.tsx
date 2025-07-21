@@ -10,10 +10,9 @@ import AccountHeader from './AccountHeader'
 import AccountStats from './AccountStats'
 import AccountProgress from './AccountProgress'
 import SectionProgressList from './SectionProgressList'
-import SummaryCards from './SummaryCards'
+import StatsCarousel from './StatsCarousel'
 import useChapterStats from '../../hooks/useChapterStats'
 import useUserProgress from '../../hooks/useUserProgress'
-import ProgressSummary from './ProgressSummary'
 import { getFullUserProgress } from '../../services/progressService'
 import { getTelegramUser } from '../../utils/telegram'
 
@@ -252,18 +251,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         </div>
       </div>
       <div className="p-6">
-        <SummaryCards
+        <StatsCarousel
+          totalTime={progressStats.totalTime}
+          averageAccuracy={averageAccuracy}
           completedChapters={completedChaptersCount}
           totalChapters={totalChapters}
           completedSections={completedSections}
           totalSections={totalSections}
-          averageAccuracy={averageAccuracy}
-        />
-        <ProgressSummary
-          correct={progressStats.correct}
-          incorrect={progressStats.incorrect}
-          totalTime={progressStats.totalTime}
-          completedSections={progressStats.completedSections}
+          startDate={startDate}
         />
         {/* Debug info to check saveProgress() calls */}
         <div className="text-sm text-emerald-700 mb-4">
