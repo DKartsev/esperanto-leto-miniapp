@@ -8,7 +8,7 @@ export interface UserProfile {
 }
 
 const useUserProfile = (userId?: string | null) => {
-  const { user, profile: authProfile, updateProfile } = useAuth() as any
+  const { user, profile: authProfile, updateProfile } = useAuth()
   const [resolvedId, setResolvedId] = useState<string | null>(
     userId || user?.id || localStorage.getItem('user_id') || null
   )
@@ -47,7 +47,7 @@ const useUserProfile = (userId?: string | null) => {
       }
       setLoading(true)
       const data = await getUserProfile(resolvedId)
-      setProfile(data as any)
+      setProfile(data as UserProfile)
       setLoading(false)
     }
     void load()

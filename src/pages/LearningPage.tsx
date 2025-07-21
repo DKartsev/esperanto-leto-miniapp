@@ -27,7 +27,7 @@ const LearningPage = () => {
       return (
         <ChaptersList
           onChapterSelect={handleChapterSelect}
-          currentUser={(profile as any)?.username}
+          currentUser={profile?.username}
         />
       );
     case 'sections':

@@ -29,7 +29,7 @@ export function useLearningNavigation() {
     timeSpent: number
   ) => {
     let userId: string | null | number | undefined =
-      localStorage.getItem('user_id') || (profile as any)?.id
+      localStorage.getItem('user_id') || profile?.id
     if (userId && /^\d+$/.test(String(userId))) {
       const telegramId = String(userId)
       const newId = await findOrCreateUserProfile(
