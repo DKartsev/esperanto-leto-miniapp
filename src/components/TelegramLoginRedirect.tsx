@@ -24,7 +24,10 @@ const TelegramLoginRedirect = () => {
 
     const initProfile = async () => {
       try {
-        const uuid = await findOrCreateUserProfile(userId, telegramUser.username || firstName);
+        const uuid = await findOrCreateUserProfile(
+          userId,
+          telegramUser.username ?? firstName ?? null
+        );
         if (uuid) {
           localStorage.setItem('user_id', uuid);
         }

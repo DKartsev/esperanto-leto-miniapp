@@ -226,7 +226,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           <div className="flex items-center justify-between">
             <AccountHeader
               username={profile?.username || user?.email?.split('@')[0] || 'Пользователь'}
-              email={user?.email}
+              email={user?.email || undefined}
               isEditing={isEditingUsername}
               newUsername={newUsername}
               onEdit={() => setIsEditingUsername(true)}
