@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import {
   updateUserProfile as authUpdateUserProfile,
-  signOut as authSignOut
+  signOut as authSignOut,
+  findOrCreateUserProfile
 } from '../services/authService'
 import { supabase } from '../services/supabaseClient'
 import { getUserStats, getUserAchievements } from '../services/progressService'
@@ -97,12 +98,31 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
     }
   }
 
-  // Инициализация при монтировании
+  // Инициализация при монтировании через Telegram WebApp
   useEffect(() => {
-    const storedTelegramId = localStorage.getItem('user_id')
-    if (storedTelegramId) {
-      loadUserData(storedTelegramId)
+    const init = async () => {
+      const tgUser = window?.Telegram?.WebApp?.initDataUnsafe?.user
+      if (!tgUser?.id) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        const uuid = await findOrCreateUserProfile(
+          String(tgUser.id),
+          tgUser.username || tgUser.first_name || null
+        )
+        localStorage.setItem('user_id', uuid)
+        localStorage.setItem('telegram_id', String(tgUser.id))
+        await loadUserData(String(tgUser.id))
+      } catch (err) {
+        console.error('Ошибка инициализации пользователя:', err)
+        setError(err instanceof Error ? err.message : String(err))
+        setLoading(false)
+      }
     }
+
+    void init()
   }, [])
 
   // Telegram-only аутентификация

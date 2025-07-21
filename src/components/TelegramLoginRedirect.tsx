@@ -11,6 +11,7 @@ const TelegramLoginRedirect = () => {
   const navigateRef = useRef(false);
 
   useEffect(() => {
+    window.Telegram?.WebApp?.ready();
     const telegramUser = window?.Telegram?.WebApp?.initDataUnsafe?.user;
     if (!telegramUser?.id) {
       setLoading(false);

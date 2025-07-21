@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { telegramWebApp } from '../services/telegramWebApp';
-import { telegramLogin } from '../services/telegramAuth';
 import { useAuth } from './SupabaseAuthProvider';
 
 interface TelegramWebAppContextType {
@@ -51,9 +50,6 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
         setUser(telegramWebApp.getUser());
         setIsDarkTheme(telegramWebApp.isDarkTheme());
         setThemeParams(telegramWebApp.getThemeParams());
-        telegramLogin().catch((err) =>
-          console.error('Telegram login error:', err)
-        );
       }
     };
 

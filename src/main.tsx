@@ -6,7 +6,6 @@ import AdminPanelPage from './pages/AdminPanelPage';
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
-import AuthCallback from './pages/AuthCallback';
 import TelegramLoginRedirect from './components/TelegramLoginRedirect';
 
 const root = createRoot(document.getElementById('root')!);
@@ -20,7 +19,6 @@ root.render(
         <TelegramWebAppProvider>
           <TelegramLoginRedirect />
           <Routes>
-            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/admin-panel" element={<AdminPanelPage />} />
             <Route path="/*" element={<App />} />
           </Routes>
