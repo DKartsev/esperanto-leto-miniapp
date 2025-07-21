@@ -50,6 +50,29 @@ export async function ensureUserProfileExists(
   }
 }
 
+/**
+ * Send Telegram init data to the backend for verification
+ */
+export async function verifyTelegramInitData(initData: string): Promise<boolean> {
+  try {
+    const res = await fetch('/api/verifyTelegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ initData })
+    });
+
+    if (!res.ok) return false;
+
+    const result = await res.json();
+    return !!result.ok;
+  } catch (err) {
+    console.error('❌ Verification request failed:', err);
+    return false;
+  }
+}
+
 export async function telegramLogin() {
   if (!window.Telegram?.WebApp) {
     console.error('Telegram SDK not initialized');
@@ -61,6 +84,12 @@ export async function telegramLogin() {
   if (!user) {
     console.warn('Telegram user data not found');
     telegramWebApp.openTelegramLink('https://t.me/EsperantoLetoBot/webapp');
+    return null;
+  }
+
+  const verified = await verifyTelegramInitData(tg.initData);
+  if (!verified) {
+    await telegramWebApp.showAlert('Ошибка проверки Telegram данных');
     return null;
   }
 
