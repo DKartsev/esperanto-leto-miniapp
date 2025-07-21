@@ -89,13 +89,11 @@ export const useUserProgress = (userId?: string | null) => {
         return
       }
 
-      let totalTimeSec = 0
       let correctAnswers = 0
       const sectionMap = new Map<string, { correct: number; total: number; chapter: number }>()
       let firstDate: Date | null = null
 
       progress.forEach((row: any) => {
-        totalTimeSec += row.time_spent || 0
         if (row.is_correct) correctAnswers += 1
 
         const key = `${row.chapter_id}-${row.section_id}`
@@ -150,7 +148,6 @@ export const useUserProgress = (userId?: string | null) => {
       }
 
       setCompletedChapters(completed)
-      setTotalStudyMinutes(Math.round(totalTimeSec / 60))
       setAverageAccuracy(avgAccuracy)
       setStartDate(firstDate ? (firstDate as Date).toISOString() : null)
       setProgressLoading(false)
@@ -176,6 +173,11 @@ export const useUserProgress = (userId?: string | null) => {
           console.log('❗ Прогресс не найден')
         }
         setProgressData(data as any[])
+        const totalTime = data.reduce(
+          (sum: number, p: any) => sum + (p.time_spent || 0),
+          0
+        )
+        setTotalStudyMinutes(Math.floor(totalTime / 60))
       }
     }
     fetchProgress()
