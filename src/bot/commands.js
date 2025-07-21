@@ -399,7 +399,7 @@ export function handleProfileCommand(ctx) {
  * Handle callback queries
  * @param {import("telegraf").Context & { callbackQuery: import('@telegraf/types').CallbackQuery.DataCallbackQuery }} ctx - Telegraf context
  */
-export function handleCallbackQuery(ctx) {
+export async function handleCallbackQuery(ctx) {
   const callbackQuery = ctx.callbackQuery;
   const chatId = callbackQuery.message.chat.id;
   const userId = callbackQuery.from.id;
