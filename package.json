@@ -17,12 +17,14 @@
     "test:ui": "vitest run"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
     "@supabase/supabase-js": "^2.50.3",
     "clsx": "^2.1.1",
     "concurrently": "^8.2.2",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
     "framer-motion": "^12.23.6",
+    "graphql": "^16.11.0",
     "lucide-react": "^0.263.1",
     "openai": "^4.20.1",
     "react": "^18.3.1",
