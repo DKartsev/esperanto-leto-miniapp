@@ -27,8 +27,12 @@ const useUserProfile = (userId?: string | null) => {
       }
       if (/^\d+$/.test(String(id))) {
         const tgUser = getTelegramUser()
-        const username = tgUser?.username || null
-        const uuid = await findOrCreateUserProfile(String(id), username)
+        const uuid = await findOrCreateUserProfile(
+          String(id),
+          tgUser?.username || null,
+          tgUser?.first_name || null,
+          tgUser?.last_name || null
+        )
         setResolvedId(uuid)
       } else {
         setResolvedId(id)

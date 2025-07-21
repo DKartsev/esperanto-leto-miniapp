@@ -31,8 +31,12 @@ export const useUserProgress = (userId?: string | null) => {
       }
       if (/^\d+$/.test(String(userId))) {
         const tgUser = getTelegramUser()
-        const username = tgUser?.username || null
-        const uuid = await findOrCreateUserProfile(String(userId), username)
+        const uuid = await findOrCreateUserProfile(
+          String(userId),
+          tgUser?.username || null,
+          tgUser?.first_name || null,
+          tgUser?.last_name || null
+        )
         setResolvedId(uuid)
       } else {
         setResolvedId(userId)

@@ -53,7 +53,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       if (id && /^\d+$/.test(String(id))) {
         const tgUser = getTelegramUser()
         const tgUsername = tgUser?.username || null
-        id = await findOrCreateUserProfile(String(id), tgUsername)
+        id = await findOrCreateUserProfile(
+          String(id),
+          tgUsername,
+          tgUser?.first_name || null,
+          tgUser?.last_name || null
+        )
       }
       setResolvedUserId(id)
       console.log('🆔 ID в MyAccount:', id)
@@ -137,8 +142,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     }
 
     setLoginLoading(true)
-    const username = tgUser.username || `${tgUser.first_name}${tgUser.last_name || ''}`
-    const userId = await findOrCreateUserProfile(tgUser.id.toString(), username)
+    const userId = await findOrCreateUserProfile(
+      tgUser.id.toString(),
+      tgUser.username || null,
+      tgUser.first_name || null,
+      tgUser.last_name || null
+    )
 
     if (!userId) {
       setLoginError('Ошибка создания профиля')

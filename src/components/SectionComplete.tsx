@@ -57,7 +57,12 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const telegramUsername = tgUser?.username || null;
 
       if (!userId && telegramId) {
-        userId = await findOrCreateUserProfile(String(telegramId), telegramUsername);
+        userId = await findOrCreateUserProfile(
+          String(telegramId),
+          telegramUsername,
+          tgUser?.first_name || null,
+          tgUser?.last_name || null
+        );
       }
 
       if (!userId || /^\d+$/.test(String(userId))) {

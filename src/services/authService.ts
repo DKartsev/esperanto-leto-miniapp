@@ -169,42 +169,36 @@ export async function ensureUserProfile(user: any): Promise<void> {
  */
 export async function findOrCreateUserProfile(
   telegramId: string | number,
-  telegramUsername: string | null
+  username: string | null,
+  firstName?: string | null,
+  lastName?: string | null
 ): Promise<string | null> {
-  const uuid = await telegramIdToUUID(telegramId)
+  const storedId = localStorage.getItem('user_id')
 
-  // Проверяем существующий профиль по telegram_id
-  const { data: existingProfile } = await supabase
+  // Проверяем профиль по telegram_id или сохраненному user_id
+  const orFilter = storedId
+    ? `telegram_id.eq.${telegramId},id.eq.${storedId}`
+    : `telegram_id.eq.${telegramId}`
+
+  const { data: existing } = await supabase
     .from('profiles')
     .select('id')
-    .eq('telegram_id', telegramId)
+    .or(orFilter)
     .maybeSingle()
 
-  if (existingProfile?.id) {
-    localStorage.setItem('user_id', existingProfile.id)
-    return existingProfile.id
+  if (existing?.id) {
+    localStorage.setItem('user_id', existing.id)
+    return existing.id
   }
 
-  // Создаем запись в users при необходимости
-  const { data: existingUser } = await supabase
-    .from('users')
-    .select('id')
-    .eq('id', uuid)
-    .maybeSingle()
+  const uuid = storedId || crypto.randomUUID()
 
-  if (!existingUser) {
-    await supabase.from('users').insert({
-      id: uuid,
-      telegram_id: telegramId,
-      username: telegramUsername
-    })
-  }
-
-  // Создаем профиль
   await supabase.from('profiles').insert({
     id: uuid,
-    username: telegramUsername,
-    telegram_id: telegramId,
+    username,
+    first_name: firstName,
+    last_name: lastName,
+    telegram_id: String(telegramId),
     created_at: new Date().toISOString()
   })
 

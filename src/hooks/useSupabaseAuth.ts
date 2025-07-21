@@ -112,7 +112,9 @@ export function useSupabaseAuth(): UseSupabaseAuthResult {
       try {
         const uuid = await findOrCreateUserProfile(
           String(tgUser.id),
-          tgUser.username || tgUser.first_name || null
+          tgUser.username || null,
+          tgUser.first_name || null,
+          tgUser.last_name || null
         )
         if (uuid) {
           localStorage.setItem('user_id', uuid)

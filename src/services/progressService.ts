@@ -33,8 +33,13 @@ export async function saveProgress(
     }
 
     const telegramId = user.id
-    const tgUsername = getTelegramUser()?.username || null
-    const profileId = await findOrCreateUserProfile(telegramId, tgUsername)
+    const tg = getTelegramUser()
+    const profileId = await findOrCreateUserProfile(
+      telegramId,
+      tg?.username || null,
+      tg?.first_name || null,
+      tg?.last_name || null
+    )
     if (!profileId) {
       console.warn('Could not resolve Telegram ID to UUID')
       localStorage.setItem('saveProgress_error', 'profile_not_found')
