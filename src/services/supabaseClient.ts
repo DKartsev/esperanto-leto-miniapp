@@ -19,7 +19,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export const checkConnection = async (): Promise<boolean> => {
   try {
-    const { error } = await supabase.from('profiles').select('count').limit(1)
+    const { error } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .limit(1)
+
     if (error) throw error
     console.log('✅ Supabase подключен успешно')
     return true
