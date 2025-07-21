@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Play, Lock, TrendingUp, Award, Shield, ChevronDown } from 'lucide-react';
+import { Play, Lock, Award, Shield, ChevronDown } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
@@ -130,11 +130,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
 
 
-  const getOverallProgress = () => {
-    if (chapters.length === 0) return 0
-    const completedChapters = chapters.filter(ch => ch.isCompleted).length
-    return Math.round((completedChapters / chapters.length) * 100)
-  };
 
   const getNextRecommendedChapter = () => {
     return chapters.find(ch => !ch.isLocked && !ch.isCompleted);
@@ -203,47 +198,22 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        {/* Overall Progress */}
-        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-emerald-900">Общий прогресс</h2>
-            <span className="text-2xl font-bold text-emerald-600">{getOverallProgress()}%</span>
-          </div>
-          <div className="w-full bg-emerald-200 rounded-full h-3 mb-2">
-            <div
-              className="bg-gradient-to-r from-emerald-500 to-green-600 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${getOverallProgress()}%` }}
-            ></div>
-          </div>
-          <p className="text-sm text-emerald-700">
-            {chapters.filter(ch => ch.isCompleted).length} из {chapters.length} глав пройдено
-            {hasAdminAccess() && (
-              <span className="ml-2 text-emerald-600 font-medium">
-                (Админ: {chapters.filter(ch => !ch.isLocked).length} доступно)
-              </span>
-            )}
-          </p>
-        </div>
 
       {/* Recommended Chapter */}
       {recommendedChapter && (
-        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 flex flex-col items-center text-center gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
-            <h3 className="text-lg font-semibold text-emerald-900">Рекомендуется изучить</h3>
-          </div>
+        <div className="bg-white border rounded-lg shadow-sm mx-4 p-3 text-sm text-left space-y-1">
+          <h3 className="text-sm font-semibold text-emerald-900">Рекомендуется изучить</h3>
           <div>
-            <h4
-              className="font-semibold text-emerald-900 break-words text-ellipsis"
-              style={{ textWrap: 'balance' }}
-            >
+            <h4 className="font-semibold text-emerald-900 break-words" style={{ textWrap: 'balance' }}>
               {recommendedChapter.title}
             </h4>
-            <p className="text-sm text-emerald-700 break-words text-ellipsis">{recommendedChapter.description}</p>
+            {recommendedChapter.description && recommendedChapter.description !== 'Нет данных' && (
+              <p className="text-emerald-700 break-words">{recommendedChapter.description}</p>
+            )}
           </div>
           <button
             onClick={() => onChapterSelect(recommendedChapter.id)}
-            className="max-w-xs w-full px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 hover:scale-105 hover:shadow-md transition-transform duration-200 active:scale-100 box-border"
+            className="px-3 py-1 rounded-md flex items-center gap-2 bg-green-600 text-white text-sm shadow-sm hover:bg-green-700"
           >
             <Play className="w-4 h-4" />
             <span>Начать</span>
