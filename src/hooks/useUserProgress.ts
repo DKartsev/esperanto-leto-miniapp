@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../services/supabaseClient.js'
-import { findOrCreateUserProfile } from '../services/authService.js'
+import { supabase } from '../services/supabaseClient'
+import { findOrCreateUserProfile } from '../services/authService'
 
 export interface ChapterProgress {
   chapterId: number

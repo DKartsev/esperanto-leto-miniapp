@@ -122,7 +122,7 @@ function MyComponent() {
 
 #### Сохранение прогресса
 ```javascript
-import { saveAnswer, getUserProgress } from './src/services/progressService.js'
+import { saveAnswer, getUserProgress } from './src/services/progressService'
 
 // Сохранение ответа
 await saveAnswer(chapterId, sectionId, questionId, isCorrect, selectedAnswer, timeSpent)
@@ -133,7 +133,7 @@ const progress = await getUserProgress()
 
 #### Работа с тестами
 ```javascript
-import { saveTestResult, getUserTestResults } from './src/services/progressService.js'
+import { saveTestResult, getUserTestResults } from './src/services/progressService'
 
 // Сохранение результата теста
 await saveTestResult({

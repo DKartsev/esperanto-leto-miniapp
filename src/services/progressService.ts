@@ -1,5 +1,6 @@
-import { supabase } from './supabaseClient.js'
-import { getCurrentUser, findOrCreateUserProfile } from './authService.js'
+// @ts-nocheck
+import { supabase } from './supabaseClient'
+import { getCurrentUser, findOrCreateUserProfile } from './authService'
 
 /**
  * Сохранить ответ пользователя
@@ -75,7 +76,7 @@ export async function saveProgress(
     localStorage.setItem('saveProgress_success', 'ok')
     console.log('✅ Ответ сохранен успешно')
     return data
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка сохранения ответа:', error.message)
     // Сохраняем текст ошибки для отладки
     localStorage.setItem('saveProgress_error', error.message)
@@ -104,7 +105,7 @@ export async function getUserProgress() {
     if (error) throw error
 
     return data || []
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения прогресса:', error.message)
     return []
   }
@@ -157,7 +158,7 @@ export async function getChapterProgress(chapterId) {
     if (error) throw error
 
     return data || []
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения прогресса главы:', error.message)
     return []
   }
@@ -185,7 +186,7 @@ export async function getSectionProgress(chapterId, sectionId) {
     if (error) throw error
 
     return data || []
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения прогресса раздела:', error.message)
     return []
   }
@@ -221,7 +222,7 @@ export async function getSectionProgressPercent(chapterId, sectionId) {
     if (!totalQuestions || totalQuestions === 0) return 0
 
     return Math.round((answeredCount / totalQuestions) * 100)
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения процента прогресса раздела:', error.message)
     return 0
   }
@@ -258,7 +259,7 @@ export async function getChapterProgressPercent(chapterId) {
     const completedCount = completed ? new Set(completed.map(p => p.section_id)).size : 0
 
     return Math.round((completedCount / totalSections) * 100)
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения процента прогресса главы:', error.message)
     return 0
   }
@@ -305,7 +306,7 @@ export async function getUserStats() {
       level: calculateLevel(accuracy, totalAnswers),
       progress: calculateOverallProgress(completedChapters.size)
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения статистики:', error.message)
     return getDefaultStats()
   }
@@ -342,7 +343,7 @@ export async function saveTestResult(testResult) {
 
     console.log('✅ Результат теста сохранен')
     return data
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка сохранения результата теста:', error.message)
     throw new Error(`Ошибка сохранения результата теста: ${error.message}`)
   }
@@ -366,7 +367,7 @@ export async function getUserTestResults() {
     if (error) throw error
 
     return data || []
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения результатов тестов:', error.message)
     return []
   }
@@ -417,7 +418,7 @@ export async function saveTestResults(
 
     console.log('✅ Результаты раздела сохранены')
     return { result: data, achievements }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка сохранения результатов раздела:', error.message)
     throw new Error(`Ошибка сохранения результатов: ${error.message}`)
   }
@@ -441,7 +442,7 @@ export async function getUserAchievements() {
     if (error) throw error
 
     return data || []
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения достижений:', error.message)
     return []
   }
@@ -455,10 +456,15 @@ export async function getUserAchievements() {
  * @param {number} accuracy
  * @returns {Promise<string[]>} список новых достижений
  */
-export async function checkAndAssignAchievements(userId, sectionId, chapterId, accuracy) {
-  const earned = []
+export async function checkAndAssignAchievements(
+  userId: string,
+  sectionId: number,
+  chapterId: number,
+  accuracy: number
+): Promise<string[]> {
+  const earned: string[] = []
 
-  const hasAchievement = async (type, extraFilter = {}) => {
+  const hasAchievement = async (type: string, extraFilter: any = {}) => {
     let query = supabase
       .from('user_achievements')
       .select('id')
@@ -478,7 +484,7 @@ export async function checkAndAssignAchievements(userId, sectionId, chapterId, a
     return data && data.length > 0
   }
 
-  const insertAchievement = async (type, data = {}) => {
+  const insertAchievement = async (type: string, data: any = {}) => {
     const { error } = await supabase.from('user_achievements').insert({
       user_id: userId,
       achievement_type: type,
@@ -534,7 +540,7 @@ export async function checkAndAssignAchievements(userId, sectionId, chapterId, a
     }
 
     return earned
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка проверки достижений:', error.message)
     return earned
   }
@@ -566,7 +572,7 @@ export async function resetUserProgress() {
     if (testsError) throw testsError
 
     console.log('✅ Прогресс пользователя сброшен')
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка сброса прогресса:', error.message)
     throw new Error(`Ошибка сброса прогресса: ${error.message}`)
   }

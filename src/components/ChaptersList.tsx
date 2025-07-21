@@ -2,10 +2,10 @@ import { useState, useEffect, type FC } from 'react';
 import { Play, Star, Trophy, BookOpen, Lock, CheckCircle, TrendingUp, Award, Shield, ChevronDown } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import Toast from './Toast';
-import { fetchChapters, fetchSections } from '../services/courseService.js'
+import { fetchChapters, fetchSections } from '../services/courseService'
 import { getChapterProgressPercent, getSectionProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
-import { supabase } from '../services/supabaseClient.js'
+import { supabase } from '../services/supabaseClient'
 
 interface Chapter {
   id: number;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../services/supabaseClient.js'
+import { supabase } from '../services/supabaseClient'
 
 const TELEGRAM_BOT = 'EsperantoLetoBot'
 

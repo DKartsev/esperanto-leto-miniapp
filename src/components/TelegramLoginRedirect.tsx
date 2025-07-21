@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './SupabaseAuthProvider';
-import { findOrCreateUserProfile } from '../services/authService.js';
+import { findOrCreateUserProfile } from '../services/authService';
 import LoadingScreen from './LoadingScreen';
 
 const TelegramLoginRedirect = () => {

@@ -1,4 +1,4 @@
-import MyAccount from '../components/MyAccount';
+import MyAccount from '../features/account/MyAccount';
 import { useAuth } from '../components/SupabaseAuthProvider';
 import { useNavigate } from 'react-router-dom';
 

@@ -7,8 +7,8 @@ import {
   generateCourseReport,
   validateCourseData,
   createSearchIndex
-} from '../utils/dataExtractor';
-import esperantoData from '../data/esperantoData';
+} from '../../utils/dataExtractor';
+import esperantoData from '../../data/esperantoData';
 
 const DataExporter: FC = () => {
   const [exportType, setExportType] = useState<'json' | 'csv' | 'report' | 'search'>('json');

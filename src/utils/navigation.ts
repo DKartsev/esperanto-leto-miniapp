@@ -1,4 +1,4 @@
-import { supabase } from '../services/supabaseClient.js'
+import { supabase } from '../services/supabaseClient'
 
 export async function getNextStep(sectionId: number): Promise<{ nextSectionId?: string; nextChapterId?: string }> {
   const { data: current } = await supabase

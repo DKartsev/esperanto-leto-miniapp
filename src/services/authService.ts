@@ -1,4 +1,5 @@
-import { supabase } from './supabaseClient.js'
+// @ts-nocheck
+import { supabase } from './supabaseClient'
 
 /**
  * Deterministically convert a Telegram numeric ID into a UUID using

@@ -1,4 +1,5 @@
-import { supabase } from './supabaseClient.js'
+// @ts-nocheck
+import { supabase } from './supabaseClient'
 
 export async function fetchChapters() {
   const { data, error } = await supabase

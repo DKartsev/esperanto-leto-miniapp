@@ -6,8 +6,8 @@ import SectionComplete from '../components/SectionComplete';
 import ChapterComplete from '../components/ChapterComplete';
 import { useAuth } from '../components/SupabaseAuthProvider';
 import { saveTestResults } from '../services/progressService';
-import { supabase } from '../services/supabaseClient.js';
-import { findOrCreateUserProfile } from '../services/authService.js';
+import { supabase } from '../services/supabaseClient';
+import { findOrCreateUserProfile } from '../services/authService';
 
 const LearningPage = () => {
   const [currentView, setCurrentView] = useState<'chapters' | 'sections' | 'questions' | 'section-complete' | 'chapter-complete'>('chapters');

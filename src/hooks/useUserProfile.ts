@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../components/SupabaseAuthProvider'
-import { getUserProfile, findOrCreateUserProfile } from '../services/authService.js'
+import { getUserProfile, findOrCreateUserProfile } from '../services/authService'
 
 export interface UserProfile {
   id: string
