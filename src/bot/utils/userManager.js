@@ -366,5 +366,5 @@ export function resetAllUsersProgress() {
     console.log(`[UserManager] ✅ Сброшен пользователь ${userId} к нулевому прогрессу`);
   }
   
-  console.log(`[UserManager] ✅ Все пользователи сброшены к нулевому прогрессу`);
+  console.log('[UserManager] ✅ Все пользователи сброшены к нулевому прогрессу');
 }
