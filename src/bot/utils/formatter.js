@@ -8,13 +8,13 @@
  * @returns {string} Formatted message
  */
 export function formatChapterList(chapters) {
-  let message = "📚 *Главы курса эсперанто*\n\n";
+  let message = '📚 *Главы курса эсперанто*\n\n';
   
   chapters.forEach(chapter => {
     message += `*${chapter.id}.* ${chapter.title}\n`;
   });
   
-  message += "\nВыберите главу из списка или отправьте номер главы.";
+  message += '\nВыберите главу из списка или отправьте номер главы.';
   
   return message;
 }
@@ -26,13 +26,13 @@ export function formatChapterList(chapters) {
  */
 export function formatSectionList(chapter) {
   let message = `📖 *Глава ${chapter.id}: ${chapter.title}*\n\n`;
-  message += "Разделы:\n";
+  message += 'Разделы:\n';
   
   chapter.sections.forEach(section => {
     message += `*${section.id}.* ${section.title}\n`;
   });
   
-  message += "\nВыберите раздел из списка или отправьте номер в формате '1.2' (где 1 - глава, 2 - раздел).";
+  message += '\nВыберите раздел из списка или отправьте номер в формате \'1.2\' (где 1 - глава, 2 - раздел).';
   
   return message;
 }
@@ -50,13 +50,13 @@ export function formatSectionContent(chapterId, sectionId, content) {
   message += content.content;
   
   if (content.examples && content.examples.length > 0) {
-    message += "\n\n*Примеры:*\n";
+    message += '\n\n*Примеры:*\n';
     content.examples.forEach(example => {
       message += `• ${example}\n`;
     });
   }
   
-  message += "\n\nДля практики отправьте: practice";
+  message += '\n\nДля практики отправьте: practice';
   
   return message;
 }
@@ -71,7 +71,7 @@ export function formatSectionContent(chapterId, sectionId, content) {
 export function formatQuizQuestion(question, questionNumber, totalQuestions) {
   let message = `*Вопрос ${questionNumber}/${totalQuestions}*\n\n`;
   
-  message += question.question + "\n\n";
+  message += question.question + '\n\n';
   
   question.options.forEach((option, index) => {
     message += `*${String.fromCharCode(65 + index)}.* ${option}\n`;
@@ -89,17 +89,17 @@ export function formatQuizQuestion(question, questionNumber, totalQuestions) {
 export function formatQuizResult(score, total) {
   const percentage = Math.round((score / total) * 100);
   
-  let message = `*Результаты теста*\n\n`;
+  let message = '*Результаты теста*\n\n';
   message += `Правильных ответов: *${score}/${total}* (${percentage}%)\n\n`;
   
   if (percentage >= 90) {
-    message += "🏆 Отличный результат! Вы отлично знаете эсперанто!";
+    message += '🏆 Отличный результат! Вы отлично знаете эсперанто!';
   } else if (percentage >= 70) {
-    message += "👍 Хороший результат! Вы хорошо знаете эсперанто.";
+    message += '👍 Хороший результат! Вы хорошо знаете эсперанто.';
   } else if (percentage >= 50) {
-    message += "👌 Неплохой результат. Продолжайте изучение!";
+    message += '👌 Неплохой результат. Продолжайте изучение!';
   } else {
-    message += "🤔 Вам стоит больше практиковаться. Не сдавайтесь!";
+    message += '🤔 Вам стоит больше практиковаться. Не сдавайтесь!';
   }
   
   return message;
@@ -140,7 +140,7 @@ export function formatUserProfile(user, stats) {
   const { first_name, username } = user;
   const { level, chaptersCompleted, testsCompleted, progress } = stats;
   
-  let message = `*Профиль пользователя*\n\n`;
+  let message = '*Профиль пользователя*\n\n';
   message += `Имя: ${first_name}\n`;
   if (username) message += `Имя пользователя: @${username}\n`;
   message += `Уровень: ${level}\n`;
@@ -148,7 +148,7 @@ export function formatUserProfile(user, stats) {
   message += `Пройдено тестов: ${testsCompleted}\n`;
   message += `Общий прогресс: ${progress}%\n\n`;
   
-  message += `_Продолжайте изучение, чтобы улучшить свои показатели!_`;
+  message += '_Продолжайте изучение, чтобы улучшить свои показатели!_';
   
   return message;
 }
