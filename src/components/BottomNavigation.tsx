@@ -2,6 +2,7 @@ import { Home, FileText, Bot, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
+import { BOTTOM_NAV_ITEM_BASE } from '../utils/classNames';
 
 const navItems = [
   { label: 'Главная', icon: Home, path: '/', animation: { scale: 1.2 } },
@@ -25,7 +26,7 @@ const BottomNavigation = () => {
           end
           className={({ isActive }) =>
             clsx(
-              'flex-1 flex flex-col items-center justify-center text-xs transition-colors duration-300 ease-in-out',
+              BOTTOM_NAV_ITEM_BASE,
               isActive
                 ? 'text-green-600 font-semibold'
                 : 'text-gray-500 hover:text-green-600'
