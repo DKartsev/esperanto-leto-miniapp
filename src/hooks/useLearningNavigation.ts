@@ -33,9 +33,12 @@ export function useLearningNavigation() {
       localStorage.getItem('user_id') || profile?.id
     if (userId && /^\d+$/.test(String(userId))) {
       const telegramId = String(userId)
+      const tg = getTelegramUser()
       const newId = await findOrCreateUserProfile(
         telegramId,
-        getTelegramUser()?.username || null
+        tg?.username || null,
+        tg?.first_name || null,
+        tg?.last_name || null
       )
       if (!newId) {
         console.error('Не удалось создать профиль через RPC')
