@@ -15,6 +15,7 @@ import useChapterStats from '../../hooks/useChapterStats'
 import useUserProgress from '../../hooks/useUserProgress'
 import ProgressSummary from './ProgressSummary'
 import { getFullUserProgress } from '../../services/progressService'
+import { getTelegramUser } from '../../utils/telegram'
 
 interface MyAccountProps {
   onBackToHome: () => void
@@ -51,7 +52,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     const resolveUserId = async () => {
       let id: string | null = user?.id || localStorage.getItem('user_id')
       if (id && /^\d+$/.test(String(id))) {
-        const tgUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        const tgUser = getTelegramUser()
+        const tgUsername = tgUser?.username || null
         id = await findOrCreateUserProfile(String(id), tgUsername)
       }
       setResolvedUserId(id)
@@ -129,7 +131,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   }
 
   const handleTelegramLogin = async () => {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+    const tgUser = getTelegramUser()
     if (!tgUser) {
       console.warn('Пользователь Telegram не найден')
       setLoginError('Пользователь Telegram не найден')
@@ -151,7 +153,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     navigate('/')
   }
 
-  const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+  const telegramUser = getTelegramUser()
 
   useEffect(() => {
     if (!isAuthenticated && telegramUser) {

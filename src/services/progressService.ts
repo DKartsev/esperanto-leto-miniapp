@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import { getCurrentUser, findOrCreateUserProfile } from './authService'
+import { getTelegramUser } from '../utils/telegram'
 
 /**
  * Сохранить ответ пользователя
@@ -32,8 +33,7 @@ export async function saveProgress(
     }
 
     const telegramId = user.id
-    const tgUsername =
-      window?.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+    const tgUsername = getTelegramUser()?.username || null
     const profileId = await findOrCreateUserProfile(telegramId, tgUsername)
     if (!profileId) {
       console.warn('Could not resolve Telegram ID to UUID')

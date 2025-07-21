@@ -3,6 +3,7 @@ import type { QuestionResultItem } from './QuestionInterface';
 import { supabase } from '../services/supabaseClient';
 import { findOrCreateUserProfile, getCurrentUser } from '../services/authService';
 import { useAuth } from './SupabaseAuthProvider';
+import { getTelegramUser } from '../utils/telegram';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
 import { getNextStep } from '../utils/navigation.js';
@@ -51,8 +52,9 @@ const SectionComplete: FC<SectionCompleteProps> = ({
       const current = await getCurrentUser() as any;
       userId = current?.id || null;
 
-      const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-      const telegramUsername = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null;
+      const tgUser = getTelegramUser();
+      const telegramId = tgUser?.id;
+      const telegramUsername = tgUser?.username || null;
 
       if (!userId && telegramId) {
         userId = await findOrCreateUserProfile(String(telegramId), telegramUsername);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../services/supabaseClient'
 import { findOrCreateUserProfile } from '../services/authService'
+import { getTelegramUser } from '../utils/telegram'
 
 export interface ChapterProgress {
   chapterId: number
@@ -29,7 +30,8 @@ export const useUserProgress = (userId?: string | null) => {
         return
       }
       if (/^\d+$/.test(String(userId))) {
-        const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        const tgUser = getTelegramUser()
+        const username = tgUser?.username || null
         const uuid = await findOrCreateUserProfile(String(userId), username)
         setResolvedId(uuid)
       } else {

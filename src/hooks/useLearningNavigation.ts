@@ -4,6 +4,7 @@ import { findOrCreateUserProfile } from '../services/authService'
 import { supabase } from '../services/supabaseClient'
 import { saveTestResults } from '../services/progressService'
 import type { QuestionResults } from '../components/QuestionInterface'
+import { getTelegramUser } from '../utils/telegram'
 
 export type LearningView =
   | 'chapters'
@@ -34,7 +35,7 @@ export function useLearningNavigation() {
       const telegramId = String(userId)
       const newId = await findOrCreateUserProfile(
         telegramId,
-        window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null
+        getTelegramUser()?.username || null
       )
       if (!newId) {
         console.error('Не удалось создать профиль через RPC')

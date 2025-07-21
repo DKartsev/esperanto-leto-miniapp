@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './SupabaseAuthProvider';
 import { findOrCreateUserProfile } from '../services/authService';
+import { getTelegramUser } from '../utils/telegram';
 import LoadingScreen from './LoadingScreen';
 
 const TelegramLoginRedirect = () => {
@@ -12,8 +13,8 @@ const TelegramLoginRedirect = () => {
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
-    const telegramUser = window?.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (!telegramUser?.id) {
+    const telegramUser = getTelegramUser();
+    if (!telegramUser) {
       setLoading(false);
       return;
     }
@@ -45,7 +46,7 @@ const TelegramLoginRedirect = () => {
       localStorage.getItem('user_id')
     ) {
       console.log('Navigate to /account', {
-        telegramUser: window?.Telegram?.WebApp?.initDataUnsafe?.user,
+        telegramUser: getTelegramUser(),
         user_id: localStorage.getItem('user_id'),
         profile
       });
