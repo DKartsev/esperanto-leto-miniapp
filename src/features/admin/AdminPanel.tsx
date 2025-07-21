@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, type FC } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Settings, Users, BookOpen, BarChart3, AlertTriangle, Shield, TrendingUp, CheckCircle, X } from 'lucide-react';
-import { isAdmin } from '../utils/adminUtils.js';
-import esperantoData, { Chapter } from '../data/esperantoData';
-import ChapterEditor from './admin/ChapterEditor';
-import UserManagement from './admin/UserManagement';
-import LogsView from './admin/LogsView';
+import { isAdmin } from '../../utils/adminUtils.js';
+import esperantoData, { Chapter } from '../../data/esperantoData';
+import ChapterEditor from './ChapterEditor';
+import UserManagement from './UserManagement';
+import LogsView from './LogsView';
 import DataExporter from './DataExporter';
 
 interface AdminUser {

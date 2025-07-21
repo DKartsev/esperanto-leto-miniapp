@@ -3,8 +3,8 @@ import {
   getUserProfile,
   updateUserProfile as authUpdateUserProfile,
   signOut as authSignOut
-} from '../services/authService.js'
-import { supabase } from '../services/supabaseClient.js'
+} from '../services/authService'
+import { supabase } from '../services/supabaseClient'
 import { getUserStats, getUserAchievements } from '../services/progressService'
 
 /**

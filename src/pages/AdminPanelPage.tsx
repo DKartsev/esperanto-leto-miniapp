@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import AdminPanel from '../components/AdminPanel';
+import AdminPanel from '../features/admin/AdminPanel';
 import { useAuth } from '../components/SupabaseAuthProvider';
 
 const AdminPanelPage = () => {

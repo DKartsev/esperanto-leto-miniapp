@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
-import { supabase } from '../services/supabaseClient.js';
-import { findOrCreateUserProfile, getCurrentUser } from '../services/authService.js';
+import { supabase } from '../services/supabaseClient';
+import { findOrCreateUserProfile, getCurrentUser } from '../services/authService';
 import { useAuth } from './SupabaseAuthProvider';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';

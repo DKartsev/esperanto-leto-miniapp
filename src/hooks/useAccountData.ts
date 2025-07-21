@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../services/supabaseClient.js'
+import { supabase } from '../services/supabaseClient'
 
 export interface ChapterStat {
   chapterId: number

@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
-import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService.js'
+import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
 import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLoadData } from '../hooks/useLoadData';

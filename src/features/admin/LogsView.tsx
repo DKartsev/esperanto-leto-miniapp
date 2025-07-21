@@ -1,5 +1,5 @@
 import { useEffect, useState, type FC } from 'react';
-import { supabase } from '../../services/supabaseClient.js';
+import { supabase } from '../../services/supabaseClient';
 
 interface LogEntry {
   id?: string;

@@ -1,5 +1,5 @@
-import { supabase } from './supabaseClient.js'
-export * from './progressService.js'
+import { supabase } from './supabaseClient'
+export * from './progressService'
 
 export async function updateChapterProgress(
   userId: string,
