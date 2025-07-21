@@ -23,7 +23,9 @@ const TelegramLoginRedirect = () => {
     const initProfile = async () => {
       try {
         const uuid = await findOrCreateUserProfile(userId, telegramUser.username || firstName);
-        localStorage.setItem('user_id', uuid);
+        if (uuid) {
+          localStorage.setItem('user_id', uuid);
+        }
         setLoading(false);
       } catch (err) {
         console.error('Ошибка входа:', err);

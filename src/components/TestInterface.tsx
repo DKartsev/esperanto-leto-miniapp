@@ -153,7 +153,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [handleComplete]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -208,7 +208,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
     }
   };
 
-  const handleComplete = () => {
+  function handleComplete() {
     const sectionResults = {
       reading: answers.filter(a => a.section === 'reading'),
       writing: answers.filter(a => a.section === 'writing'),
@@ -222,7 +222,7 @@ const TestInterface: FC<TestInterfaceProps> = ({ onComplete, onBack }) => {
       sectionResults,
       timeSpent: (30 * 60) - timeRemaining
     });
-  };
+  }
 
   const handleExit = () => {
     if (confirm('Вы уверены, что хотите выйти из теста? Прогресс будет потерян.')) {

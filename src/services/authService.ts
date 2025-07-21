@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from './supabaseClient'
 
 /**
@@ -9,7 +8,7 @@ import { supabase } from './supabaseClient'
  * @param {string|number} telegramId Telegram user id
  * @returns {Promise<string>} UUID derived from the id
  */
-export async function telegramIdToUUID(telegramId) {
+export async function telegramIdToUUID(telegramId: string | number): Promise<string> {
   const data = new TextEncoder().encode(String(telegramId))
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
@@ -36,7 +35,7 @@ export async function telegramIdToUUID(telegramId) {
  * @returns {Promise<Object>} Данные сессии
  */
 // Раньше здесь был вход через Supabase Auth
-export async function signIn(_email, _password) {
+export async function signIn(): Promise<void> {
   throw new Error('Email/пароль вход отключён')
 }
 
@@ -74,7 +73,7 @@ export async function getCurrentUser() {
  * @param {string} userId - ID пользователя
  * @returns {Promise<Object|null>} Профиль пользователя
  */
-export async function getUserProfile(userId) {
+export async function getUserProfile(userId: string): Promise<any | null> {
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -85,7 +84,7 @@ export async function getUserProfile(userId) {
     if (error && error.code !== 'PGRST116') throw error
 
     return data || null
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка получения профиля:', error.message)
     return null
   }
@@ -97,7 +96,7 @@ export async function getUserProfile(userId) {
  * @param {Object} updates - Обновления профиля
  * @returns {Promise<Object>} Обновленный профиль
  */
-export async function updateUserProfile(userId, updates) {
+export async function updateUserProfile(userId: string, updates: Record<string, any>): Promise<any> {
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -113,7 +112,7 @@ export async function updateUserProfile(userId, updates) {
     
     console.log('✅ Профиль обновлен успешно')
     return data
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Ошибка обновления профиля:', error.message)
     throw new Error(`Ошибка обновления профиля: ${error.message}`)
   }
@@ -123,7 +122,7 @@ export async function updateUserProfile(userId, updates) {
  * Ensure the user has a profile record in `profiles` table
  * @param {Object} user - Supabase user object
  */
-export async function ensureUserProfile(user) {
+export async function ensureUserProfile(user: any): Promise<void> {
   if (!user?.id) return
   try {
     const { data: existingProfile, error: fetchError } = await supabase
@@ -167,7 +166,10 @@ export async function ensureUserProfile(user) {
  * @param {string|null} username
  * @returns {Promise<string|null>} profile UUID or null
  */
-export async function findOrCreateUserProfile(telegramId, telegramUsername) {
+export async function findOrCreateUserProfile(
+  telegramId: string | number,
+  telegramUsername: string | null
+): Promise<string | null> {
   const uuid = await telegramIdToUUID(telegramId)
 
   // Проверяем существующий профиль по telegram_id
@@ -214,7 +216,9 @@ export async function findOrCreateUserProfile(telegramId, telegramUsername) {
  * @param {Function} callback - Функция обратного вызова
  * @returns {Object} Объект подписки
  */
-export function onAuthStateChange(callback) {
+export function onAuthStateChange(
+  callback: (event: string, session: any) => void
+) {
   return supabase.auth.onAuthStateChange((event, session) => {
     console.log('🔄 Изменение состояния аутентификации:', event)
     callback(event, session)

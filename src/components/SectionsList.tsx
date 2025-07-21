@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import LoadingScreen from './LoadingScreen';
-import { Play, CheckCircle2, Book } from 'lucide-react';
+import { CheckCircle2, Book } from 'lucide-react';
 import { fetchSections } from '../services/courseService';
 import { useLoadData } from '../hooks/useLoadData';
 import { getSectionProgressPercent } from '../services/progressService'
