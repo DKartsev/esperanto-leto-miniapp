@@ -19,7 +19,7 @@ export async function saveProgress({
   selectedAnswer,
   isCorrect,
   timeSpent = 0,
-  hintsUsed = 0,
+  hintsUsed = 0
 }: {
   chapterId: number
   sectionId: number
@@ -30,9 +30,6 @@ export async function saveProgress({
   hintsUsed?: number
 }): Promise<any> {
   try {
-    // Отмечаем вызов функции в localStorage для отладки
-    localStorage.setItem('saveProgress_called', new Date().toISOString())
-
     const currentUser = await getCurrentUser()
     const userId = currentUser?.id
     if (!userId) {
@@ -40,45 +37,61 @@ export async function saveProgress({
       return null
     }
 
-    console.log('💾 Сохранение ответа:', {
-      chapterId,
-      sectionId,
-      questionId,
-      isCorrect
-    })
-
-    const { data, error } = await supabase
+    // ✅ Сначала получаем текущую запись (если есть)
+    const { data: existing, error: fetchError } = await supabase
       .from('user_progress')
-      .insert([
-        {
-          user_id: userId,
-          chapter_id: chapterId,
-          section_id: sectionId,
-          question_id: questionId,
-          selected_answer: selectedAnswer,
-          is_correct: isCorrect,
-          time_spent: timeSpent,
-          hints_used: hintsUsed,
-          answered_at: new Date().toISOString()
-        }
-      ])
-      .select()
+      .select('*')
+      .eq('user_id', userId)
+      .eq('section_id', sectionId)
+      .limit(1)
       .single()
 
-    if (error) {
-      localStorage.setItem('saveProgress_error', error.message)
-      throw error
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Ошибка при получении прогресса:', fetchError)
+      return null
     }
 
-    // Отмечаем успешное сохранение
-    localStorage.setItem('saveProgress_success', 'ok')
-    console.log('✅ Ответ сохранен успешно')
+    // 💡 Решаем: нужно ли обновлять запись
+    const shouldUpdate =
+      !existing ||
+      (existing && isCorrect && !existing.is_correct) ||
+      (existing && isCorrect && timeSpent < (existing.time_spent ?? 0))
+
+    if (!shouldUpdate) {
+      console.log('⏩ Прогресс не обновляется: текущая попытка не лучше предыдущей')
+      return existing
+    }
+
+    // 🆕 Вставка или обновление по ключу user_id + section_id
+    const { data, error } = await supabase
+      .from('user_progress')
+      .upsert(
+        [
+          {
+            user_id: userId,
+            chapter_id: chapterId,
+            section_id: sectionId,
+            question_id: questionId,
+            selected_answer: selectedAnswer,
+            is_correct: isCorrect,
+            time_spent: timeSpent,
+            hints_used: hintsUsed,
+            answered_at: new Date().toISOString()
+          }
+        ],
+        {
+          onConflict: ['user_id', 'section_id']
+        }
+      )
+
+    if (error) {
+      console.error('❌ Ошибка upsert прогресса:', error)
+    }
+
     return data
-  } catch (error: any) {
-    console.error('❌ Ошибка сохранения ответа:', error.message)
-    // Сохраняем текст ошибки для отладки
-    localStorage.setItem('saveProgress_error', error.message)
-    throw new Error(`Ошибка сохранения ответа: ${error.message}`)
+  } catch (err) {
+    console.error('Ошибка в saveProgress:', err)
+    return null
   }
 }
 
