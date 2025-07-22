@@ -1,6 +1,6 @@
 import { Home, FileText, Bot, User } from 'lucide-react'
 import { Routes, Route } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { NavigationItem } from './components/NavigationBar'
 import MainLayout from './layout/MainLayout'
 import LearningPage from './pages/LearningPage'
@@ -8,6 +8,7 @@ import TestPage from './pages/TestPage'
 import AIChatPage from './pages/AIChatPage'
 import AccountPage from './pages/AccountPage'
 import LandingPage from './pages/LandingPage'
+import LoadingVideo from './components/LoadingVideo'
 import { useTelegramUser } from './hooks/useTelegramUser'
 import { syncTelegramProfile } from './services/syncTelegramProfile'
 
@@ -20,6 +21,13 @@ const navItems: NavigationItem[] = [
 
 function App() {
   const telegramUser = useTelegramUser()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (localStorage.getItem('intro_seen') === '1') {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (telegramUser) {
@@ -29,6 +37,15 @@ function App() {
       })
     }
   }, [telegramUser])
+
+  const handleIntroFinish = () => {
+    localStorage.setItem('intro_seen', '1')
+    setLoading(false)
+  }
+
+  if (loading) {
+    return <LoadingVideo onFinish={handleIntroFinish} />
+  }
 
   return (
     <MainLayout items={navItems}>
