@@ -391,9 +391,10 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   <Play className="w-5 h-5" />
                 )}
               </button>
-            </div>
-          </div>
-        </motion.div>))}
+              </div>
+          </motion.div>
+        );
+      })}
       </div>
 
       {/* Learning Tips */}
