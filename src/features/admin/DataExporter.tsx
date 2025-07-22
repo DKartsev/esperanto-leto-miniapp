@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { Download, FileText, Database, Search, BarChart3 } from 'lucide-react';
 import { 
   extractCourseData, 
@@ -8,11 +8,18 @@ import {
   validateCourseData,
   createSearchIndex
 } from '../../utils/dataExtractor';
-import esperantoData from '../../data/esperantoData';
+import { fetchEsperantoData, Chapter } from '../../data/esperantoData';
 
 const DataExporter: FC = () => {
   const [exportType, setExportType] = useState<'json' | 'csv' | 'report' | 'search'>('json');
   const [isExporting, setIsExporting] = useState(false);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+
+  useEffect(() => {
+    void fetchEsperantoData()
+      .then(setChapters)
+      .catch(err => console.error('Failed to load course data', err));
+  }, []);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -24,25 +31,25 @@ const DataExporter: FC = () => {
 
       switch (exportType) {
         case 'json':
-          content = exportToJSON(extractCourseData(esperantoData));
+          content = exportToJSON(extractCourseData(chapters));
           filename = 'esperanto-course-data.json';
           mimeType = 'application/json';
           break;
           
         case 'csv':
-          content = exportQuestionsToCSV(esperantoData);
+          content = exportQuestionsToCSV(chapters);
           filename = 'esperanto-questions.csv';
           mimeType = 'text/csv';
           break;
           
         case 'report':
-          content = generateCourseReport(esperantoData);
+          content = generateCourseReport(chapters);
           filename = 'esperanto-course-report.md';
           mimeType = 'text/markdown';
           break;
           
         case 'search':
-          content = exportToJSON(createSearchIndex(esperantoData));
+          content = exportToJSON(createSearchIndex(chapters));
           filename = 'esperanto-search-index.json';
           mimeType = 'application/json';
           break;
@@ -67,8 +74,8 @@ const DataExporter: FC = () => {
     }
   };
 
-  const validation = validateCourseData(esperantoData);
-  const courseData = extractCourseData(esperantoData);
+  const validation = validateCourseData(chapters);
+  const courseData = extractCourseData(chapters);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6">
