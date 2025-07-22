@@ -4,18 +4,18 @@
 
 const BOT_USERNAME = process.env.BOT_USERNAME || 'YOUR_BOT_USERNAME';
 
+// New implementation based on render instructions
 function buildWebAppUrl(params = {}) {
+  const defaultUrl = "https://esperanto-leto-miniapp.onrender.com";
   const envUrl = process.env.WEBAPP_URL;
-  const base = envUrl && envUrl.startsWith('https://')
-    ? envUrl
-    : `https://t.me/${BOT_USERNAME}/webapp`;
 
-  if (params && Object.keys(params).length > 0) {
-    const search = new URLSearchParams(params);
-    const query = base.includes('?') ? `&${search.toString()}` : `?${search.toString()}`;
-    return `${base}${query}`;
-  }
-  return base;
+  // Log to Render console
+  console.log("\ud83d\udce6 WEBAPP_URL =", envUrl);
+
+  const baseUrl = (envUrl && envUrl.startsWith("https://")) ? envUrl : defaultUrl;
+
+  const query = new URLSearchParams(params).toString();
+  return query ? `${baseUrl}?${query}` : baseUrl;
 }
 
 /**
