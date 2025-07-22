@@ -14,3 +14,10 @@ vi.mock('./services/supabaseClient', () => ({
 vi.mock('./components/ui/LogConsole', () => ({
   default: () => null,
 }));
+
+// Mock HTMLMediaElement.play to avoid jsdom errors during tests
+Object.defineProperty(window.HTMLMediaElement.prototype, 'play', {
+  configurable: true,
+  writable: true,
+  value: vi.fn().mockResolvedValue(undefined)
+});

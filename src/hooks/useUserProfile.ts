@@ -8,14 +8,24 @@ export interface UserProfile {
   [key: string]: any
 }
 
-const useUserProfile = (userId?: string | null) => {
-  const { user, profile: authProfile, updateProfile } = useAuth()
-  const resolved = userId || user?.id || localStorage.getItem('user_id') || null
+export interface UseUserProfileResult {
+  userId: string | null
+  data: UserProfile | null
+  isLoading: boolean
+  isError: boolean
+  updateProfile: (updates: Record<string, any>) => Promise<UserProfile | null>
+}
 
-  const query = useQuery({
+const useUserProfile = (userId: string | null): UseUserProfileResult => {
+  const { user, profile: authProfile, updateProfile } = useAuth()
+  const resolved = userId ?? user?.id ?? localStorage.getItem('user_id') ?? null
+
+  const query = useQuery<UserProfile>({
     queryKey: ['user-profile', resolved],
     queryFn: async () => {
-      if (!resolved) return null
+      if (!resolved) {
+        throw new Error('userId is required')
+      }
       let finalId = resolved
       if (/^\d+$/.test(String(resolved))) {
         const tgUser = getTelegramUser()
