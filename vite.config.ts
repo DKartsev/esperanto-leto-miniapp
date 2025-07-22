@@ -32,7 +32,8 @@ export default defineConfig(({ mode }) => {
     },
     publicDir: 'public',
     define: {
-      'process.env': env,
+      'process.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
+      'process.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
     },
   };
 });

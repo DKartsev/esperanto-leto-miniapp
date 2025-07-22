@@ -1,6 +1,5 @@
 import { supabase } from './supabaseClient'
 import { getCurrentUser } from './authService'
-import { useUserId } from '../context/UserContext'
 
 /**
  * Сохранить ответ пользователя
@@ -34,7 +33,8 @@ export async function saveProgress({
     // Отмечаем вызов функции в localStorage для отладки
     localStorage.setItem('saveProgress_called', new Date().toISOString())
 
-    const userId = useUserId()
+    const currentUser = await getCurrentUser()
+    const userId = currentUser?.id
     if (!userId) {
       console.warn('userId not available')
       return null
