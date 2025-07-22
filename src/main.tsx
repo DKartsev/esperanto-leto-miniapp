@@ -1,9 +1,9 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.tsx';
-import AdminPanelPage from './pages/AdminPanelPage';
+const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage'));
 import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
@@ -25,7 +25,14 @@ root.render(
             <UserProvider>
               <TelegramLoginRedirect />
               <Routes>
-                <Route path="/admin-panel" element={<AdminPanelPage />} />
+                <Route
+                  path="/admin-panel"
+                  element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <AdminPanelPage />
+                    </Suspense>
+                  }
+                />
                 <Route path="/*" element={<App />} />
               </Routes>
             </UserProvider>

@@ -1,13 +1,13 @@
 import { Home, FileText, Bot, User } from 'lucide-react'
 import { Routes, Route } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import type { NavigationItem } from './components/NavigationBar'
 import MainLayout from './layout/MainLayout'
 import LearningPage from './pages/LearningPage'
 import TestPage from './pages/TestPage'
-import AIChatPage from './pages/AIChatPage'
 import AccountPage from './pages/AccountPage'
-import LandingPage from './pages/LandingPage'
+const AIChatPage = lazy(() => import('./pages/AIChatPage'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 import StartupLoader from './components/StartupLoader'
 
 const navItems: NavigationItem[] = [
@@ -41,9 +41,23 @@ function App() {
       <Routes>
         <Route path="/" element={<LearningPage />} />
         <Route path="/test" element={<TestPage />} />
-        <Route path="/ai" element={<AIChatPage />} />
+        <Route
+          path="/ai"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <AIChatPage />
+            </Suspense>
+          }
+        />
         <Route path="/account" element={<AccountPage />} />
-        <Route path="/landing" element={<LandingPage />} />
+        <Route
+          path="/landing"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <LandingPage />
+            </Suspense>
+          }
+        />
       </Routes>
     </MainLayout>
   )
