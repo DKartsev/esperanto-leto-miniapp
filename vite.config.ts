@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    base: '/',
     plugins: [react()],
     test: {
       environment: 'jsdom',
@@ -23,6 +24,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: 5173,
+      historyApiFallback: true,
     },
     build: {
       outDir: 'dist',
