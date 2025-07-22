@@ -3,7 +3,14 @@ import { useTelegramUser } from '../hooks/useTelegramUser';
 import { supabase } from '../services/supabaseClient';
 import { syncTelegramProfile } from '../services/syncTelegramProfile';
 
-export const UserContext = createContext<{ userId: string | null; profile: any | null }>({
+export interface Profile {
+  id: string
+  username?: string | null
+  telegram_id?: string | null
+  [key: string]: any
+}
+
+export const UserContext = createContext<{ userId: string | null; profile: Profile | null }>({
   userId: null,
   profile: null
 });
@@ -11,7 +18,7 @@ export const UserContext = createContext<{ userId: string | null; profile: any |
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const telegramUser = useTelegramUser();
   const [userId, setUserId] = useState<string | null>(null);
-  const [profile, setProfile] = useState<any | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     async function fetchProfile() {

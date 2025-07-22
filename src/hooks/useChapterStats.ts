@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../services/supabaseClient'
 import { findOrCreateUserProfile } from '../services/authService'
 import { getTelegramUser } from '../utils/telegram'
@@ -12,44 +12,27 @@ export interface ChapterStats {
 }
 
 export const useChapterStats = (userId?: string | null) => {
-  const [resolvedId, setResolvedId] = useState<string | null>(null)
-  const [stats, setStats] = useState<ChapterStats | null>(null)
-
-  useEffect(() => {
-    const resolve = async () => {
-      if (!userId) {
-        setResolvedId(null)
-        return
-      }
+  const query = useQuery({
+    queryKey: ['chapter-stats', userId],
+    queryFn: async () => {
+      if (!userId) return null
+      let resolvedId = userId
       if (/^\d+$/.test(String(userId))) {
         const tgUser = getTelegramUser()
-        const uuid = await findOrCreateUserProfile(
+        resolvedId = await findOrCreateUserProfile(
           String(userId),
           tgUser?.username || null,
           tgUser?.first_name || null,
           tgUser?.last_name || null
         )
-        setResolvedId(uuid)
-      } else {
-        setResolvedId(userId)
       }
-    }
-    void resolve()
-  }, [userId])
-
-  useEffect(() => {
-    const load = async () => {
-      if (!resolvedId) return
 
       const { data: chapters, error } = await supabase
         .from('user_chapter_progress')
         .select('average_accuracy, total_time, completed')
         .eq('user_id', resolvedId)
 
-      if (error) {
-        console.error('Ошибка загрузки прогресса глав:', error)
-        return
-      }
+      if (error) throw error
 
       let totalTime = 0
       let averageAccuracy = 0
@@ -68,26 +51,28 @@ export const useChapterStats = (userId?: string | null) => {
         .from('chapters')
         .select('id', { count: 'exact', head: true })
 
-      if (chaptersError) {
-        console.error('Ошибка получения количества глав:', chaptersError)
-      }
+      if (chaptersError) throw chaptersError
 
       const totalCh = totalChapters ?? 0
       const progress = totalCh ? Math.round((completedChapters / totalCh) * 100) : 0
 
-      setStats({
+      return {
         totalTime: Math.round(totalTime / 60),
         averageAccuracy,
         completedChapters,
         totalChapters: totalCh,
         progress
-      })
-    }
+      } as ChapterStats
+    },
+    enabled: !!userId,
+    staleTime: 60 * 1000
+  })
 
-    load()
-  }, [resolvedId])
-
-  return stats
+  return {
+    data: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError
+  }
 }
 
 export default useChapterStats
