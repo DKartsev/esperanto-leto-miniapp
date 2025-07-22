@@ -20,6 +20,7 @@ BOT_USERNAME=EsperantoLetoBot
 WEBAPP_URL=https://tgminiapp.esperanto-leto.ru
 
 # OpenAI (опционально)
+OPENAI_API_KEY=your_openai_api_key
 VITE_OPENAI_API_KEY=your_openai_api_key
 
 # Supabase (обязательно)
@@ -295,6 +296,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # OpenAI (опционально)
+OPENAI_API_KEY=your_openai_api_key
 VITE_OPENAI_API_KEY=your_openai_api_key
 ```
 

@@ -13,7 +13,7 @@ const rateLimit = {
 
 export function createOpenAIService() {
   // Validate environment variables
-  const apiKey = process.env.VITE_OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   if (!apiKey || apiKey === 'your_openai_api_key') {
     logger.warn('OpenAI API key is not configured properly');
     return {

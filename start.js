@@ -40,8 +40,8 @@ function checkEnvironment() {
   
   const requiredVars = [
     'TELEGRAM_BOT_TOKEN',
-    'BOT_USERNAME',
-    'WEBAPP_URL'
+    'WEBAPP_URL',
+    'OPENAI_API_KEY'
   ];
   
   const missing = requiredVars.filter(varName => !process.env[varName]);
@@ -56,6 +56,7 @@ function checkEnvironment() {
     console.error('   TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxyz');
     console.error('   BOT_USERNAME=YourBotUsername');
     console.error('   WEBAPP_URL=https://your-domain.com');
+    console.error('   OPENAI_API_KEY=your_openai_api_key');
     process.exit(1);
   }
   
