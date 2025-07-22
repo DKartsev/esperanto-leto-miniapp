@@ -5,10 +5,15 @@
 const BOT_USERNAME = process.env.BOT_USERNAME || 'YOUR_BOT_USERNAME';
 
 function buildWebAppUrl(params = {}) {
-  const base = `https://t.me/${BOT_USERNAME}/webapp`;
+  const envUrl = process.env.WEBAPP_URL;
+  const base = envUrl && envUrl.startsWith('https://')
+    ? envUrl
+    : `https://t.me/${BOT_USERNAME}/webapp`;
+
   if (params && Object.keys(params).length > 0) {
     const search = new URLSearchParams(params);
-    return `${base}?startapp=${encodeURIComponent(search.toString())}`;
+    const query = base.includes('?') ? `&${search.toString()}` : `?${search.toString()}`;
+    return `${base}${query}`;
   }
   return base;
 }
