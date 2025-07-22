@@ -8,7 +8,7 @@ import TestPage from './pages/TestPage'
 import AIChatPage from './pages/AIChatPage'
 import AccountPage from './pages/AccountPage'
 import LandingPage from './pages/LandingPage'
-import LoadingVideo from './components/LoadingVideo'
+import StartupLoader from './components/StartupLoader'
 import { useTelegramUser } from './hooks/useTelegramUser'
 import { syncTelegramProfile } from './services/syncTelegramProfile'
 
@@ -21,11 +21,11 @@ const navItems: NavigationItem[] = [
 
 function App() {
   const telegramUser = useTelegramUser()
-  const [loading, setLoading] = useState(true)
+  const [loadingFinished, setLoadingFinished] = useState(false)
 
   useEffect(() => {
     if (localStorage.getItem('intro_seen') === '1') {
-      setLoading(false)
+      setLoadingFinished(true)
     }
   }, [])
 
@@ -40,11 +40,11 @@ function App() {
 
   const handleIntroFinish = () => {
     localStorage.setItem('intro_seen', '1')
-    setLoading(false)
+    setLoadingFinished(true)
   }
 
-  if (loading) {
-    return <LoadingVideo onFinish={handleIntroFinish} />
+  if (!loadingFinished) {
+    return <StartupLoader onFinish={handleIntroFinish} />
   }
 
   return (
