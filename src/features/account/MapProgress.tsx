@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
 import { supabase } from '../../services/supabaseClient'
@@ -23,7 +22,6 @@ const chapterRequirements: Record<number, number> = {
 }
 
 const MapProgress: FC = () => {
-  const navigate = useNavigate()
   const [items, setItems] = useState<MapItem[]>([])
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const { stats } = useAuth()
@@ -94,7 +92,7 @@ const MapProgress: FC = () => {
             initial={item.justUnlocked ? { scale: 0.5, opacity: 0 } : { scale: 0 }}
             animate={{ scale: item.justUnlocked ? 1.1 : 1, opacity: 1 }}
             transition={{ delay: index * 0.1, duration: 0.4, ease: 'easeOut' }}
-            onClick={item.locked ? undefined : () => navigate(`/chapter/${item.id}`)}
+            onClick={item.locked ? undefined : () => console.log('Open chapter', item.id)}
             className={clsx('cursor-pointer', item.locked && 'opacity-50 pointer-events-none')}
           >
             <div
