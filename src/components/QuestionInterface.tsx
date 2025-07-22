@@ -2,7 +2,7 @@ import { useState, type FC } from 'react';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
-import { saveProgress } from '../services/progressService'
+import { saveProgressBulk, saveTestResults } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLoadData } from '../hooks/useLoadData';
 import TheoryBlock from './TheoryBlock';
@@ -39,6 +39,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
 }) => {
   const { refreshStats, isAuthenticated } = useAuth()
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [startTime] = useState(Date.now())
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -133,33 +134,36 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
 
     if (!isAuthenticated) {
       console.warn('Answer not saved: user is not authenticated')
-      return
-    }
-
-    try {
-      await saveProgress({
-        chapterId,
-        sectionId,
-        questionId: currentQuestionData.id,
-        selectedAnswer: answer,
-        isCorrect: correct,
-        timeSpent: 0,
-        hintsUsed,
-      })
-      await refreshStats()
-    } catch (err) {
-      console.error('Ошибка сохранения ответа:', err)
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion + 1 >= totalQuestions) {
-      onComplete({
+      const results = {
         totalQuestions,
         correctAnswers: answers.filter(a => a.isCorrect).length,
         incorrectAnswers: answers.filter(a => !a.isCorrect),
         totalHintsUsed: answers.reduce((sum, a) => sum + a.hintsUsed, 0)
-      });
+      }
+
+      if (isAuthenticated) {
+        try {
+          await saveProgressBulk(chapterId, sectionId, answers)
+          const spent = Math.round((Date.now() - startTime) / 1000)
+          await saveTestResults(
+            chapterId,
+            sectionId,
+            results.correctAnswers,
+            results.totalQuestions,
+            spent
+          )
+          await refreshStats()
+        } catch (err) {
+          console.error('Ошибка сохранения результатов:', err)
+        }
+      }
+
+      onComplete(results)
     } else {
       setCurrentQuestion(prev => prev + 1);
       setSelectedAnswer('');
