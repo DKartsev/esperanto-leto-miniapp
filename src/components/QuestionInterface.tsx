@@ -1,6 +1,7 @@
-import { useState, type FC } from 'react';
-import { motion } from 'framer-motion';
-import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
+import { useState, type FC } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { HelpCircle, Eye, ArrowRight, X, Book, Brain } from 'lucide-react'
+import Tooltip from './ui/Tooltip'
 import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
 import { saveProgressBulk, saveTestResults } from '../services/progressService'
@@ -47,6 +48,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [answers, setAnswers] = useState<QuestionResultItem[]>([]);
+  const [isExiting, setIsExiting] = useState(false)
   const [showTheory, setShowTheory] = useState(true);
   const [currentTheoryBlock, setCurrentTheoryBlock] = useState(0);
   const [theoryBlocks, setTheoryBlocks] = useState<Array<{ id: number; title: string; content: string; examples: string[]; key_terms: string[] }>>([])
@@ -117,6 +119,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     return `Раздел ${sectionId}`;
   };
 
+  const termTranslations: Record<string, string> = {
+    saluton: 'привет',
+    dankon: 'спасибо'
+  }
+
   const handleAnswerSelect = async (answer: string) => {
     setSelectedAnswer(answer)
     const correct = answer === currentQuestionData.correctAnswer
@@ -180,6 +187,14 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     setSelectedAnswer(currentQuestionData.correctAnswer);
     setIsCorrect(true);
   };
+
+  const handleNextDelayed = () => {
+    setIsExiting(true)
+    setTimeout(async () => {
+      setIsExiting(false)
+      await handleNext()
+    }, 800)
+  }
 
   const handleHint = () => {
     if (hintsUsed < 2 && hintsUsed < currentQuestionData.hints.length) {
@@ -245,13 +260,20 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
         {/* Theory Content */}
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8 mb-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-xl shadow-sm border border-emerald-200 p-8 mb-6"
+            >
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
                   <Book className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-semibold text-emerald-900">Теория</h2>
+                  <h2 className="text-2xl font-semibold text-emerald-900 flex items-center gap-1">
+                    <Brain className="w-6 h-6" /> Теория
+                  </h2>
                   <p className="text-emerald-700">{currentTheory.title}</p>
                 </div>
               </div>
@@ -276,9 +298,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
                   <h3 className="text-xl font-semibold text-emerald-900 mb-4">Ключевые термины:</h3>
                   <div className="flex flex-wrap gap-3">
                     {currentTheory.key_terms.map((term, index) => (
-                      <span key={index} className="bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-medium">
-                        {term}
-                      </span>
+                      <Tooltip key={index} text={termTranslations[term] || term}>
+                        <span className="cursor-pointer bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-medium">
+                          {term}
+                        </span>
+                      </Tooltip>
                     ))}
                   </div>
                 </div>
@@ -321,7 +345,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -369,7 +393,14 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
 
       {/* Question Content */}
       <div className="p-6">
-        <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentQuestionData.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={isExiting ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6"
+          >
           <h2 className="text-xl font-semibold text-emerald-900 mb-6">
             {currentQuestionData.question}
           </h2>
@@ -381,14 +412,14 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
                 key={index}
                 onClick={() => handleAnswerSelect(option)}
                 disabled={selectedAnswer !== ''}
-                className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
+                className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95 ${
                   selectedAnswer === option
                     ? isCorrect
                       ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
                       : 'border-red-500 bg-red-50 text-red-800'
                     : selectedAnswer !== '' && option === currentQuestionData.correctAnswer
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                    : 'border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                      : 'border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50'
                 } ${selectedAnswer !== '' ? 'cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <div className="flex items-center justify-between">
@@ -434,9 +465,9 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
           {!selectedAnswer && hintsUsed < 2 && (
             <button
               onClick={handleHint}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+              className="flex-1 bg-blue-100 text-blue-800 font-semibold py-2 px-3 rounded-lg transition-transform duration-200 flex items-center justify-center space-x-2 hover:scale-105 active:scale-95"
             >
-              <HelpCircle className="w-5 h-5" />
+              <span role="img" aria-label="hint">💡</span>
               <span>Подсказка ({2 - hintsUsed})</span>
             </button>
           )}
@@ -444,25 +475,27 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
           {!selectedAnswer && (
             <button
               onClick={handleShowAnswer}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+              className="flex-1 bg-gray-100 text-gray-800 font-semibold py-2 px-3 rounded-lg transition-transform duration-200 flex items-center justify-center space-x-2 hover:scale-105 active:scale-95"
             >
-              <Eye className="w-5 h-5" />
+              <span role="img" aria-label="answer">👁</span>
               <span>Показать ответ</span>
             </button>
           )}
           
           {selectedAnswer && (
             <button
-              onClick={handleNext}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+              onClick={handleNextDelayed}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-transform duration-200 flex items-center justify-center space-x-2 hover:scale-105 active:scale-95"
             >
               <span>{currentQuestion + 1 >= totalQuestions ? 'Завершить' : 'Следующий'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
+      </AnimatePresence>
     </div>
+  </div>
   );
 };
 
