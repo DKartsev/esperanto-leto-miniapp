@@ -44,8 +44,8 @@ export const fetchEsperantoData = async (): Promise<Chapter[]> => {
   if (cache) return cache;
   const res = await fetch('/esperantoData.json');
   if (!res.ok) throw new Error('Failed to load esperanto data');
-  cache = await res.json();
-  return cache;
+  cache = (await res.json()) as Chapter[];
+  return cache ?? [];
 };
 
 export const getChapterById = (

@@ -68,12 +68,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
   const chapterStats = useChapterStats(resolvedUserId)
   const {
-    startDate,
-    completedChapters,
-    averageAccuracy,
-    chapterProgress,
+    startDate = null,
+    completedChapters = 0,
+    averageAccuracy = 0,
+    chapterProgress = [],
     recommendedChapter,
-    progressData
+    progressData = []
   } = useUserProgress(resolvedUserId)
 
   useEffect(() => {

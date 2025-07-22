@@ -37,9 +37,9 @@ export const useUserProgress = (userId?: string | null) => {
     void resolve()
   }, [userId])
 
-  const { data, isLoading } = useQuery(
-    ['user-progress', resolvedId],
-    async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['user-progress', resolvedId],
+    queryFn: async () => {
       if (!resolvedId) return null
       const [progressRes, chaptersRes] = await Promise.all([
         supabase
@@ -106,7 +106,7 @@ export const useUserProgress = (userId?: string | null) => {
       const avgAccuracy = progress.length ? Math.round((correctAnswers / progress.length) * 100) : 0
 
       return {
-        startDate: firstDate ? firstDate.toISOString() : null,
+        startDate: firstDate ? new Date(firstDate).toISOString() : null,
         completedChapters,
         totalStudyMinutes: Math.floor(totalTime / 60),
         averageAccuracy: avgAccuracy,
@@ -118,8 +118,9 @@ export const useUserProgress = (userId?: string | null) => {
         sectionProgressMap
       }
     },
-    { enabled: !!resolvedId, staleTime: 60 * 1000 }
-  )
+    enabled: !!resolvedId,
+    staleTime: 60 * 1000
+  })
 
   return {
     progressLoading: isLoading,
