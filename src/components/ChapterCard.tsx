@@ -38,6 +38,7 @@ const ChapterCard: FC<ChapterCardProps> = ({ number, title, subtitle, level, onS
       >
         <Play className="w-4 h-4" />
         <span>Начать</span>
+        <span className="ml-2 text-xs text-white/80">+20 XP</span>
       </button>
     </div>
   );

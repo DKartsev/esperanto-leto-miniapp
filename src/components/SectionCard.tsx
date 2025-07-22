@@ -28,7 +28,10 @@ const SectionCard: FC<SectionCardProps> = ({ id, title, progress, locked = false
         </span>
         <ProgressBar percent={progress} />
       </div>
-      <Play className="w-5 h-5 text-emerald-600" />
+      <div className="flex items-center gap-1">
+        <span className="text-xs text-emerald-600 font-medium">+20 XP</span>
+        <Play className="w-5 h-5 text-emerald-600" />
+      </div>
       <span className="absolute top-2 right-2 text-sm opacity-70">{status}</span>
     </button>
   )

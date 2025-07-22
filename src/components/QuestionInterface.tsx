@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { motion } from 'framer-motion';
 import { HelpCircle, Eye, ArrowRight, X, Book } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
@@ -393,11 +394,11 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{option}</span>
                   {selectedAnswer === option && isCorrect && (
-                    <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }} className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                    </div>
+                    </motion.div>
                   )}
                   {selectedAnswer === option && !isCorrect && (
                     <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">

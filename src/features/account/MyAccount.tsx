@@ -11,6 +11,7 @@ import AccountStats from './AccountStats'
 import AccountProgress from './AccountProgress'
 import SectionProgressList from './SectionProgressList'
 import StatsCarousel from './StatsCarousel'
+import Achievements from './Achievements'
 import useChapterStats from '../../hooks/useChapterStats'
 import useUserProgress from '../../hooks/useUserProgress'
 import { getFullUserProgress } from '../../services/progressService'
@@ -189,6 +190,10 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     chapterStats?.completedChapters ?? completedChapters
   const totalSections = chapterProgress.reduce((sum, cp) => sum + cp.totalSections, 0)
   const completedSections = chapterProgress.reduce((sum, cp) => sum + cp.completedSections, 0)
+  const xp = progressStats.completedSections * 20
+  const nextLevelXp = 200
+  const level = xp < nextLevelXp ? 'A1' : 'A2'
+  const xpPercent = Math.min(((xp % nextLevelXp) / nextLevelXp) * 100, 100)
 
   if (loading || statsLoading) {
     return (
@@ -282,6 +287,15 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         </div>
       </div>
       <div className="p-6">
+        <div className="mb-4">
+          <div className="flex justify-between items-center text-sm font-medium mb-1">
+            <span>Уровень: {level}</span>
+            <span>XP: {xp} / {nextLevelXp}</span>
+          </div>
+          <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+            <div className="h-2 bg-emerald-500 rounded-full" style={{ width: `${xpPercent}%` }} />
+          </div>
+        </div>
         <StatsCarousel
           totalTime={progressStats.totalTime}
           averageAccuracy={averageAccuracy}
@@ -293,43 +307,9 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         />
         <div className="mt-4">
           <h3 className="text-base font-semibold text-gray-900 mb-2">🏆 Достижения</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { icon: '✅', label: 'Перфекционист — 100% точности в одной главе' },
-              { icon: '⏳', label: 'Устойчивость — более 30 мин обучения' },
-              { icon: '🎯', label: 'Первая победа — пройден первый раздел' }
-            ].map(a => (
-              <div
-                key={a.label}
-                className="flex flex-col items-center gap-y-1 bg-white rounded-2xl shadow-sm p-4"
-              >
-                <span className="text-xl">{a.icon}</span>
-                <p className="text-xs text-gray-500 text-center">{a.label}</p>
-              </div>
-            ))}
-          </div>
+          <Achievements completed={achievements?.map(a => a.achievement_type) || []} />
         </div>
-        {isDev && (
-          <div className="text-sm text-emerald-700 mb-4">
-            <p>⏱️ Save Progress: {debugCall || 'не вызывался'}</p>
-            <p>✅ Статус: {debugStatus || 'нет данных'}</p>
-            <p>❌ Ошибка: {debugError || 'ошибок нет'}</p>
-          </div>
-        )}
 
-        {achievements && achievements.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-yellow-200 p-6 mb-6">
-            <h2 className="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
-              <Trophy className="w-5 h-5 mr-2" />
-              Достижения
-            </h2>
-            <ul className="list-disc pl-5 space-y-1">
-              {achievements.map((a: any, idx: number) => (
-                <li key={idx} className="text-yellow-700">{a.achievement_type}</li>
-              ))}
-            </ul>
-          </div>
-        )}
         {progressData && progressData.length > 0 && (
           <SectionProgressList progress={progressData} />
         )}
