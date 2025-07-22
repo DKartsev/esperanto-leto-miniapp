@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, type FC } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Settings, Users, BookOpen, BarChart3, AlertTriangle, Shield, TrendingUp, CheckCircle, X } from 'lucide-react';
 import { isAdmin } from '../../utils/adminUtils.js';
-import esperantoData, { Chapter } from '../../data/esperantoData';
+import { Chapter, fetchEsperantoData } from '../../data/esperantoData';
 import ChapterEditor from './ChapterEditor';
 import UserManagement from './UserManagement';
 import LogsView from './LogsView';
@@ -51,13 +51,13 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  const [chapters, setChapters] = useState<Chapter[]>(esperantoData);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [users, setUsers] = useState<UserProgress[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [systemStats, setSystemStats] = useState<SystemStats>({
     totalUsers: 0,
     activeUsers: 0,
-    totalChapters: esperantoData.length,
+    totalChapters: 0,
     totalQuestions: 0,
     averageProgress: 0,
     completionRate: 0
@@ -94,6 +94,12 @@ const AdminPanel: FC<AdminPanelProps> = ({ onClose, currentUser, currentEmail })
     ];
     setAdminUsers(mockAdminUsers);
   };
+
+  useEffect(() => {
+    void fetchEsperantoData()
+      .then(setChapters)
+      .catch(err => console.error('Failed to load course data', err));
+  }, []);
 
   const loadAnalytics = useCallback(() => {
     const totalQuestions = chapters.reduce((total, chapter) => total + chapter.sections.reduce((s, sec) => s + (sec.questions?.length || 0), 0), 0);
