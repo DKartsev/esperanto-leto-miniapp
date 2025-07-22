@@ -1,26 +1,37 @@
-import { Home, FileText, Bot, User } from 'lucide-react'
-import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { NavigationItem } from './components/NavigationBar'
+import { useLocation, useNavigate } from 'react-router-dom'
 import MainLayout from './layout/MainLayout'
 import LearningPage from './pages/LearningPage'
 import TestPage from './pages/TestPage'
 import AccountPage from './pages/AccountPage'
+import BottomNavigation from './components/BottomNavigation'
 const AIChatPage = lazy(() => import('./pages/AIChatPage'))
-const LandingPage = lazy(() => import('./pages/LandingPage'))
 import StartupLoader from './components/StartupLoader'
 
-const navItems: NavigationItem[] = [
-  { id: 'home', label: 'Главная', icon: Home, path: '/' },
-  { id: 'test', label: 'Тест', icon: FileText, path: '/test' },
-  { id: 'ai', label: 'AI', icon: Bot, path: '/ai' },
-  { id: 'account', label: 'Мой аккаунт', icon: User, path: '/account' },
-];
+
+type Tab = 'home' | 'test' | 'ai' | 'profile'
 
 function App() {
   const [loadingFinished, setLoadingFinished] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+  const [currentTab, setCurrentTab] = useState<Tab>('home')
+
+  const tabPaths: Record<Tab, string> = {
+    home: '/',
+    test: '/test',
+    ai: '/ai',
+    profile: '/account'
+  }
+
+  useEffect(() => {
+    const path = location.pathname
+    if (path.startsWith('/test')) setCurrentTab('test')
+    else if (path.startsWith('/ai')) setCurrentTab('ai')
+    else if (path.startsWith('/account')) setCurrentTab('profile')
+    else setCurrentTab('home')
+  }, [location.pathname])
 
   useEffect(() => {
     if (localStorage.getItem('intro_seen') === '1') {
@@ -38,81 +49,39 @@ function App() {
     return <StartupLoader onFinish={handleIntroFinish} />
   }
 
+  const tabs: Record<Tab, JSX.Element> = {
+    home: <LearningPage />,
+    test: <TestPage />,
+    ai: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <AIChatPage />
+      </Suspense>
+    ),
+    profile: <AccountPage />,
+  }
+
+  const changeTab = (tab: Tab) => {
+    setCurrentTab(tab)
+    navigate(tabPaths[tab], { replace: true })
+  }
+
   return (
-    <MainLayout items={navItems}>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.2 }}
-              >
-                <LearningPage />
-              </motion.div>
-            }
-          />
-          <Route
-            path="/test"
-            element={
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.2 }}
-              >
-                <TestPage />
-              </motion.div>
-            }
-          />
-          <Route
-            path="/ai"
-            element={
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Suspense fallback={<div>Loading...</div>}>
-                  <AIChatPage />
-                </Suspense>
-              </motion.div>
-            }
-          />
-          <Route
-            path="/account"
-            element={
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.2 }}
-              >
-                <AccountPage />
-              </motion.div>
-            }
-          />
-          <Route
-            path="/landing"
-            element={
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Suspense fallback={<div>Loading...</div>}>
-                  <LandingPage />
-                </Suspense>
-              </motion.div>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
+    <MainLayout>
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentTab}
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -50, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
+          >
+            {tabs[currentTab]}
+          </motion.div>
+        </AnimatePresence>
+        <BottomNavigation currentTab={currentTab} setCurrentTab={changeTab} />
+      </div>
     </MainLayout>
   )
 }
