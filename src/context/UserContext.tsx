@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { supabase } from '../services/supabaseClient';
+import { syncTelegramProfile } from '../services/syncTelegramProfile';
 
 export const UserContext = createContext<{ userId: string | null; profile: any | null }>({
   userId: null,
@@ -13,40 +14,39 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<any | null>(null);
 
   useEffect(() => {
-    async function fetchOrCreate() {
-      const telegramId = telegramUser?.id || localStorage.getItem('telegram_id');
-      if (!telegramId) return;
+    async function fetchProfile() {
+      if (telegramUser) {
+        const data = await syncTelegramProfile(telegramUser);
+        if (data) {
+          setProfile(data);
+          setUserId(data.id);
+          localStorage.setItem('user_id', data.id);
+          localStorage.setItem('telegram_id', String(data.telegram_id));
+          return;
+        }
+      }
 
-      let { data, error } = await supabase
+      const storedId = localStorage.getItem('telegram_id');
+      if (!storedId) return;
+
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('telegram_id', telegramId)
+        .eq('telegram_id', storedId)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Ошибка при получении профиля:', error);
         return;
       }
 
-      if (!data) {
-        const { data: newProfile, error: insertError } = await supabase
-          .from('profiles')
-          .insert([{ telegram_id: telegramId, created_at: new Date().toISOString() }])
-          .select()
-          .single();
-        if (insertError) {
-          console.error('Ошибка создания профиля:', insertError);
-          return;
-        }
-        data = newProfile;
+      if (data) {
+        setProfile(data);
+        setUserId(data.id);
       }
-
-      setProfile(data);
-      setUserId(data.id);
-      localStorage.setItem('user_id', data.id);
-      localStorage.setItem('telegram_id', String(telegramId));
     }
-    fetchOrCreate();
+
+    fetchProfile();
   }, [telegramUser]);
 
   return <UserContext.Provider value={{ userId, profile }}>{children}</UserContext.Provider>;

@@ -9,8 +9,6 @@ import AIChatPage from './pages/AIChatPage'
 import AccountPage from './pages/AccountPage'
 import LandingPage from './pages/LandingPage'
 import StartupLoader from './components/StartupLoader'
-import { useTelegramUser } from './hooks/useTelegramUser'
-import { syncTelegramProfile } from './services/syncTelegramProfile'
 
 const navItems: NavigationItem[] = [
   { id: 'home', label: 'Главная', icon: Home, path: '/' },
@@ -20,7 +18,6 @@ const navItems: NavigationItem[] = [
 ];
 
 function App() {
-  const telegramUser = useTelegramUser()
   const [loadingFinished, setLoadingFinished] = useState(false)
 
   useEffect(() => {
@@ -29,14 +26,6 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
-    if (telegramUser) {
-      syncTelegramProfile(telegramUser).then(profile => {
-        console.log('Профиль пользователя синхронизирован:', profile)
-        // Можно сохранить UUID в стейт, localStorage или context
-      })
-    }
-  }, [telegramUser])
 
   const handleIntroFinish = () => {
     localStorage.setItem('intro_seen', '1')
