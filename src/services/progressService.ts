@@ -31,7 +31,9 @@ export async function saveProgress({
 }): Promise<any> {
   try {
     const currentUser = await getCurrentUser()
-    const userId = currentUser?.id
+    const userId = Array.isArray(currentUser?.id)
+      ? currentUser?.id[0]
+      : currentUser?.id
     if (!userId) {
       console.warn('userId not available')
       return null
@@ -72,7 +74,9 @@ export async function saveProgress({
             chapter_id: chapterId,
             section_id: sectionId,
             question_id: questionId,
-            selected_answer: selectedAnswer,
+            selected_answer: Array.isArray(selectedAnswer)
+              ? selectedAnswer.join(', ')
+              : selectedAnswer,
             is_correct: isCorrect,
             time_spent: timeSpent,
             hints_used: hintsUsed,
