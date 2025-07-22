@@ -1,6 +1,6 @@
 import { FC, useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Shield, LogOut, Check, Trophy } from 'lucide-react'
+import { User, Shield, LogOut, Check } from 'lucide-react'
 import { useAuth } from '../../components/SupabaseAuthProvider'
 import { isAdmin } from '../../utils/adminUtils.js'
 import { findOrCreateUserProfile, getCurrentUser } from '../../services/authService'
@@ -103,11 +103,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     fetchProgressData()
   }, [])
 
-  // Debug info from localStorage about saveProgress
-  const debugCall = localStorage.getItem('saveProgress_called')
-  const debugStatus = localStorage.getItem('saveProgress_success')
-  const debugError = localStorage.getItem('saveProgress_error')
-  const isDev = import.meta.env.DEV
 
   useEffect(() => {
     setNewUsername(profile?.username || '')

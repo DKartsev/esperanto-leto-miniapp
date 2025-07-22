@@ -142,10 +142,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
 
 
-  const getNextRecommendedChapter = () => {
-    return chapters.find(ch => !ch.isLocked && !ch.isCompleted);
-  };
-
   const recommendedChapters = chapters
     .filter(ch => !ch.isLocked && !ch.isCompleted)
     .slice(0, 2);
@@ -156,7 +152,6 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     return true;
   });
 
-  const recommendedChapter = getNextRecommendedChapter();
 
   const handleToggleChapter = async (chapter: Chapter) => {
     if (chapter.isLocked && !hasAdminAccess()) return;

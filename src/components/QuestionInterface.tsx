@@ -1,6 +1,6 @@
 import { useState, type FC } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HelpCircle, Eye, ArrowRight, X, Book, Brain } from 'lucide-react'
+import { ArrowRight, X, Book, Brain } from 'lucide-react'
 import Tooltip from './ui/Tooltip'
 import LoadingScreen from './LoadingScreen';
 import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
