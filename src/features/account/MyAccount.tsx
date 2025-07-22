@@ -107,15 +107,15 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     setNewUsername(profile?.username || '')
   }, [profile])
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await signOut()
     } catch (error) {
       console.error('❌ Ошибка выхода:', error)
     }
-  }
+  }, [signOut])
 
-  const handleUsernameSave = async () => {
+  const handleUsernameSave = useCallback(async () => {
     try {
       if (!newUsername || newUsername === profile?.username) {
         setIsEditingUsername(false)
@@ -126,12 +126,12 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     } catch (error) {
       console.error('Ошибка обновления имени пользователя:', error)
     }
-  }
+  }, [newUsername, profile?.username, updateProfile])
 
-  const handleUsernameCancel = () => {
+  const handleUsernameCancel = useCallback(() => {
     setNewUsername(profile?.username || '')
     setIsEditingUsername(false)
-  }
+  }, [profile?.username])
 
   const handleTelegramLogin = useCallback(async () => {
     const tgUser = getTelegramUser()
