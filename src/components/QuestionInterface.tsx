@@ -5,6 +5,7 @@ import { fetchTheoryBlocks, fetchQuestions } from '../services/courseService'
 import { saveProgress } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLoadData } from '../hooks/useLoadData';
+import TheoryBlock from './TheoryBlock';
 
 
 export interface QuestionResultItem {
@@ -251,11 +252,7 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
               </div>
 
               <div className="prose prose-emerald max-w-none">
-                <div className="text-emerald-800 text-lg leading-relaxed mb-6 space-y-4">
-                  {currentTheory.content.split('\n').map((line, idx) => (
-                    <p key={idx}>{line}</p>
-                  ))}
-                </div>
+                <TheoryBlock content={currentTheory.content} />
 
                 {/* Examples */}
                 <div className="mb-6">
