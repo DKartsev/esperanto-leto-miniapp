@@ -5,10 +5,10 @@ import { useCallback } from 'react'
 const AccountPage = () => {
   const navigate = useNavigate()
 
-  const handleBackToHome = useCallback(() => {
-    document.activeElement?.blur()
-    navigate('/', { replace: true })
-  }, [navigate])
+    const handleBackToHome = useCallback(() => {
+      ;(document.activeElement as HTMLElement | null)?.blur()
+      navigate('/', { replace: true })
+    }, [navigate])
 
   return (
     <MyAccount
