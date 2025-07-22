@@ -86,7 +86,7 @@ export async function saveProgress({
           } as any
         ],
         {
-          onConflict: ['user_id', 'section_id']
+          onConflict: 'user_id, section_id'
         }
       )
 
