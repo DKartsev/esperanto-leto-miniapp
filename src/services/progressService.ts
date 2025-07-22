@@ -736,3 +736,46 @@ function calculateOverallProgress(completedChapters: number): number {
   const totalChapters = 14 // Общее количество глав в курсе
   return Math.round((completedChapters / totalChapters) * 100)
 }
+
+export interface ContinueInfo {
+  chapterId: number
+  chapterTitle: string
+  sectionId: number
+  sectionTitle: string
+}
+
+export async function getLastIncompleteSection(): Promise<ContinueInfo | null> {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return null
+
+    const { data: row, error } = await supabase
+      .from('user_progress')
+      .select('chapter_id, section_id, answered_at, completed')
+      .eq('user_id', user.id)
+      .neq('completed', true)
+      .order('answered_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error || !row) return null
+
+    const [sectionRes, chapterRes] = await Promise.all([
+      supabase.from('sections').select('title').eq('id', row.section_id).maybeSingle(),
+      supabase.from('chapters').select('title').eq('id', row.chapter_id).maybeSingle(),
+    ])
+
+    if (sectionRes.error || chapterRes.error) return null
+    if (!sectionRes.data || !chapterRes.data) return null
+
+    return {
+      chapterId: row.chapter_id,
+      chapterTitle: chapterRes.data.title || '',
+      sectionId: row.section_id,
+      sectionTitle: sectionRes.data.title || '',
+    }
+  } catch (err) {
+    console.error('Ошибка поиска незавершённого раздела:', err)
+    return null
+  }
+}
