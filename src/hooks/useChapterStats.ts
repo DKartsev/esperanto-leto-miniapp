@@ -11,11 +11,19 @@ export interface ChapterStats {
   progress: number
 }
 
-export const useChapterStats = (userId?: string | null) => {
-  const query = useQuery({
+export interface UseChapterStatsResult {
+  data: ChapterStats | null
+  isLoading: boolean
+  isError: boolean
+}
+
+export const useChapterStats = (userId: string | null): UseChapterStatsResult => {
+  const query = useQuery<ChapterStats>({
     queryKey: ['chapter-stats', userId],
     queryFn: async () => {
-      if (!userId) return null
+      if (!userId) {
+        throw new Error('userId is required')
+      }
       let resolvedId = userId
       if (/^\d+$/.test(String(userId))) {
         const tgUser = getTelegramUser()
@@ -62,7 +70,7 @@ export const useChapterStats = (userId?: string | null) => {
         completedChapters,
         totalChapters: totalCh,
         progress
-      } as ChapterStats
+      }
     },
     enabled: !!userId,
     staleTime: 60 * 1000
