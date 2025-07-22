@@ -1,25 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 export function useLoadData<T>(loader: () => Promise<T>, deps: any[] = []) {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const isMountedRef = useRef(true)
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const result = await loader()
-      setData(result)
+      if (isMountedRef.current) {
+        setData(result)
+      }
     } catch (err: any) {
-      setError(err?.message || 'Ошибка загрузки')
+      if (isMountedRef.current) {
+        setError(err?.message || 'Ошибка загрузки')
+      }
     } finally {
-      setLoading(false)
+      if (isMountedRef.current) {
+        setLoading(false)
+      }
     }
-  }
+  }, [loader])
 
   useEffect(() => {
-    loadData()
+    isMountedRef.current = true
+    void loadData()
+    return () => {
+      isMountedRef.current = false
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 
