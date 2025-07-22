@@ -104,6 +104,63 @@ export async function saveProgress({
 // Для обратной совместимости
 export const saveAnswer = saveProgress
 
+export interface BulkAnswer {
+  questionId: number | null
+  selectedAnswer: string | string[]
+  isCorrect: boolean
+  timeSpent?: number
+  hintsUsed?: number
+}
+
+/**
+ * Сохранить несколько ответов пользователя разом
+ */
+export async function saveProgressBulk(
+  chapterId: number,
+  sectionId: number,
+  answers: BulkAnswer[]
+): Promise<any> {
+  try {
+    const currentUser = await getCurrentUser()
+    const userId = Array.isArray(currentUser?.id)
+      ? currentUser?.id[0]
+      : currentUser?.id
+    if (!userId) {
+      console.warn('userId not available')
+      return null
+    }
+
+    if (!answers.length) return null
+
+    const rows = answers.map(a => ({
+      user_id: userId,
+      chapter_id: chapterId,
+      section_id: sectionId,
+      question_id: a.questionId,
+      selected_answer: Array.isArray(a.selectedAnswer)
+        ? a.selectedAnswer.join(', ')
+        : String(a.selectedAnswer),
+      is_correct: a.isCorrect,
+      time_spent: a.timeSpent ?? 0,
+      hints_used: a.hintsUsed ?? 0,
+      answered_at: new Date().toISOString()
+    })) as any[]
+
+    const { data, error } = await supabase
+      .from('user_progress')
+      .upsert(rows, { onConflict: 'user_id, question_id' })
+
+    if (error) {
+      console.error('❌ Ошибка bulk upsert прогресса:', error)
+    }
+
+    return data
+  } catch (err) {
+    console.error('Ошибка в saveProgressBulk:', err)
+    return null
+  }
+}
+
 /**
  * Получить весь прогресс пользователя
  * @returns {Promise<Array>} Массив ответов пользователя
