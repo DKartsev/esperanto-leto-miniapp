@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { SkeletonCard } from './Skeletons';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
-import { getAllChaptersProgressPercent, getSectionProgressPercent } from '../services/progressService'
+import { getAllChaptersProgressPercent, getSectionProgressPercent, getLastIncompleteSection, type ContinueInfo } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
 import { supabase } from '../services/supabaseClient'
 
@@ -39,6 +39,7 @@ interface ChaptersListProps {
 const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = '' }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [continueInfo, setContinueInfo] = useState<ContinueInfo | null>(null);
 
   // Функция для проверки прав администратора
   const hasAdminAccess = () => {
@@ -52,6 +53,14 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [openChapterId, setOpenChapterId] = useState<number | null>(null)
   const [sectionsByChapter, setSectionsByChapter] = useState<Record<number, Section[]>>({})
+
+  useEffect(() => {
+    const fetchContinue = async () => {
+      const info = await getLastIncompleteSection()
+      setContinueInfo(info)
+    }
+    fetchContinue()
+  }, [])
 
   useEffect(() => {
     const load = async () => {
@@ -137,6 +146,10 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     return chapters.find(ch => !ch.isLocked && !ch.isCompleted);
   };
 
+  const recommendedChapters = chapters
+    .filter(ch => !ch.isLocked && !ch.isCompleted)
+    .slice(0, 2);
+
   const filteredChapters = chapters.filter(chapter => {
     if (showOnlyAvailable && chapter.isLocked) return false;
     if (selectedDifficulty !== 'all' && chapter.difficulty !== selectedDifficulty) return false;
@@ -184,7 +197,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   }
 
   return (
-    <div className="min-h-screen mx-auto max-w-screen-sm p-4 sm:p-6 space-y-6">
+    <div className="min-h-screen pb-24 mx-auto max-w-screen-sm p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-2">Изучение эсперанто</h1>
@@ -207,27 +220,46 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       <div className="grid grid-cols-1 gap-6">
 
-      {/* Recommended Chapter */}
-      {recommendedChapter && (
-        <div className="bg-emerald-50 rounded-xl shadow p-4 mb-4 mx-4 text-left">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-800 mb-2">
-            📚 Рекомендуется изучить
-          </h3>
-          <p className="text-base font-semibold text-gray-900 mb-1 break-words" style={{ textWrap: 'balance' }}>
-            {recommendedChapter.title}
-          </p>
-          {recommendedChapter.description && recommendedChapter.description !== 'Нет данных' && (
-            <p className="text-sm text-gray-600 mb-3 break-words">
-              {recommendedChapter.description}
-            </p>
-          )}
-          <button
-            onClick={() => onChapterSelect(recommendedChapter.id)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg transition"
-          >
-            Начать обучение
-          </button>
-        </div>
+      {continueInfo && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1 }} className="mx-4">
+          <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">Вы остановились на:</p>
+              <p className="font-semibold text-gray-900">
+                {`Глава ${continueInfo.chapterId} — ${continueInfo.sectionTitle}`}
+              </p>
+            </div>
+            <button
+              className="bg-emerald-500 text-white px-3 py-1 rounded-xl text-sm hover:bg-emerald-600 transition"
+              onClick={() => onChapterSelect(continueInfo.chapterId)}
+            >
+              Продолжить ▶
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {recommendedChapters.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="px-4">
+          <h3 className="text-lg font-semibold text-emerald-800 mb-2">Рекомендуется изучить</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {recommendedChapters.map(ch => (
+              <button
+                key={ch.id}
+                onClick={() => onChapterSelect(ch.id)}
+                className="bg-emerald-50 rounded-xl shadow p-3 flex flex-col text-left"
+              >
+                <span
+                  className="text-sm font-semibold text-gray-900 mb-1"
+                  style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                >
+                  {ch.title}
+                </span>
+                <span className="text-xs text-emerald-600">{ch.progress}%</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
       )}
 
       {/* Filters */}
@@ -270,14 +302,14 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Chapters Grid */}
       <div className="grid gap-4">
-        {filteredChapters.map((chapter) => {
+        {filteredChapters.map((chapter, i) => {
           const status = chapter.isLocked && !hasAdminAccess()
             ? '🔒'
             : chapter.isCompleted
               ? '✅'
               : '🔓'
           return (
-          <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
+          <motion.div key={chapter.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.1 }} className="w-full max-w-sm mx-auto px-4">
             <div
               className={`relative bg-white rounded-2xl shadow-sm p-3 py-2 space-y-1 ${
                 chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''
@@ -297,12 +329,20 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   >
                     {chapter.isLocked && !hasAdminAccess() ? <Lock className="w-4 h-4" /> : chapter.id}
                   </div>
-                  <h3 className="text-sm font-semibold text-emerald-900 truncate">{chapter.title}</h3>
+                  <h3
+                    className="text-sm font-semibold text-gray-900"
+                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                  >
+                    {chapter.title}
+                  </h3>
                 </div>
                 <ChevronDown
                   className={`w-4 h-4 text-emerald-600 transition-transform ${openChapterId === chapter.id ? 'rotate-180' : ''}`}
                 />
               </button>
+              <p className="text-xs text-emerald-600 mt-1">
+                {chapter.progress >= 100 ? '✅ 100%' : `${chapter.progress}%`}
+              </p>
 
               {openChapterId === chapter.id && (
                 <motion.ul
@@ -353,7 +393,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </button>
             </div>
           </div>
-        ))}
+        </motion.div>))}
       </div>
 
       {/* Learning Tips */}
