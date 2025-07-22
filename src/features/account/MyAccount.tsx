@@ -106,6 +106,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const debugCall = localStorage.getItem('saveProgress_called')
   const debugStatus = localStorage.getItem('saveProgress_success')
   const debugError = localStorage.getItem('saveProgress_error')
+  const isDev = import.meta.env.DEV
 
   useEffect(() => {
     setNewUsername(profile?.username || '')
@@ -275,6 +276,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
               completedChapters={chapterStats.completedChapters}
               totalChapters={chapterStats.totalChapters}
               startDate={startDate}
+              totalTime={progressStats.totalTime}
             />
           )}
         </div>
@@ -289,12 +291,31 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
           totalSections={totalSections}
           startDate={startDate}
         />
-        {/* Debug info to check saveProgress() calls */}
-        <div className="text-sm text-emerald-700 mb-4">
-          <p>⏱️ Save Progress: {debugCall || 'не вызывался'}</p>
-          <p>✅ Статус: {debugStatus || 'нет данных'}</p>
-          <p>❌ Ошибка: {debugError || 'ошибок нет'}</p>
+        <div className="mt-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-2">🏆 Достижения</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { icon: '✅', label: 'Перфекционист — 100% точности в одной главе' },
+              { icon: '⏳', label: 'Устойчивость — более 30 мин обучения' },
+              { icon: '🎯', label: 'Первая победа — пройден первый раздел' }
+            ].map(a => (
+              <div
+                key={a.label}
+                className="flex flex-col items-center gap-y-1 bg-white rounded-2xl shadow-sm p-4"
+              >
+                <span className="text-xl">{a.icon}</span>
+                <p className="text-xs text-gray-500 text-center">{a.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
+        {isDev && (
+          <div className="text-sm text-emerald-700 mb-4">
+            <p>⏱️ Save Progress: {debugCall || 'не вызывался'}</p>
+            <p>✅ Статус: {debugStatus || 'нет данных'}</p>
+            <p>❌ Ошибка: {debugError || 'ошибок нет'}</p>
+          </div>
+        )}
 
         {achievements && achievements.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-yellow-200 p-6 mb-6">
