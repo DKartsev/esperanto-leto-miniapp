@@ -1,6 +1,7 @@
 import { Home, FileText, Bot, User } from 'lucide-react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useState, lazy, Suspense } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { NavigationItem } from './components/NavigationBar'
 import MainLayout from './layout/MainLayout'
 import LearningPage from './pages/LearningPage'
@@ -19,6 +20,7 @@ const navItems: NavigationItem[] = [
 
 function App() {
   const [loadingFinished, setLoadingFinished] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     if (localStorage.getItem('intro_seen') === '1') {
@@ -38,27 +40,79 @@ function App() {
 
   return (
     <MainLayout items={navItems}>
-      <Routes>
-        <Route path="/" element={<LearningPage />} />
-        <Route path="/test" element={<TestPage />} />
-        <Route
-          path="/ai"
-          element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <AIChatPage />
-            </Suspense>
-          }
-        />
-        <Route path="/account" element={<AccountPage />} />
-        <Route
-          path="/landing"
-          element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <LandingPage />
-            </Suspense>
-          }
-        />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.2 }}
+              >
+                <LearningPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/test"
+            element={
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TestPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/ai"
+            element={
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Suspense fallback={<div>Loading...</div>}>
+                  <AIChatPage />
+                </Suspense>
+              </motion.div>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.2 }}
+              >
+                <AccountPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/landing"
+            element={
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Suspense fallback={<div>Loading...</div>}>
+                  <LandingPage />
+                </Suspense>
+              </motion.div>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
     </MainLayout>
   )
 }
