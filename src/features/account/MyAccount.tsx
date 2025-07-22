@@ -66,7 +66,11 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     resolveUserId()
   }, [user])
 
-  const chapterStats = useChapterStats(resolvedUserId)
+  const {
+    data: chapterStats,
+    isLoading: statsLoading,
+    isError: statsError
+  } = useChapterStats(resolvedUserId)
   const {
     startDate = null,
     completedChapters = 0,
@@ -180,16 +184,23 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
 
   // Метрики прогресса
   const totalChapters = chapterStats?.totalChapters || chapterProgress.length
-  const completedChaptersCount = chapterStats?.completedChapters ?? completedChapters
+  const completedChaptersCount =
+    chapterStats?.completedChapters ?? completedChapters
   const totalSections = chapterProgress.reduce((sum, cp) => sum + cp.totalSections, 0)
   const completedSections = chapterProgress.reduce((sum, cp) => sum + cp.completedSections, 0)
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="p-6 space-y-2">
         <SkeletonText lines={2} />
         <SkeletonCard lines={3} />
       </div>
+    )
+  }
+
+  if (statsError) {
+    return (
+      <div className="p-6 text-red-600">Не удалось загрузить статистику</div>
     )
   }
 
