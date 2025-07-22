@@ -183,7 +183,13 @@ await saveTestResult({
 Пример кода:
 
 ```ts
-await saveProgress()
+await saveProgress({
+  chapterId: 1,
+  sectionId: 2,
+  questionId: 3,
+  selectedAnswer: 'A',
+  isCorrect: true,
+})
 await saveTestResults()
 await checkAndAssignAchievements()
 router.push(`/section/${nextSectionId}`)
