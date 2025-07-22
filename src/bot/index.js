@@ -64,9 +64,9 @@ console.log('=' .repeat(50));
 // Validate required environment variables
 console.log('📋 Проверка переменных окружения:');
 const requiredEnvVars = {
-  'TELEGRAM_BOT_TOKEN': process.env.TELEGRAM_BOT_TOKEN,
-  'BOT_USERNAME': process.env.BOT_USERNAME,
-  'WEBAPP_URL': process.env.WEBAPP_URL
+  TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+  WEBAPP_URL: process.env.WEBAPP_URL,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY
 };
 
 let hasErrors = false;
@@ -86,8 +86,8 @@ if (hasErrors) {
   console.error('3. Получите токен бота от @BotFather в Telegram');
   console.error('\nПример правильного .env файла:');
   console.error('TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxyz-1234567890');
-  console.error('BOT_USERNAME=YourBotUsername');
   console.error('WEBAPP_URL=https://your-domain.com');
+  console.error('OPENAI_API_KEY=your_openai_api_key');
   process.exit(1);
 }
 
