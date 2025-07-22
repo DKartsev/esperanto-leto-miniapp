@@ -1,4 +1,10 @@
-import 'dotenv/config';
+// Load environment variables from .env in local development
+// Skip when running on the Render platform where variables are preconfigured
+if (!process.env.RENDER) {
+  const dotenv = await import('dotenv');
+  dotenv.config();
+}
+console.log('✅ Переменные загружены из окружения:', Object.keys(process.env));
 
 import { Telegraf } from 'telegraf';
 import express from 'express';
