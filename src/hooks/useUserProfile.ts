@@ -26,7 +26,7 @@ const useUserProfile = (userId: string | null): UseUserProfileResult => {
       if (!resolved) {
         throw new Error('userId is required')
       }
-      let finalId = resolved
+      let finalId: string | null = resolved
       if (/^\d+$/.test(String(resolved))) {
         const tgUser = getTelegramUser()
         finalId = await findOrCreateUserProfile(
@@ -35,6 +35,9 @@ const useUserProfile = (userId: string | null): UseUserProfileResult => {
           tgUser?.first_name || null,
           tgUser?.last_name || null
         )
+      }
+      if (!finalId) {
+        throw new Error('Failed to resolve userId')
       }
       if (authProfile && authProfile.id === finalId) {
         return authProfile as UserProfile

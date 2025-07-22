@@ -24,7 +24,7 @@ export const useChapterStats = (userId: string | null): UseChapterStatsResult =>
       if (!userId) {
         throw new Error('userId is required')
       }
-      let resolvedId = userId
+      let resolvedId: string | null = userId
       if (/^\d+$/.test(String(userId))) {
         const tgUser = getTelegramUser()
         resolvedId = await findOrCreateUserProfile(
@@ -33,6 +33,9 @@ export const useChapterStats = (userId: string | null): UseChapterStatsResult =>
           tgUser?.first_name || null,
           tgUser?.last_name || null
         )
+      }
+      if (!resolvedId) {
+        throw new Error('Failed to resolve userId')
       }
 
       const { data: chapters, error } = await supabase
