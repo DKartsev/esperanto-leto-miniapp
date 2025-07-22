@@ -1,6 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Lock, Award, Shield, ChevronDown } from 'lucide-react';
-import LoadingScreen from './LoadingScreen';
+import { SkeletonCard } from './Skeletons';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
 import { getAllChaptersProgressPercent, getSectionProgressPercent } from '../services/progressService'
@@ -169,7 +169,13 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
   };
 
   if (loading) {
-    return <LoadingScreen />;
+    return (
+      <div className="p-6 space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    )
   }
 
   if (error) {

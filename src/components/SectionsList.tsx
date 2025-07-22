@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 import clsx from 'clsx'
-import LoadingScreen from './LoadingScreen'
+import { SkeletonSectionList } from './Skeletons'
 import { CheckCircle2, Book } from 'lucide-react'
 import { fetchSections } from '../services/courseService'
 import { useLoadData } from '../hooks/useLoadData'
@@ -62,7 +62,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   const chapterTitle = getChapterTitle(chapterId);
 
   if (loading) {
-    return <LoadingScreen />;
+    return <SkeletonSectionList />;
   }
 
   if (error) {

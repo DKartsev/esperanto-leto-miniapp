@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../components/SupabaseAuthProvider'
 import { getUserProfile, findOrCreateUserProfile } from '../services/authService'
 import { getTelegramUser } from '../utils/telegram'
@@ -10,56 +10,37 @@ export interface UserProfile {
 
 const useUserProfile = (userId?: string | null) => {
   const { user, profile: authProfile, updateProfile } = useAuth()
-  const [resolvedId, setResolvedId] = useState<string | null>(
-    userId || user?.id || localStorage.getItem('user_id') || null
-  )
-  const [profile, setProfile] = useState<UserProfile | null>(
-    authProfile && (!userId || authProfile?.id === resolvedId) ? authProfile : null
-  )
-  const [loading, setLoading] = useState(false)
+  const resolved = userId || user?.id || localStorage.getItem('user_id') || null
 
-  useEffect(() => {
-    const resolve = async () => {
-      const id = userId || user?.id || localStorage.getItem('user_id')
-      if (!id) {
-        setResolvedId(null)
-        return
-      }
-      if (/^\d+$/.test(String(id))) {
+  const query = useQuery({
+    queryKey: ['user-profile', resolved],
+    queryFn: async () => {
+      if (!resolved) return null
+      let finalId = resolved
+      if (/^\d+$/.test(String(resolved))) {
         const tgUser = getTelegramUser()
-        const uuid = await findOrCreateUserProfile(
-          String(id),
+        finalId = await findOrCreateUserProfile(
+          String(resolved),
           tgUser?.username || null,
           tgUser?.first_name || null,
           tgUser?.last_name || null
         )
-        setResolvedId(uuid)
-      } else {
-        setResolvedId(id)
       }
-    }
-    void resolve()
-  }, [userId, user])
+      if (authProfile && authProfile.id === finalId) {
+        return authProfile as UserProfile
+      }
+      const data = await getUserProfile(finalId)
+      return data as UserProfile
+    },
+    enabled: !!resolved,
+    initialData:
+      authProfile && (!userId || authProfile.id === resolved)
+        ? (authProfile as UserProfile)
+        : undefined,
+    staleTime: 60 * 1000
+  })
 
-  useEffect(() => {
-    const load = async () => {
-      if (!resolvedId) {
-        setProfile(null)
-        return
-      }
-      if (authProfile && authProfile.id === resolvedId) {
-        setProfile(authProfile)
-        return
-      }
-      setLoading(true)
-      const data = await getUserProfile(resolvedId)
-      setProfile(data as UserProfile)
-      setLoading(false)
-    }
-    void load()
-  }, [resolvedId, authProfile])
-
-  return { userId: resolvedId, profile, loading, updateProfile }
+  return { userId: resolved, profile: query.data ?? null, loading: query.isLoading, updateProfile }
 }
 
 export default useUserProfile

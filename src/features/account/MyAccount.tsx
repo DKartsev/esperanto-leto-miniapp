@@ -4,7 +4,7 @@ import { User, Shield, LogOut, Check, Trophy } from 'lucide-react'
 import { useAuth } from '../../components/SupabaseAuthProvider'
 import { isAdmin } from '../../utils/adminUtils.js'
 import { findOrCreateUserProfile, getCurrentUser } from '../../services/authService'
-import LoadingScreen from '../../components/LoadingScreen'
+import { SkeletonText, SkeletonCard } from '../../components/Skeletons'
 import AdminPanelButton from '../admin/AdminPanelButton'
 import AccountHeader from './AccountHeader'
 import AccountStats from './AccountStats'
@@ -185,12 +185,21 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const completedSections = chapterProgress.reduce((sum, cp) => sum + cp.completedSections, 0)
 
   if (loading) {
-    return <LoadingScreen />
+    return (
+      <div className="p-6 space-y-2">
+        <SkeletonText lines={2} />
+        <SkeletonCard lines={3} />
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
     if (loginLoading) {
-      return <LoadingScreen />
+      return (
+        <div className="p-6">
+          <SkeletonText lines={3} />
+        </div>
+      )
     }
 
     return (
