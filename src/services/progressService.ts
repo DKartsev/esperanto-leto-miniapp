@@ -7,7 +7,7 @@ import { getCurrentUser } from './authService'
  * @param {number} sectionId - ID раздела
  * @param {number} questionId - ID вопроса
  * @param {boolean} isCorrect - Правильность ответа
- * @param {string} selectedAnswer - Выбранный ответ
+ * @param {string|string[]} selectedAnswer - Выбранный ответ
  * @param {number} timeSpent - Время на ответ (в секундах)
  * @param {number} hintsUsed - Количество использованных подсказок
  * @returns {Promise<Object>} Сохраненный ответ
@@ -24,7 +24,7 @@ export async function saveProgress({
   chapterId: number
   sectionId: number
   questionId: number | null
-  selectedAnswer: string
+  selectedAnswer: string | string[]
   isCorrect: boolean
   timeSpent?: number
   hintsUsed?: number
@@ -65,6 +65,10 @@ export async function saveProgress({
     }
 
     // 🆕 Вставка или обновление по ключу user_id + section_id
+    const answerString: string = Array.isArray(selectedAnswer)
+      ? selectedAnswer.join(', ')
+      : String(selectedAnswer)
+
     const { data, error } = await supabase
       .from('user_progress')
       .upsert(
@@ -74,14 +78,12 @@ export async function saveProgress({
             chapter_id: chapterId,
             section_id: sectionId,
             question_id: questionId,
-            selected_answer: Array.isArray(selectedAnswer)
-              ? selectedAnswer.join(', ')
-              : selectedAnswer,
+            selected_answer: answerString,
             is_correct: isCorrect,
             time_spent: timeSpent,
             hints_used: hintsUsed,
             answered_at: new Date().toISOString()
-          }
+          } as any
         ],
         {
           onConflict: ['user_id', 'section_id']
