@@ -33,6 +33,7 @@
     "react-dom": "^18.3.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.30.1",
+    "react-swipeable": "^6.2.2",
     "telegraf": "^4.16.3",
     "uuid": "^9.0.0"
   },
