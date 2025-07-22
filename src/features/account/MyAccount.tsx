@@ -1,5 +1,4 @@
-import { FC, useState, useRef, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { FC, useState, useEffect, useCallback } from 'react'
 import { User, Shield, LogOut, Check } from 'lucide-react'
 import { useAuth } from '../../components/SupabaseAuthProvider'
 import { isAdmin } from '../../utils/adminUtils.js'
@@ -34,7 +33,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     updateProfile,
   } = useAuth()
 
-  const navigate = useNavigate()
 
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile?.username || '')
@@ -159,8 +157,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     // ✅ сохраняем uuid пользователя
     localStorage.setItem('user_id', userId)
 
-    navigate('/')
-  }, [navigate])
+    onBackToHome()
+  }, [onBackToHome])
 
   const telegramUser = getTelegramUser()
 
@@ -170,13 +168,6 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
     }
   }, [isAuthenticated, telegramUser, handleTelegramLogin])
 
-  const navigateRef = useRef(false)
-  useEffect(() => {
-    if (!navigateRef.current && telegramUser && localStorage.getItem('user_id') && profile && !loading) {
-      navigateRef.current = true
-      navigate('/account')
-    }
-  }, [telegramUser, profile, loading, navigate])
 
   const hasAdminAccess = () => isAdmin(profile?.username, user?.email)
 

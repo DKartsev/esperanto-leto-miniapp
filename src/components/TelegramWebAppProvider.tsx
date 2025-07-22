@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, useRef, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { telegramWebApp } from '../services/telegramWebApp';
 import { useAuth } from './SupabaseAuthProvider';
 
@@ -38,7 +37,6 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
   const [user, setUser] = useState<unknown>(null);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [themeParams, setThemeParams] = useState<Record<string, unknown>>({});
-  const navigate = useNavigate();
   const { profile, loading } = useAuth();
   const navigatedRef = useRef(false);
 
@@ -86,15 +84,14 @@ export const TelegramWebAppProvider: FC<TelegramWebAppProviderProps> = ({ childr
       !loading &&
       (window.location.pathname === '/' || window.location.pathname === '/welcome')
     ) {
-      console.log('Navigate to /account', {
+      console.log('Ready to show account', {
         telegramUser: user,
         user_id: localStorage.getItem('user_id'),
         profile
       });
       navigatedRef.current = true;
-      navigate('/account');
     }
-  }, [isAvailable, profile, loading, navigate, user]);
+  }, [isAvailable, profile, loading, user]);
 
   const contextValue: TelegramWebAppContextType = {
     isAvailable,

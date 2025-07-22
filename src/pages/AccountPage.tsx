@@ -1,23 +1,20 @@
+import { FC, useCallback } from 'react'
 import MyAccount from '../features/account/MyAccount'
-import { useNavigate } from 'react-router-dom'
-import { useCallback } from 'react'
 
-const AccountPage = () => {
-  const navigate = useNavigate()
+interface AccountPageProps {
+  onNavigateHome: () => void
+  onStartChapter?: (id: number) => void
+}
 
-    const handleBackToHome = useCallback(() => {
-      ;(document.activeElement as HTMLElement | null)?.blur()
-      navigate('/', { replace: true })
-    }, [navigate])
+const AccountPage: FC<AccountPageProps> = ({ onNavigateHome, onStartChapter }) => {
+  const handleBackToHome = useCallback(() => {
+    (document.activeElement as HTMLElement | null)?.blur()
+    onNavigateHome()
+  }, [onNavigateHome])
 
   return (
-    <MyAccount
-      onBackToHome={handleBackToHome}
-      onStartChapter={(id: number) =>
-        navigate('/', { state: { chapter: id }, replace: true })
-      }
-    />
-  );
-};
+    <MyAccount onBackToHome={handleBackToHome} onStartChapter={onStartChapter} />
+  )
+}
 
 export default AccountPage;

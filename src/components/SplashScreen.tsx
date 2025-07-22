@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -14,7 +13,6 @@ declare global {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -35,7 +33,6 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       window.hideLoadingScreen();
     }
     onFinish();
-    navigate('/');
   };
 
   return (
