@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient'
-import { getCurrentUser, findOrCreateUserProfile } from './authService'
-import { getTelegramUser } from '../utils/telegram'
+import { getCurrentUser } from './authService'
+import { useUserId } from '../context/UserContext'
 
 /**
  * Сохранить ответ пользователя
@@ -13,36 +13,30 @@ import { getTelegramUser } from '../utils/telegram'
  * @param {number} hintsUsed - Количество использованных подсказок
  * @returns {Promise<Object>} Сохраненный ответ
  */
-export async function saveProgress(
-  chapterId: number,
-  sectionId: number,
-  questionId: number | null,
-  selectedAnswer: string,
-  isCorrect: boolean,
-  timeSpent: number = 0,
-  hintsUsed: number = 0
-): Promise<any> {
+export async function saveProgress({
+  chapterId,
+  sectionId,
+  questionId,
+  selectedAnswer,
+  isCorrect,
+  timeSpent = 0,
+  hintsUsed = 0,
+}: {
+  chapterId: number
+  sectionId: number
+  questionId: number | null
+  selectedAnswer: string
+  isCorrect: boolean
+  timeSpent?: number
+  hintsUsed?: number
+}): Promise<any> {
   try {
     // Отмечаем вызов функции в localStorage для отладки
     localStorage.setItem('saveProgress_called', new Date().toISOString())
 
-    const user = await getCurrentUser()
-    if (!user) {
-      console.warn('User not authenticated, skipping save')
-      return null
-    }
-
-    const telegramId = user.id
-    const tg = getTelegramUser()
-    const profileId = await findOrCreateUserProfile(
-      telegramId,
-      tg?.username || null,
-      tg?.first_name || null,
-      tg?.last_name || null
-    )
-    if (!profileId) {
-      console.warn('Could not resolve Telegram ID to UUID')
-      localStorage.setItem('saveProgress_error', 'profile_not_found')
+    const userId = useUserId()
+    if (!userId) {
+      console.warn('userId not available')
       return null
     }
 
@@ -57,7 +51,7 @@ export async function saveProgress(
       .from('user_progress')
       .insert([
         {
-          user_id: profileId,
+          user_id: userId,
           chapter_id: chapterId,
           section_id: sectionId,
           question_id: questionId,

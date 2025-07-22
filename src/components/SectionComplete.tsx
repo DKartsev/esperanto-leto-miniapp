@@ -1,9 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import type { QuestionResultItem } from './QuestionInterface';
 import { supabase } from '../services/supabaseClient';
-import { findOrCreateUserProfile, getCurrentUser } from '../services/authService';
 import { useAuth } from './SupabaseAuthProvider';
-import { getTelegramUser } from '../utils/telegram';
+import { useUserId } from '../context/UserContext';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
 import { getNextStep } from '../utils/navigation.js';
@@ -31,6 +30,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   onNext
 }) => {
   const { refreshStats } = useAuth();
+  const userId = useUserId();
   const percentage = Math.round((results.correctAnswers / results.totalQuestions) * 100);
   const accuracy = results.totalQuestions > 0 ? results.correctAnswers / results.totalQuestions : 0;
 
@@ -47,31 +47,8 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   useEffect(() => {
     const saveSectionProgress = async () => {
       const completed = percentage >= 70;
-
-      let userId: string | null = null;
-      const current = await getCurrentUser() as any;
-      userId = current?.id || null;
-
-      const tgUser = getTelegramUser();
-      const telegramId = tgUser?.id;
-      const telegramUsername = tgUser?.username || null;
-
-      if (!userId && telegramId) {
-        userId = await findOrCreateUserProfile(
-          String(telegramId),
-          telegramUsername,
-          tgUser?.first_name || null,
-          tgUser?.last_name || null
-        );
-      }
-
-      if (!userId || /^\d+$/.test(String(userId))) {
-        console.error('❌ Ошибка получения пользователя или профиля');
-        return;
-      }
-
-      if (!userId || /^\d+$/.test(userId)) {
-        console.error('❌ Ошибка: userId не является UUID, прогресс не будет сохранён');
+      if (!userId) {
+        console.error('userId not available');
         return;
       }
 
@@ -108,7 +85,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
     };
 
     saveSectionProgress();
-  }, [chapterId, sectionId, percentage, refreshStats]);
+  }, [chapterId, sectionId, percentage, refreshStats, userId]);
 
   if (accuracy < 0.7) {
     return <SectionFailed sectionId={String(sectionId)} onRetry={onRetry} />;

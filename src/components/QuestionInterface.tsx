@@ -136,15 +136,15 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     }
 
     try {
-      await saveProgress(
+      await saveProgress({
         chapterId,
         sectionId,
-        currentQuestionData.id,
-        answer,
-        correct,
-        0,
-        hintsUsed
-      )
+        questionId: currentQuestionData.id,
+        selectedAnswer: answer,
+        isCorrect: correct,
+        timeSpent: 0,
+        hintsUsed,
+      })
       await refreshStats()
     } catch (err) {
       console.error('Ошибка сохранения ответа:', err)
