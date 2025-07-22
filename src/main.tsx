@@ -7,6 +7,7 @@ import './index.css';
 import { SupabaseAuthProvider } from './components/SupabaseAuthProvider';
 import { TelegramWebAppProvider } from './components/TelegramWebAppProvider';
 import TelegramLoginRedirect from './components/TelegramLoginRedirect';
+import { UserProvider } from './context/UserContext';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -17,11 +18,13 @@ root.render(
       {/* the Telegram provider can access authentication context */}
       <SupabaseAuthProvider>
         <TelegramWebAppProvider>
-          <TelegramLoginRedirect />
-          <Routes>
-            <Route path="/admin-panel" element={<AdminPanelPage />} />
-            <Route path="/*" element={<App />} />
-          </Routes>
+          <UserProvider>
+            <TelegramLoginRedirect />
+            <Routes>
+              <Route path="/admin-panel" element={<AdminPanelPage />} />
+              <Route path="/*" element={<App />} />
+            </Routes>
+          </UserProvider>
         </TelegramWebAppProvider>
       </SupabaseAuthProvider>
     </BrowserRouter>
