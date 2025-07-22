@@ -6,6 +6,7 @@ import { useUserId } from '../context/UserContext';
 import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
 import { getNextStep } from '../utils/navigation.js';
+import Toast from './Toast';
 
 interface SectionResults {
   totalQuestions: number;
@@ -36,6 +37,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
   const [nextSectionId, setNextSectionId] = useState<string | undefined>(undefined);
   const [nextChapterId, setNextChapterId] = useState<string | undefined>(undefined);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     getNextStep(sectionId).then(step => {
@@ -78,6 +80,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         console.log('Прогресс раздела успешно сохранён.');
         try {
           await refreshStats();
+          setToastMessage('🎉 Раздел пройден! Вы получили +20 XP');
         } catch (err) {
           console.error('Ошибка обновления статистики:', err);
         }
@@ -93,12 +96,17 @@ const SectionComplete: FC<SectionCompleteProps> = ({
 
   if (accuracy >= 0.7) {
     return (
-      <SectionSuccess
-        sectionId={String(sectionId)}
-        nextSectionId={nextSectionId}
-        nextChapterId={nextChapterId}
-        onNext={() => onNext && onNext(nextSectionId, nextChapterId)}
-      />
+      <>
+        <SectionSuccess
+          sectionId={String(sectionId)}
+          nextSectionId={nextSectionId}
+          nextChapterId={nextChapterId}
+          onNext={() => onNext && onNext(nextSectionId, nextChapterId)}
+        />
+        {toastMessage && (
+          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+        )}
+      </>
     );
   }
 
