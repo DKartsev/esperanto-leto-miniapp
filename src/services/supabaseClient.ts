@@ -33,4 +33,3 @@ export const checkConnection = async (): Promise<boolean> => {
   }
 }
 
-checkConnection()
