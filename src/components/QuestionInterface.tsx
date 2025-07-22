@@ -458,7 +458,6 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
               <p className="text-blue-700">{currentQuestionData.hints[hintsUsed - 1]}</p>
             </div>
           )}
-        </div>
 
         {/* Action Buttons */}
         <div className="flex gap-3">
