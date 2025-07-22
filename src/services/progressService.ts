@@ -289,6 +289,55 @@ export async function getChapterProgressPercent(chapterId: number): Promise<numb
 }
 
 /**
+ * Получить процент прогресса по всем главам для текущего пользователя
+ * @returns {Promise<Record<number, number>>} Ключ - ID главы, значение - процент завершения
+ */
+export async function getAllChaptersProgressPercent(): Promise<Record<number, number>> {
+  try {
+    const user = await getCurrentUser()
+    if (!user) return {}
+
+    const { data: sections, error: sectionsError } = await supabase
+      .from('sections')
+      .select('id, chapter_id')
+
+    if (sectionsError || !sections) throw sectionsError
+
+    const { data: progress, error: progressError } = await supabase
+      .from('user_progress')
+      .select('section_id, chapter_id')
+      .eq('user_id', user.id)
+
+    if (progressError || !progress) throw progressError
+
+    const totalByChapter: Record<number, number> = {}
+    sections.forEach(sec => {
+      totalByChapter[sec.chapter_id] = (totalByChapter[sec.chapter_id] || 0) + 1
+    })
+
+    const completedByChapter: Record<number, Set<number>> = {}
+    progress.forEach(row => {
+      const ch = row.chapter_id
+      if (row.section_id == null) return
+      if (!completedByChapter[ch]) completedByChapter[ch] = new Set<number>()
+      completedByChapter[ch].add(row.section_id)
+    })
+
+    const result: Record<number, number> = {}
+    Object.entries(totalByChapter).forEach(([chapterIdStr, total]) => {
+      const chId = Number(chapterIdStr)
+      const completed = completedByChapter[chId] ? completedByChapter[chId].size : 0
+      result[chId] = total > 0 ? Math.round((completed / total) * 100) : 0
+    })
+
+    return result
+  } catch (error: any) {
+    console.error('❌ Ошибка получения прогресса по всем главам:', error.message)
+    return {}
+  }
+}
+
+/**
  * Получить статистику пользователя
  * @returns {Promise<Object>} Статистика пользователя
  */

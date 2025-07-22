@@ -3,7 +3,7 @@ import { Play, Lock, Award, Shield, ChevronDown } from 'lucide-react';
 import LoadingScreen from './LoadingScreen';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
-import { getChapterProgressPercent, getSectionProgressPercent } from '../services/progressService'
+import { getAllChaptersProgressPercent, getSectionProgressPercent } from '../services/progressService'
 import { isAdmin } from '../utils/adminUtils.js'
 import { supabase } from '../services/supabaseClient'
 
@@ -56,10 +56,11 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
     const load = async () => {
       try {
         const data = await fetchChapters()
+        const progressMap = await getAllChaptersProgressPercent()
         const processed: Chapter[] = []
 
         for (const ch of data as Array<{ id: number; title: string }>) {
-          const progress = await getChapterProgressPercent(ch.id)
+          const progress = progressMap[ch.id] || 0
 
           processed.push({
             id: ch.id,
