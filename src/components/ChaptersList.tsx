@@ -1,5 +1,6 @@
 import { useState, useEffect, type FC } from 'react';
 import { Play, Lock, Award, Shield, ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { SkeletonCard } from './Skeletons';
 import Toast from './Toast';
 import { fetchChapters, fetchSections } from '../services/courseService'
@@ -269,11 +270,20 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
 
       {/* Chapters Grid */}
       <div className="grid gap-4">
-        {filteredChapters.map((chapter) => (
+        {filteredChapters.map((chapter) => {
+          const status = chapter.isLocked && !hasAdminAccess()
+            ? '🔒'
+            : chapter.isCompleted
+              ? '✅'
+              : '🔓'
+          return (
           <div key={chapter.id} className="w-full max-w-sm mx-auto px-4">
             <div
-              className={`bg-white rounded-lg shadow p-3 space-y-2 ${chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''}`}
+              className={`relative bg-white rounded-2xl shadow-sm p-3 py-2 space-y-1 ${
+                chapter.isLocked && !hasAdminAccess() ? 'opacity-60' : ''
+              }`}
             >
+              <span className="absolute top-2 right-2 text-sm opacity-70">{status}</span>
               <button
                 type="button"
                 onClick={() => handleToggleChapter(chapter)}
@@ -295,7 +305,11 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
               </button>
 
               {openChapterId === chapter.id && (
-                <ul className="mt-2 space-y-1">
+                <motion.ul
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-2 space-y-1"
+                >
                   {sectionsByChapter[chapter.id]?.map((section) => (
                     <li
                       key={section.id}
@@ -307,7 +321,7 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                       </span>
                     </li>
                   ))}
-                </ul>
+                </motion.ul>
               )}
 
               <button
@@ -316,27 +330,25 @@ const ChaptersList: FC<ChaptersListProps> = ({ onChapterSelect, currentUser = ''
                   onChapterSelect(chapter.id);
                 }}
                 disabled={chapter.isLocked && !hasAdminAccess()}
-                className={`mt-2 max-w-xs w-full px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold transition-colors duration-200 box-border ${
+                aria-label={
+                  chapter.isLocked && !hasAdminAccess()
+                    ? 'Заблокировано'
+                    : chapter.isStarted
+                      ? 'Продолжить'
+                      : 'Начать'
+                }
+                className={`mt-2 max-w-xs w-full px-3 py-1.5 rounded-lg flex items-center justify-center transition-transform hover:scale-105 box-border ${
                   chapter.isLocked && !hasAdminAccess()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-600 text-white shadow hover:bg-green-700'
                 } ${hasAdminAccess() && chapter.isLocked ? 'border-2 border-emerald-400' : ''}`}
               >
                 {chapter.isLocked && !hasAdminAccess() ? (
-                  <>
-                    <Lock className="w-4 h-4" />
-                    <span>Заблокировано</span>
-                  </>
+                  <Lock className="w-5 h-5" />
                 ) : hasAdminAccess() && chapter.isLocked ? (
-                  <>
-                    <Shield className="w-4 h-4" />
-                    <span>Открыть (Админ)</span>
-                  </>
+                  <Shield className="w-5 h-5" />
                 ) : (
-                  <>
-                    <Play className="w-4 h-4" />
-                    <span>{chapter.isStarted ? 'Продолжить' : 'Начать'}</span>
-                  </>
+                  <Play className="w-5 h-5" />
                 )}
               </button>
             </div>

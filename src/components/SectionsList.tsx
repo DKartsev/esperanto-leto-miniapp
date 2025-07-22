@@ -1,7 +1,7 @@
 import { type FC } from 'react'
-import clsx from 'clsx'
 import { SkeletonSectionList } from './Skeletons'
-import { CheckCircle2, Book } from 'lucide-react'
+import { Book } from 'lucide-react'
+import SectionCard from './SectionCard'
 import { fetchSections } from '../services/courseService'
 import { useLoadData } from '../hooks/useLoadData'
 import useUserProgress from '../hooks/useUserProgress'
@@ -88,39 +88,13 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
 
       <div className="space-y-2">
         {sections.map((section) => (
-          <button
+          <SectionCard
             key={section.id}
-            onClick={() => onSectionSelect(section.id)}
-            className="w-full bg-white rounded-lg shadow px-3 py-2 flex items-center justify-between"
-          >
-            <div className="flex flex-col items-start flex-grow pr-2">
-              <span
-                className={clsx(
-                  'text-sm truncate',
-                  section.isCompleted ? 'text-emerald-800 font-semibold' : 'text-emerald-900'
-                )}
-              >
-                {`Раздел ${section.id} — ${section.title}`}
-              </span>
-              <div className="w-full bg-gray-200 h-1 rounded-full mt-1">
-                <div
-                  className={clsx(
-                    'h-1 rounded-full transition-all',
-                    section.progress <= 30
-                      ? 'bg-red-400'
-                      : section.progress < 70
-                        ? 'bg-yellow-400'
-                        : 'bg-green-500'
-                  )}
-                  style={{ width: `${section.progress}%` }}
-                />
-              </div>
-            </div>
-            <span className="flex items-center gap-1 text-sm text-emerald-700">
-              {section.isCompleted && <CheckCircle2 className="w-4 h-4 text-green-600" />}
-              {section.progress}%
-            </span>
-          </button>
+            id={section.id}
+            title={section.title}
+            progress={section.progress}
+            onSelect={() => onSectionSelect(section.id)}
+          />
         ))}
       </div>
 
