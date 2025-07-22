@@ -71,9 +71,9 @@ console.log('=' .repeat(50));
 console.log('📋 Проверка переменных окружения:');
 const requiredEnvVars = {
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
-  WEBAPP_URL: process.env.WEBAPP_URL,
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY
+  WEBAPP_URL: process.env.WEBAPP_URL
 };
+console.log('ℹ️ OPENAI_API_KEY не используется — пропускаем проверку');
 
 let hasErrors = false;
 for (const [key, value] of Object.entries(requiredEnvVars)) {
@@ -93,7 +93,7 @@ if (hasErrors) {
   console.error('\nПример правильного .env файла:');
   console.error('TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxyz-1234567890');
   console.error('WEBAPP_URL=https://your-domain.com');
-  console.error('OPENAI_API_KEY=your_openai_api_key');
+  // console.error('OPENAI_API_KEY=your_openai_api_key');
   process.exit(1);
 }
 
