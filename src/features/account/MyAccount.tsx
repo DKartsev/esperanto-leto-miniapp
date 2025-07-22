@@ -12,6 +12,7 @@ import AccountProgress from './AccountProgress'
 import SectionProgressList from './SectionProgressList'
 import StatsCarousel from './StatsCarousel'
 import Achievements from './Achievements'
+import MapProgress from './MapProgress'
 import useChapterStats from '../../hooks/useChapterStats'
 import useUserProgress from '../../hooks/useUserProgress'
 import { getFullUserProgress } from '../../services/progressService'
@@ -308,6 +309,7 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
         {progressData && progressData.length > 0 && (
           <SectionProgressList progress={progressData} />
         )}
+        <MapProgress />
         {chapterProgress && chapterProgress.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 p-6 mb-6">
             {recommendedChapter ? (
