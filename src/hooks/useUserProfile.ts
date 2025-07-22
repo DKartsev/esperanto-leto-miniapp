@@ -40,7 +40,13 @@ const useUserProfile = (userId?: string | null) => {
     staleTime: 60 * 1000
   })
 
-  return { userId: resolved, profile: query.data ?? null, loading: query.isLoading, updateProfile }
+  return {
+    userId: resolved,
+    data: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    updateProfile
+  }
 }
 
 export default useUserProfile
