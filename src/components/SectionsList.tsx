@@ -20,7 +20,7 @@ interface SectionsListProps {
 
 const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBackToChapters }) => {
   const { profile } = useAuth()
-  const { sectionProgressMap } = useUserProgress(profile?.id)
+  const { sectionProgressMap = {} } = useUserProgress(profile?.id)
 
   const { data, loading, error } = useLoadData(async () => {
     const fetched = await fetchSections(chapterId)
@@ -31,7 +31,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
   }, [chapterId])
 
   const sections: Array<Section & { progress: number; isCompleted: boolean }> =
-    (data as Section[] | null)?.map((sec) => {
+    ((data as Section[]) || []).map((sec) => {
       const progressInfo = sectionProgressMap[sec.id] || {
         accuracy: 0,
         completed: false,
