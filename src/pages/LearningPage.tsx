@@ -1,5 +1,4 @@
-import ChaptersList from '../components/ChaptersList';
-import SectionsList from '../components/SectionsList';
+import ChaptersAndSections from '../components/ChaptersAndSections';
 import QuestionInterface from '../components/QuestionInterface';
 import SectionComplete from '../components/SectionComplete';
 import ChapterComplete from '../components/ChapterComplete';
@@ -12,7 +11,6 @@ const LearningPage = () => {
     selectedSection,
     sectionResults,
     earnedAchievements,
-    profile,
     handleChapterSelect,
     handleSectionSelect,
     handleQuestionComplete,
@@ -25,18 +23,13 @@ const LearningPage = () => {
 
   switch (currentView) {
     case 'chapters':
-      return (
-        <ChaptersList
-          onChapterSelect={handleChapterSelect}
-          currentUser={profile?.username}
-        />
-      );
     case 'sections':
       return (
-        <SectionsList
-          chapterId={selectedChapter!}
-          onSectionSelect={handleSectionSelect}
-          onBackToChapters={handleBackToChapters}
+        <ChaptersAndSections
+          onSectionSelect={(chId, secId) => {
+            handleChapterSelect(chId);
+            handleSectionSelect(secId);
+          }}
         />
       );
     case 'questions':
