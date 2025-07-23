@@ -1,4 +1,4 @@
-import ChaptersAndSections from '../components/ChaptersAndSections';
+import ChapterPath from '../components/ChapterPath';
 import QuestionInterface from '../components/QuestionInterface';
 import SectionComplete from '../components/SectionComplete';
 import ChapterComplete from '../components/ChapterComplete';
@@ -25,7 +25,7 @@ const LearningPage = () => {
     case 'chapters':
     case 'sections':
       return (
-        <ChaptersAndSections
+        <ChapterPath
           onSectionSelect={(chId, secId) => {
             handleChapterSelect(chId);
             handleSectionSelect(secId);
