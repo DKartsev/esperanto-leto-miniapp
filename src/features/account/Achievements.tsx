@@ -1,4 +1,6 @@
 import { FC } from 'react'
+import { motion } from 'framer-motion'
+import clsx from 'clsx'
 
 export interface Achievement {
   title: string
@@ -18,17 +20,25 @@ interface AchievementsProps {
 }
 
 const Achievements: FC<AchievementsProps> = ({ completed = [] }) => (
-  <div className="grid grid-cols-3 gap-2">
-    {ACHIEVEMENTS.map(a => {
-      const done = completed.includes(a.type)
+  <div className="grid grid-cols-2 gap-3 mt-6">
+    {ACHIEVEMENTS.map((a, i) => {
+      const unlocked = completed.includes(a.type)
       return (
-        <div
+        <motion.div
           key={a.type}
-          className={`flex flex-col items-center gap-y-1 bg-white rounded-2xl shadow-sm p-4 ${done ? '' : 'opacity-50'}`}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.1 }}
+          className={clsx(
+            'p-3 rounded-xl border text-sm transition',
+            unlocked
+              ? 'bg-white text-emerald-700 border-emerald-300 shadow-sm'
+              : 'bg-gray-100 text-gray-400 border-gray-200'
+          )}
         >
-          <span className="text-xl">{a.icon}</span>
-          <p className="text-xs text-center text-gray-500">{a.title}</p>
-        </div>
+          <p className="font-semibold">{a.title}</p>
+          <p className="text-xs">{a.condition}</p>
+        </motion.div>
       )
     })}
   </div>

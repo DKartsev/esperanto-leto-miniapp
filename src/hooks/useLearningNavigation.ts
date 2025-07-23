@@ -19,6 +19,7 @@ export function useLearningNavigation() {
   const [selectedSection, setSelectedSection] = useState<number | null>(null)
   const [sectionResults, setSectionResults] = useState<QuestionResults | null>(null)
   const [sectionStartTime, setSectionStartTime] = useState<number | null>(null)
+  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([])
 
   const { profile, refreshStats } = useAuth()
 
@@ -94,13 +95,14 @@ export function useLearningNavigation() {
           results.totalQuestions,
           timeSpent
         )
-        await saveTestResults(
+        const { achievements } = await saveTestResults(
           selectedChapter,
           selectedSection,
           results.correctAnswers,
           results.totalQuestions,
           timeSpent
         )
+        setEarnedAchievements(achievements)
         await refreshStats()
       } catch (err) {
         console.error('Ошибка сохранения результатов раздела:', err)
@@ -155,6 +157,7 @@ export function useLearningNavigation() {
     selectedChapter,
     selectedSection,
     sectionResults,
+    earnedAchievements,
     profile,
     handleChapterSelect,
     handleSectionSelect,

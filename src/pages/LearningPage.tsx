@@ -11,6 +11,7 @@ const LearningPage = () => {
     selectedChapter,
     selectedSection,
     sectionResults,
+    earnedAchievements,
     profile,
     handleChapterSelect,
     handleSectionSelect,
@@ -53,6 +54,7 @@ const LearningPage = () => {
           results={sectionResults!}
           chapterId={selectedChapter!}
           sectionId={selectedSection!}
+          newAchievements={earnedAchievements}
           onRetry={handleRetrySection}
           onNext={handleNextStep}
         />
