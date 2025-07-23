@@ -62,18 +62,19 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, sections, onSectionSel
   const offset = 10
   const leftX = radius + offset
   const rightX = width - radius - offset
-
+  
   const getPoint = (idx: number) => ({
     x: idx % 2 === 0 ? leftX : rightX,
     y: idx * step + radius
   })
 
+  const controlX = width / 2
+
   const paths = sections.slice(0, -1).map((_, idx) => {
     const start = getPoint(idx)
     const end = getPoint(idx + 1)
-    const startY = start.y + radius
-    const endY = end.y - radius
-    return `M${start.x},${startY} L${end.x},${endY}`
+    const midY = (start.y + end.y) / 2
+    return `M${start.x},${start.y} Q${controlX},${midY} ${end.x},${end.y}`
   })
 
   const svgHeight = Math.max(step * (sections.length - 1) + radius * 2, 0)
@@ -94,10 +95,10 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, sections, onSectionSel
             <ZigZagPath key={i} d={d} index={i} />
           ))}
         </svg>
-        <div className="flex flex-col items-center gap-y-6 relative">
+        <div className="flex flex-col items-center gap-y-6 relative w-full">
           {sections.map((sec, idx) => {
             const alignLeft = idx % 2 === 0
-            const wrapper = clsx('px-6', alignLeft ? 'self-start' : 'self-end')
+            const wrapper = clsx('px-6 w-full flex', alignLeft ? 'justify-end' : 'justify-start')
             const btnClass = clsx(
               'w-14 h-14 rounded-full border flex items-center justify-center text-base font-medium',
               sec.completed
