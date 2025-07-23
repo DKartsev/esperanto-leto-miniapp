@@ -22,7 +22,7 @@ export async function fetchSections(){return [{id:1},{id:2},{id:3}]};`,
         loader: 'ts'
       }));
       build.onLoad({ filter: /^useUserProgress$/, namespace: 'stub' }, () => ({
-        contents: `export default function useUserProgress(){return {sectionProgressMap:{}};}`,
+        contents: 'export default function useUserProgress(){return {sectionProgressMap:{}};}',
         loader: 'ts'
       }));
       build.onLoad({ filter: /^SupabaseAuthProvider$/, namespace: 'stub' }, () => ({
