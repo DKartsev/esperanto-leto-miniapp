@@ -70,7 +70,7 @@ test('ChapterPath renders layout correctly', async () => {
   const paths = container.querySelectorAll('svg path');
   assert.equal(paths.length, 0);
 
-  const wrappers = container.querySelectorAll('div.absolute');
-  assert.ok(wrappers[0].className.includes('left-4'));
-  assert.ok(wrappers[1].className.includes('right-4'));
+  const wrappers = container.querySelectorAll('div.mt-12');
+  assert.ok(wrappers[0].className.includes('self-start'));
+  assert.ok(wrappers[1].className.includes('self-end'));
 });
