@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import { motion } from 'framer-motion'
-import clsx from 'clsx'
 
 interface ZigZagPathProps {
   d: string
@@ -20,11 +19,12 @@ const pathVariants = {
 const ZigZagPath: FC<ZigZagPathProps> = ({ d, index, className }) => (
   <motion.path
     d={d}
-    strokeWidth="2"
-    strokeDasharray="4 4"
+    strokeWidth="1.5"
+    strokeDasharray="4"
     strokeLinecap="round"
+    stroke="#C5C5C5"
     fill="none"
-    className={clsx('stroke-emerald-600', className)}
+    className={className}
     initial="hidden"
     animate="visible"
     variants={pathVariants}
