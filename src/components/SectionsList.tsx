@@ -50,10 +50,13 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
     xp: 20,
   }))
 
-  const chunkedSections: typeof sectionsWithStatus[][] = []
-  for (let i = 0; i < sectionsWithStatus.length; i += 4) {
-    chunkedSections.push(sectionsWithStatus.slice(i, i + 4))
+  function chunkArray<T>(arr: T[], size: number): T[][] {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+      arr.slice(i * size, i * size + size)
+    )
   }
+
+  const chunkedSections = chunkArray(sectionsWithStatus, 4)
 
 
   const getChapterTitle = (chapterId: number): string => {
