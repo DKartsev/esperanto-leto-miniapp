@@ -20,6 +20,7 @@ const ZigZagPath: FC<ZigZagPathProps> = ({ d, index, className }) => (
   <motion.path
     d={d}
     strokeWidth="1.5"
+    strokeDasharray="4"
     strokeLinecap="round"
     stroke="#CCCCCC"
     fill="none"
