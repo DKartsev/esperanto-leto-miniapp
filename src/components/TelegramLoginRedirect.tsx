@@ -1,15 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from './SupabaseAuthProvider';
 import { findOrCreateUserProfile } from '../services/authService';
 import { getTelegramUser } from '../utils/telegram';
 import LoadingScreen from './LoadingScreen';
 
 const TelegramLoginRedirect = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const { profile, loading: authLoading } = useAuth();
-  const navigateRef = useRef(false);
+  const processedRef = useRef(false);
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
@@ -40,26 +38,25 @@ const TelegramLoginRedirect = () => {
     };
 
     initProfile();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (
-      !navigateRef.current &&
+      !processedRef.current &&
       profile &&
       !authLoading &&
       localStorage.getItem('user_id')
     ) {
-      console.log('Navigate to /account', {
+      console.log('Profile ready', {
         telegramUser: getTelegramUser(),
         user_id: localStorage.getItem('user_id'),
         profile
       });
-      navigateRef.current = true;
-      navigate('/account');
+      processedRef.current = true;
     }
-  }, [profile, authLoading, navigate]);
+  }, [profile, authLoading]);
 
-  if (!loading) return null;
+  if (!loading) return <p className="text-center text-gray-400">Контент загружается...</p>;
 
   return (
     <LoadingScreen />

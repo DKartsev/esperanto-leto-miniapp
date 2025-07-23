@@ -23,7 +23,7 @@ const StartupLoader: FC<StartupLoaderProps> = ({ onFinish }) => {
     }
   }, [onFinish]);
 
-  if (hidden) return null;
+  if (hidden) return <p className="text-center text-gray-400">Контент загружается...</p>;
 
   return (
     <div

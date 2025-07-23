@@ -66,7 +66,7 @@ const LearningPage = () => {
         />
       );
     default:
-      return null;
+      return <p className="text-center text-gray-400">Контент загружается...</p>;
   }
 };
 

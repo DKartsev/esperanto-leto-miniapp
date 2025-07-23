@@ -110,7 +110,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
     );
   }
 
-  return null;
+  return <p className="text-center text-gray-400">Контент загружается...</p>;
 };
 
 export default SectionComplete;
