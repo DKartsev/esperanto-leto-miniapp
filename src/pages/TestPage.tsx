@@ -49,7 +49,7 @@ const TestPage = () => {
     case 'results':
       return <TestResults results={testResults!} onSaveResults={() => {}} onRetakeTest={handleRetakeTest} />;
     default:
-      return null;
+      return <p className="text-center text-gray-400">Контент загружается...</p>;
   }
 };
 

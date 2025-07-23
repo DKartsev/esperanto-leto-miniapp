@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { NAV_ITEM_BASE, NAV_ICON_BASE } from '../utils/classNames';
@@ -17,8 +16,8 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: FC<NavigationBarProps> = ({ items, show = true }) => {
-  const { pathname } = useLocation();
-  if (!show) return null;
+  const pathname = window.location.pathname;
+  if (!show) return <p className="text-center text-gray-400">Контент загружается...</p>;
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-emerald-200 shadow-lg z-50 safe-area-inset-bottom">
       <div className="max-w-md mx-auto">
@@ -26,10 +25,9 @@ const NavigationBar: FC<NavigationBarProps> = ({ items, show = true }) => {
           {items.map(({ id, label, icon: Icon, path }) => {
             const active = pathname === path;
             return (
-              <NavLink
+              <a
                 key={id}
-                to={path}
-                end
+                href={path}
                 className={clsx(
                   NAV_ITEM_BASE,
                   active
@@ -41,7 +39,7 @@ const NavigationBar: FC<NavigationBarProps> = ({ items, show = true }) => {
               <span className="text-xs font-medium transition-all duration-200 text-center leading-tight">
                 {label}
               </span>
-              </NavLink>
+              </a>
             );
           })}
         </div>
