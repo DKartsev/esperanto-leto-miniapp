@@ -21,6 +21,7 @@ const ZigZagPath: FC<ZigZagPathProps> = ({ d, index, className }) => (
     d={d}
     stroke="#059669"
     strokeWidth="2"
+    strokeDasharray="4 4"
     fill="none"
     className={className}
     initial="hidden"
