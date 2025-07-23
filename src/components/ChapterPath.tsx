@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from 'react'
+import { useEffect, useState, type FC, useRef, useLayoutEffect } from 'react'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
 import { fetchChapters, fetchSections } from '../services/courseService'
@@ -37,6 +37,19 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
   const [chapters, setChapters] = useState<ChapterData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(100)
+
+  useLayoutEffect(() => {
+    const update = () => {
+      if (containerRef.current) {
+        setWidth(containerRef.current.offsetWidth)
+      }
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   useEffect(() => {
     const load = async () => {
@@ -82,7 +95,6 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
     return <div className="p-6 text-red-600">{error}</div>
   }
 
-  const width = 100
   const step = 80
   const radius = 28
   const offset = 10
@@ -96,7 +108,10 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
   })
 
   return (
-    <div className="min-h-screen overflow-y-auto pb-safe px-4 pt-4 space-y-8 max-w-screen-sm mx-auto">
+    <div
+      className="min-h-screen overflow-y-auto pb-safe px-4 pt-4 space-y-8 max-w-screen-sm mx-auto"
+      ref={containerRef}
+    >
       {chapters.map(ch => {
         const completedCount = ch.sections.filter(s => s.completed).length
         const paths = ch.sections.slice(0, -1).map((_, idx) => {
@@ -128,12 +143,12 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
                   const alignLeft = idx % 2 === 0
                   const wrapper = clsx('px-6 w-full flex', alignLeft ? 'justify-end' : 'justify-start')
                   const btnClass = clsx(
-                    'w-14 h-14 rounded-full border flex items-center justify-center text-base font-medium',
+                    'w-14 h-14 rounded-full border-4 flex items-center justify-center text-base font-medium bg-transparent',
                     sec.completed
-                      ? 'bg-emerald-500 text-white border-emerald-600'
+                      ? 'border-emerald-600 text-emerald-600'
                       : sec.unlocked
-                        ? 'bg-white text-emerald-600 border-emerald-600'
-                        : 'bg-gray-200 text-gray-400 border-gray-300 opacity-50 pointer-events-none'
+                        ? 'border-emerald-600 text-emerald-600'
+                        : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none'
                   )
                   return (
                     <motion.div
