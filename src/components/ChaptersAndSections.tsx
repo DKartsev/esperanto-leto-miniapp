@@ -63,24 +63,28 @@ const ChaptersAndSections: FC<ChaptersAndSectionsProps> = ({ onSectionSelect }) 
     const load = async () => {
       try {
         const ch = await fetchChapters();
-        const list: ChapterData[] = [];
-        for (const c of ch as Array<{ id: number; title: string }>) {
-          const secs = await fetchSections(c.id);
-          const sections: SectionInfo[] = (secs as Array<{ id: number }>).map((s, idx) => {
+        const sectionLists = await Promise.all(ch.map(c => fetchSections(c.id)));
+
+        const list: ChapterData[] = ch.map((c, idx) => {
+          const secs = sectionLists[idx] as Array<{ id: number }>;
+          const sections: SectionInfo[] = secs.map((s, sIdx) => {
             const progress = sectionProgressMap[s.id] || { accuracy: 0, completed: false };
             return {
               id: s.id,
-              index: idx + 1,
+              index: sIdx + 1,
               completed: progress.completed || progress.accuracy >= 70,
               unlocked: false,
               xp: 20,
             };
           });
+
           for (let i = 0; i < sections.length; i++) {
             sections[i].unlocked = i === 0 || sections[i - 1].completed;
           }
-          list.push({ id: c.id, title: c.title || getChapterTitle(c.id), sections });
-        }
+
+          return { id: c.id, title: c.title || getChapterTitle(c.id), sections };
+        });
+
         setChapters(list);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Ошибка загрузки');
