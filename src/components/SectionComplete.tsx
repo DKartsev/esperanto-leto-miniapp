@@ -7,6 +7,7 @@ import SectionFailed from './SectionFailed';
 import SectionSuccess from './SectionSuccess';
 import { getNextStep } from '../utils/navigation.js';
 import Toast from './Toast';
+import { ACHIEVEMENTS } from '../features/account/Achievements';
 
 interface SectionResults {
   totalQuestions: number;
@@ -19,6 +20,7 @@ interface SectionCompleteProps {
   results: SectionResults;
   chapterId: number;
   sectionId: number;
+  newAchievements?: string[];
   onRetry?: () => void;
   onNext?: (nextSectionId?: string, nextChapterId?: string) => void;
 }
@@ -27,6 +29,7 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   results,
   chapterId,
   sectionId,
+  newAchievements,
   onRetry,
   onNext
 }) => {
@@ -38,6 +41,22 @@ const SectionComplete: FC<SectionCompleteProps> = ({
   const [nextSectionId, setNextSectionId] = useState<string | undefined>(undefined);
   const [nextChapterId, setNextChapterId] = useState<string | undefined>(undefined);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [achQueue, setAchQueue] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (newAchievements && newAchievements.length > 0) {
+      setAchQueue(newAchievements);
+    }
+  }, [newAchievements]);
+
+  useEffect(() => {
+    if (!toastMessage && achQueue.length > 0) {
+      const type = achQueue[0];
+      const title = ACHIEVEMENTS.find(a => a.type === type)?.title || type;
+      setToastMessage(`🏆 Новое достижение: ${title}!`);
+      setAchQueue(q => q.slice(1));
+    }
+  }, [toastMessage, achQueue]);
 
   useEffect(() => {
     getNextStep(sectionId).then(step => {
@@ -81,6 +100,9 @@ const SectionComplete: FC<SectionCompleteProps> = ({
         try {
           await refreshStats();
           setToastMessage('🎉 Раздел пройден! Вы получили +20 XP');
+          if (newAchievements && newAchievements.length > 0) {
+            setAchQueue(newAchievements);
+          }
         } catch (err) {
           console.error('Ошибка обновления статистики:', err);
         }

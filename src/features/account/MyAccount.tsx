@@ -178,9 +178,8 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
   const totalSections = chapterProgress.reduce((sum, cp) => sum + cp.totalSections, 0)
   const completedSections = chapterProgress.reduce((sum, cp) => sum + cp.completedSections, 0)
   const xp = progressStats.completedSections * 20
-  const nextLevelXp = 200
-  const level = xp < nextLevelXp ? 'A1' : 'A2'
-  const xpPercent = Math.min(((xp % nextLevelXp) / nextLevelXp) * 100, 100)
+  const level = Math.floor(xp / 100)
+  const progress = xp % 100
 
   if (loading || statsLoading) {
     return (
@@ -275,13 +274,14 @@ const MyAccount: FC<MyAccountProps> = ({ onBackToHome, onStartChapter }) => {
       </div>
       <div className="p-6">
         <div className="mb-4">
-          <div className="flex justify-between items-center text-sm font-medium mb-1">
-            <span>Уровень: {level}</span>
-            <span>XP: {xp} / {nextLevelXp}</span>
+          <p className="text-sm text-gray-500">Уровень: {level}</p>
+          <div className="w-full h-2 rounded-full bg-gray-200 mt-1">
+            <div
+              className="h-2 rounded-full bg-emerald-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
-          <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-            <div className="h-2 bg-emerald-500 rounded-full" style={{ width: `${xpPercent}%` }} />
-          </div>
+          <p className="text-xs text-gray-400 mt-1">{xp} XP</p>
         </div>
         <StatsCarousel
           totalTime={progressStats.totalTime}
