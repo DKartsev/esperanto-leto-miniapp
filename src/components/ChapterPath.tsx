@@ -95,8 +95,8 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
     return <div className="p-6 text-red-600">{error}</div>
   }
 
-  const step = 80
-  const radius = 28
+  const step = 136
+  const radius = 56
   const offset = 10
   const leftX = radius + offset
   const rightX = width - radius - offset
@@ -141,9 +141,12 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
               <div className="flex flex-col items-center gap-y-6 relative w-full">
                 {ch.sections.map((sec, idx) => {
                   const alignLeft = idx % 2 === 0
-                  const wrapper = clsx('px-6 w-full flex', alignLeft ? 'justify-end' : 'justify-start')
+                  const wrapper = clsx(
+                    'px-6 w-full flex',
+                    alignLeft ? 'justify-end mr-auto' : 'justify-start ml-auto'
+                  )
                   const btnClass = clsx(
-                    'w-14 h-14 rounded-full border-4 flex items-center justify-center text-base font-medium bg-transparent',
+                    'w-28 h-28 rounded-full border-4 flex items-center justify-center text-base font-medium bg-transparent',
                     sec.completed
                       ? 'border-emerald-600 text-emerald-600'
                       : sec.unlocked
