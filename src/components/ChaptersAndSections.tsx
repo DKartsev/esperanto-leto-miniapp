@@ -3,6 +3,7 @@ import { fetchChapters, fetchSections } from '../services/courseService';
 import { useAuth } from './SupabaseAuthProvider';
 import useUserProgress from '../hooks/useUserProgress';
 import SectionsList from './SectionsList';
+import { getChapterTitle } from '../utils/courseTitles';
 
 interface ChaptersAndSectionsProps {
   onSectionSelect: (chapterId: number, sectionId: number) => void;
@@ -21,35 +22,6 @@ interface ChapterData {
   title: string;
   sections: SectionInfo[];
 }
-
-const getChapterTitle = (chapterId: number): string => {
-  switch (chapterId) {
-    case 1:
-      return 'Основы эсперанто';
-    case 2:
-      return 'Основные глаголы и действия';
-    case 3:
-      return 'Грамматика';
-    case 4:
-      return 'Словарный запас';
-    case 5:
-      return 'Произношение';
-    case 6:
-      return 'Диалоги';
-    case 7:
-      return 'Культура';
-    case 8:
-      return 'Литература';
-    case 9:
-      return 'История языка';
-    case 10:
-      return 'Практические упражнения';
-    case 11:
-      return 'Итоговый тест';
-    default:
-      return `Глава ${chapterId}`;
-  }
-};
 
 const ChaptersAndSections: FC<ChaptersAndSectionsProps> = ({ onSectionSelect }) => {
   const { profile } = useAuth();
