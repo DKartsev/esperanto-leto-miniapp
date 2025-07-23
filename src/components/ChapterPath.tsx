@@ -113,7 +113,6 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
       ref={containerRef}
     >
       {chapters.map(ch => {
-        const completedCount = ch.sections.filter(s => s.completed).length
         const paths = ch.sections.slice(0, -1).map((_, idx) => {
           const start = getPoint(idx)
           const end = getPoint(idx + 1)
@@ -125,7 +124,7 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
         return (
           <div key={ch.id} className="overflow-y-auto max-h-[calc(100vh-200px)]">
             <h2 className="text-lg font-semibold text-emerald-900 text-center mb-4">
-              {`${ch.id} (${completedCount}/${ch.sections.length}) ${ch.title}`}
+              {`${ch.id} ${ch.title}`}
             </h2>
             <div className="relative">
               <svg
