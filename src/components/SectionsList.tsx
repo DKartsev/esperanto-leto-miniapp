@@ -50,13 +50,7 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
     xp: 20,
   }))
 
-  function chunkArray<T>(arr: T[], size: number): T[][] {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-      arr.slice(i * size, i * size + size)
-    )
-  }
-
-  const chunkedSections = chunkArray(sectionsWithStatus, 4)
+  const completedCount = sectionsWithStatus.filter(s => s.completed).length
 
 
   const getChapterTitle = (chapterId: number): string => {
@@ -76,7 +70,9 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
     }
   };
 
-  const chapterTitle = getChapterTitle(chapterId);
+  const chapterTitle = getChapterTitle(chapterId)
+  const totalSections = sectionsWithStatus.length
+  const headerTitle = `${chapterId} (${completedCount}/${totalSections}) ${chapterTitle}`
 
   if (loading) {
     return <SkeletonSectionList />;
@@ -98,55 +94,71 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
           </svg>
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-emerald-900">{chapterTitle}</h1>
-          <p className="text-emerald-700">Изучите теорию, затем выберите раздел для практики</p>
+          <h1 className="text-xl font-semibold text-emerald-900">{headerTitle}</h1>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {chunkedSections.map((row, i) => (
-          <div
-            key={i}
-            className={clsx('flex gap-4', i % 2 === 1 && 'flex-row-reverse')}
-          >
-            {row.map((section, j) => (
-              <motion.div
-                key={section.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: j * 0.05 }}
-                onClick={
-                  section.unlocked ? () => onSectionSelect(section.id) : undefined
-                }
-                className={clsx(
-                  'relative flex flex-col items-center cursor-pointer',
-                  !section.unlocked && 'pointer-events-none opacity-50'
-                )}
-              >
-                <div
-                  className={clsx(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border',
-                    section.completed
-                      ? 'bg-emerald-500 text-white border-emerald-600'
-                      : section.unlocked
-                      ? 'bg-white text-gray-800 border-gray-400'
-                      : 'bg-gray-200 text-gray-400 border-gray-300'
+      <div className="relative max-h-[calc(100vh-200px)] overflow-y-auto py-4">
+        <div className="absolute left-1/2 top-0 bottom-0 border-l-2 border-dashed border-gray-300" />
+        <div className="space-y-6">
+          {sectionsWithStatus.map((section, i) => (
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="grid grid-cols-2 items-center"
+            >
+              {i % 2 === 0 ? (
+                <div className="relative flex justify-end pr-4">
+                  <button
+                    onClick={section.unlocked ? () => onSectionSelect(section.id) : undefined}
+                    disabled={!section.unlocked}
+                    className={clsx(
+                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border transition-colors',
+                      section.completed
+                        ? 'bg-emerald-500 text-white border-emerald-600'
+                        : section.unlocked
+                        ? 'bg-white text-emerald-600 border-emerald-600'
+                        : 'bg-gray-200 text-gray-400 border-gray-300'
+                    )}
+                  >
+                    {section.index}
+                  </button>
+                  <div className="absolute top-1/2 right-full w-4 border-t-2 border-dashed border-gray-300" />
+                  {section.completed && (
+                    <span className="absolute top-full mt-1 text-[10px] text-emerald-600">
+                      +{section.xp} XP
+                    </span>
                   )}
-                >
-                  {section.index}
                 </div>
-                {section.completed && (
-                  <span className="text-[10px] text-emerald-600 mt-1">
-                    +{section.xp} XP
-                  </span>
-                )}
-                {j < row.length - 1 && (
+              ) : (
+                <div className="relative flex justify-start pl-4">
+                  <button
+                    onClick={section.unlocked ? () => onSectionSelect(section.id) : undefined}
+                    disabled={!section.unlocked}
+                    className={clsx(
+                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border transition-colors',
+                      section.completed
+                        ? 'bg-emerald-500 text-white border-emerald-600'
+                        : section.unlocked
+                        ? 'bg-white text-emerald-600 border-emerald-600'
+                        : 'bg-gray-200 text-gray-300 border-gray-300'
+                    )}
+                  >
+                    {section.index}
+                  </button>
                   <div className="absolute top-1/2 left-full w-4 border-t-2 border-dashed border-gray-300" />
-                )}
-              </motion.div>
-            ))}
-          </div>
-        ))}
+                  {section.completed && (
+                    <span className="absolute top-full mt-1 text-[10px] text-emerald-600">
+                      +{section.xp} XP
+                    </span>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Study Tips */}
