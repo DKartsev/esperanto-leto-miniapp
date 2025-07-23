@@ -81,63 +81,49 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
     return <div className="p-6 text-red-600">{error}</div>
   }
 
-  const circleSize = 96
-  const marginY = 48
-  const step = circleSize + marginY
-
   return (
-    <div
-      className="min-h-screen overflow-y-auto pb-safe px-4 pt-4 space-y-8 max-w-screen-sm mx-auto"
-    >
-      {chapters.map(ch => {
-        const containerHeight = step * (ch.sections.length - 1) + circleSize
-
-        return (
-          <div key={ch.id} className="overflow-y-auto max-h-[calc(100vh-200px)]">
-            <h2 className="text-lg font-semibold text-emerald-900 text-center mb-4">
-              {`${ch.id} ${ch.title}`}
-            </h2>
-            <div className="relative" style={{ height: containerHeight }}>
-              {ch.sections.map((sec, idx) => {
-                const alignLeft = idx % 2 === 0
-                const wrapperClass = clsx(
-                  'absolute flex flex-col items-center',
-                  alignLeft ? 'left-4' : 'right-4'
-                )
-                const btnClass = clsx(
-                  'w-24 h-24 rounded-full border-2 flex items-center justify-center text-2xl font-bold bg-transparent',
-                  sec.completed
+    <div className="min-h-screen overflow-y-auto pb-safe pt-4 space-y-8 max-w-screen-sm mx-auto pl-4 pr-4">
+      {chapters.map(ch => (
+        <div key={ch.id} className="overflow-y-auto max-h-[calc(100vh-200px)]">
+          <h2 className="text-lg font-semibold text-emerald-900 text-center mb-4">
+            {`${ch.id} ${ch.title}`}
+          </h2>
+          <div className="flex flex-col items-center">
+            {ch.sections.map((sec, idx) => {
+              const alignLeft = idx % 2 === 0
+              const wrapperClass = clsx(
+                'flex flex-col items-center mt-12',
+                alignLeft ? 'self-start' : 'self-end'
+              )
+              const btnClass = clsx(
+                'w-24 h-24 rounded-full border-2 flex items-center justify-center text-2xl font-bold bg-transparent',
+                sec.completed
+                  ? 'border-emerald-600 text-emerald-600'
+                  : sec.unlocked
                     ? 'border-emerald-600 text-emerald-600'
-                    : sec.unlocked
-                      ? 'border-emerald-600 text-emerald-600'
-                      : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed'
-                )
-                return (
-                  <motion.div
-                    key={sec.id}
-                    className={wrapperClass}
-                    style={{ top: idx * step }}
-                    variants={circleVariants}
-                    initial="hidden"
-                    animate="visible"
-                    custom={idx}
-                  >
-                    <button
-                      onClick={() => sec.unlocked && onSectionSelect(ch.id, sec.id)}
-                      className={btnClass}
-                    >
-                      {sec.index}
-                    </button>
-                    {sec.completed && (
-                      <span className="mt-1 text-[10px] text-emerald-600">+{sec.xp} XP</span>
-                    )}
-                  </motion.div>
-                )
-              })}
-              </div>
+                    : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed'
+              )
+              return (
+                <motion.div
+                  key={sec.id}
+                  className={wrapperClass}
+                  variants={circleVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={idx}
+                >
+                  <button onClick={() => onSectionSelect(ch.id, sec.id)} className={btnClass}>
+                    {sec.index}
+                  </button>
+                  {sec.completed && (
+                    <span className="mt-1 text-[10px] text-emerald-600">+{sec.xp} XP</span>
+                  )}
+                </motion.div>
+              )
+            })}
           </div>
-        )
-      })}
+        </div>
+      ))}
     </div>
   )
 }
