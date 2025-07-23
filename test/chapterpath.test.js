@@ -68,9 +68,9 @@ test('ChapterPath renders layout correctly', async () => {
   assert.equal(buttons.length, 3);
 
   const paths = container.querySelectorAll('svg path');
-  assert.equal(paths.length, 2);
+  assert.equal(paths.length, 0);
 
-  const wrappers = container.querySelectorAll('div.px-6');
-  assert.ok(wrappers[0].className.includes('mr-auto'));
-  assert.ok(wrappers[1].className.includes('ml-auto'));
+  const wrappers = container.querySelectorAll('div.absolute');
+  assert.ok(wrappers[0].className.includes('left-4'));
+  assert.ok(wrappers[1].className.includes('right-4'));
 });
