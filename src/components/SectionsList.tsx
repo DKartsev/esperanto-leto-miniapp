@@ -1,7 +1,8 @@
 import { type FC } from 'react'
+import { motion } from 'framer-motion'
+import clsx from 'clsx'
 import { SkeletonSectionList } from './Skeletons'
 import { Book } from 'lucide-react'
-import SectionCard from './SectionCard'
 import { fetchSections } from '../services/courseService'
 import { useLoadData } from '../hooks/useLoadData'
 import useUserProgress from '../hooks/useUserProgress'
@@ -40,6 +41,19 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
       const isCompleted = progressInfo.completed || progress >= 70
       return { ...sec, progress, isCompleted }
     }) || []
+
+  const sectionsWithStatus = sections.map((sec, idx, arr) => ({
+    id: sec.id,
+    index: idx + 1,
+    completed: sec.isCompleted,
+    unlocked: idx === 0 || arr[idx - 1].isCompleted,
+    xp: 20,
+  }))
+
+  const chunkedSections: typeof sectionsWithStatus[][] = []
+  for (let i = 0; i < sectionsWithStatus.length; i += 4) {
+    chunkedSections.push(sectionsWithStatus.slice(i, i + 4))
+  }
 
 
   const getChapterTitle = (chapterId: number): string => {
@@ -86,15 +100,49 @@ const SectionsList: FC<SectionsListProps> = ({ chapterId, onSectionSelect, onBac
         </div>
       </div>
 
-      <div className="space-y-2">
-        {sections.map((section) => (
-          <SectionCard
-            key={section.id}
-            id={section.id}
-            title={section.title}
-            progress={section.progress}
-            onSelect={() => onSectionSelect(section.id)}
-          />
+      <div className="space-y-4">
+        {chunkedSections.map((row, i) => (
+          <div
+            key={i}
+            className={clsx('flex gap-4', i % 2 === 1 && 'flex-row-reverse')}
+          >
+            {row.map((section, j) => (
+              <motion.div
+                key={section.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: j * 0.05 }}
+                onClick={
+                  section.unlocked ? () => onSectionSelect(section.id) : undefined
+                }
+                className={clsx(
+                  'relative flex flex-col items-center cursor-pointer',
+                  !section.unlocked && 'pointer-events-none opacity-50'
+                )}
+              >
+                <div
+                  className={clsx(
+                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border',
+                    section.completed
+                      ? 'bg-emerald-500 text-white border-emerald-600'
+                      : section.unlocked
+                      ? 'bg-white text-gray-800 border-gray-400'
+                      : 'bg-gray-200 text-gray-400 border-gray-300'
+                  )}
+                >
+                  {section.index}
+                </div>
+                {section.completed && (
+                  <span className="text-[10px] text-emerald-600 mt-1">
+                    +{section.xp} XP
+                  </span>
+                )}
+                {j < row.length - 1 && (
+                  <div className="absolute top-1/2 left-full w-4 border-t-2 border-dashed border-gray-300" />
+                )}
+              </motion.div>
+            ))}
+          </div>
         ))}
       </div>
 
