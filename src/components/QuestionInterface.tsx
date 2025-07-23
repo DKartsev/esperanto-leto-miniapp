@@ -8,6 +8,7 @@ import { saveProgressBulk, saveTestResults } from '../services/progressService'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLoadData } from '../hooks/useLoadData';
 import TheoryBlock from './TheoryBlock';
+import { getChapterTitle } from '../utils/courseTitles';
 
 
 export interface QuestionResultItem {
@@ -96,14 +97,6 @@ const QuestionInterface: FC<QuestionInterfaceProps> = ({
     return <div className="p-6">Данные не найдены</div>
   }
 
-  const getChapterTitle = (chapterId: number): string => {
-    switch (chapterId) {
-      case 1: return "Основы эсперанто";
-      case 2: return "Основные глаголы и действия";
-      case 3: return "Грамматика";
-      default: return `Глава ${chapterId}`;
-    }
-  };
 
   const getSectionTitle = (chapterId: number, sectionId: number): string => {
     if (chapterId === 1) {
