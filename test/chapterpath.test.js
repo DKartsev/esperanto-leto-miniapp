@@ -32,7 +32,7 @@ export default function SupabaseAuthProvider({children}){return children;}`,
       }));
       build.onLoad({ filter: /^framer-motion$/, namespace: 'stub' }, () => ({
         contents: `import React from 'react';
-export const motion={div:(p)=>React.createElement('div',p),path:(p)=>React.createElement('path',p)};`,
+export const motion={div:(p)=>React.createElement('div',p)};`,
         loader: 'tsx',
         resolveDir: '.'
       }));
@@ -66,11 +66,24 @@ test('ChapterPath renders layout correctly', async () => {
 
   const buttons = container.querySelectorAll('button');
   assert.equal(buttons.length, 3);
+  buttons.forEach(btn => {
+    assert.ok(btn.className.includes('w-24'));
+    assert.ok(btn.className.includes('h-24'));
+  });
 
   const paths = container.querySelectorAll('svg path');
   assert.equal(paths.length, 0);
 
   const wrappers = container.querySelectorAll('div.mt-12');
-  assert.ok(wrappers[0].className.includes('self-start'));
-  assert.ok(wrappers[1].className.includes('self-end'));
+  wrappers.forEach((wrap, idx) => {
+    if (idx % 2 === 0) {
+      assert.ok(
+        wrap.className.includes('self-start') || wrap.style.alignSelf === 'flex-start'
+      );
+    } else {
+      assert.ok(
+        wrap.className.includes('self-end') || wrap.style.alignSelf === 'flex-end'
+      );
+    }
+  });
 });
