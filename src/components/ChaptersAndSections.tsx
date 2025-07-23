@@ -1,9 +1,8 @@
 import { useEffect, useState, type FC } from 'react';
-import clsx from 'clsx';
-import { motion } from 'framer-motion';
 import { fetchChapters, fetchSections } from '../services/courseService';
 import { useAuth } from './SupabaseAuthProvider';
 import useUserProgress from '../hooks/useUserProgress';
+import SectionsList from './SectionsList';
 
 interface ChaptersAndSectionsProps {
   onSectionSelect: (chapterId: number, sectionId: number) => void;
@@ -100,83 +99,20 @@ const ChaptersAndSections: FC<ChaptersAndSectionsProps> = ({ onSectionSelect }) 
     return <div className="p-6 text-red-600">{error}</div>;
   }
 
-  const handleSelect = (chapterId: number, section: SectionInfo) => {
-    if (!section.unlocked) return;
-    onSectionSelect(chapterId, section.id);
+  const handleSelect = (chapterId: number, sectionId: number) => {
+    onSectionSelect(chapterId, sectionId);
   };
 
   return (
     <div className="min-h-screen overflow-y-auto pb-safe px-4 pt-4 space-y-8 max-w-screen-sm mx-auto">
-      {chapters.map((ch) => {
-        const completedCount = ch.sections.filter((s) => s.completed).length;
-        return (
-          <div key={ch.id} className="space-y-4">
-            <h2 className="text-lg font-semibold text-emerald-900">
-              {`${ch.id} (${completedCount}/${ch.sections.length}) ${getChapterTitle(ch.id)}`}
-            </h2>
-            <div className="relative py-4">
-              <div className="absolute left-1/2 top-0 bottom-0 border-l-2 border-dashed border-gray-300" />
-              <div className="space-y-6">
-                {ch.sections.map((sec, i) => (
-                  <motion.div
-                    key={sec.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="grid grid-cols-2 items-center"
-                  >
-                    {i % 2 === 0 ? (
-                      <div className="relative flex justify-end pr-4">
-                        <button
-                          onClick={() => handleSelect(ch.id, sec)}
-                          disabled={!sec.unlocked}
-                          className={clsx(
-                            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border',
-                            sec.completed
-                              ? 'bg-emerald-500 text-white border-emerald-600'
-                              : sec.unlocked
-                              ? 'bg-white text-emerald-600 border-emerald-600'
-                              : 'bg-gray-200 text-gray-300 border-gray-300 cursor-not-allowed'
-                          )}
-                          style={{ cursor: sec.unlocked ? 'pointer' : 'not-allowed' }}
-                        >
-                          {sec.index}
-                        </button>
-                        <div className="absolute top-1/2 right-full w-4 border-t-2 border-dashed border-gray-300" />
-                        {sec.completed && (
-                          <span className="absolute top-full mt-1 text-[10px] text-emerald-600">+{sec.xp} XP</span>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="relative flex justify-start pl-4">
-                        <button
-                          onClick={() => handleSelect(ch.id, sec)}
-                          disabled={!sec.unlocked}
-                          className={clsx(
-                            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border',
-                            sec.completed
-                              ? 'bg-emerald-500 text-white border-emerald-600'
-                              : sec.unlocked
-                              ? 'bg-white text-emerald-600 border-emerald-600'
-                              : 'bg-gray-200 text-gray-300 border-gray-300 cursor-not-allowed'
-                          )}
-                          style={{ cursor: sec.unlocked ? 'pointer' : 'not-allowed' }}
-                        >
-                          {sec.index}
-                        </button>
-                        <div className="absolute top-1/2 left-full w-4 border-t-2 border-dashed border-gray-300" />
-                        {sec.completed && (
-                          <span className="absolute top-full mt-1 text-[10px] text-emerald-600">+{sec.xp} XP</span>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      {chapters.map((ch) => (
+        <SectionsList
+          key={ch.id}
+          chapterId={ch.id}
+          sections={ch.sections}
+          onSectionSelect={(sectionId) => handleSelect(ch.id, sectionId)}
+        />
+      ))}
     </div>
   );
 };
