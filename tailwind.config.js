@@ -5,6 +5,7 @@ export default {
     extend: {
       spacing: {
         'safe': 'env(safe-area-inset-bottom)',
+        '18': '4.5rem',
       },
       screens: {
         'safe-area': 'screen and (display-mode: standalone)',

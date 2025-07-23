@@ -145,12 +145,12 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
                     alignLeft ? 'justify-end mr-auto' : 'justify-start ml-auto'
                   )
                   const btnClass = clsx(
-                    'w-28 h-28 rounded-full border-4 flex items-center justify-center text-base font-medium bg-transparent',
+                    'w-18 h-18 rounded-full border-2 flex items-center justify-center text-xl font-bold bg-transparent',
                     sec.completed
                       ? 'border-emerald-600 text-emerald-600'
                       : sec.unlocked
                         ? 'border-emerald-600 text-emerald-600'
-                        : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none'
+                        : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed'
                   )
                   return (
                     <motion.div
