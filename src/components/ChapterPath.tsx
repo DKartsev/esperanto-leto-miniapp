@@ -25,8 +25,82 @@ interface ChapterData {
 }
 
 const circleVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: (i: number) => ({ opacity: 1, scale: 1, transition: { delay: i * 0.05 } })
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05 }
+  })
+}
+
+interface SectionItemProps {
+  chapterId: number
+  section: SectionInfo
+  index: number
+  isLast: boolean
+  onSelect: (chapterId: number, sectionId: number) => void
+}
+
+const SectionItem: FC<SectionItemProps> = ({
+  chapterId,
+  section,
+  index,
+  isLast,
+  onSelect
+}) => {
+  const alignLeft = index % 2 === 0
+  const wrapperClass = clsx(
+    'relative flex flex-col items-center mt-12',
+    alignLeft ? 'self-start' : 'self-end'
+  )
+  const btnClass = clsx(
+    'w-24 h-24 rounded-full border-2 flex items-center justify-center text-3xl font-bold bg-transparent transition-transform hover:scale-105',
+    section.completed || section.unlocked
+      ? 'border-emerald-600 text-emerald-600'
+      : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed'
+  )
+  const gradId = `grad-${section.id}`
+  return (
+    <motion.div
+      data-testid="section-item"
+      className={wrapperClass}
+      variants={circleVariants}
+      initial="hidden"
+      animate="visible"
+      custom={index}
+    >
+      <button
+        onClick={() => onSelect(chapterId, section.id)}
+        className={btnClass}
+      >
+        {section.index}
+      </button>
+      {section.completed && (
+        <span className="mt-1 text-[10px] text-emerald-600">+{section.xp} XP</span>
+      )}
+      {!isLast && (
+        <svg
+          className="absolute top-full left-1/2 -translate-x-1/2 w-1 h-12"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#34d399" />
+              <stop offset="100%" stopColor="#059669" />
+            </linearGradient>
+          </defs>
+          <line
+            x1="0.5"
+            y1="0"
+            x2="0.5"
+            y2="48"
+            stroke={`url(#${gradId})`}
+            strokeWidth="2"
+          />
+        </svg>
+      )}
+    </motion.div>
+  )
 }
 
 const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
@@ -88,39 +162,37 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
           <h2 className="text-lg font-semibold text-emerald-900 text-center mb-4">
             {`${ch.id} ${ch.title}`}
           </h2>
-          <div className="flex flex-col items-center">
-            {ch.sections.map((sec, idx) => {
-              const alignLeft = idx % 2 === 0
-              const wrapperClass = clsx(
-                'flex flex-col items-center mt-12',
-                alignLeft ? 'self-start' : 'self-end'
-              )
-              const btnClass = clsx(
-                'w-24 h-24 rounded-full border-2 flex items-center justify-center text-2xl font-bold bg-transparent',
-                sec.completed
-                  ? 'border-emerald-600 text-emerald-600'
-                  : sec.unlocked
-                    ? 'border-emerald-600 text-emerald-600'
-                    : 'border-gray-300 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed'
-              )
-              return (
-                <motion.div
-                  key={sec.id}
-                  className={wrapperClass}
-                  variants={circleVariants}
-                  initial="hidden"
-                  animate="visible"
-                  custom={idx}
-                >
-                  <button onClick={() => onSectionSelect(ch.id, sec.id)} className={btnClass}>
-                    {sec.index}
-                  </button>
-                  {sec.completed && (
-                    <span className="mt-1 text-[10px] text-emerald-600">+{sec.xp} XP</span>
-                  )}
-                </motion.div>
-              )
-            })}
+          <div className="relative flex flex-col items-center">
+            <svg
+              className="absolute inset-0 pointer-events-none w-full h-full -z-10"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="route-grad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#34d399" />
+                  <stop offset="100%" stopColor="#059669" />
+                </linearGradient>
+              </defs>
+              <line
+                x1="50%"
+                y1="0"
+                x2="50%"
+                y2="100%"
+                stroke="url(#route-grad)"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+            </svg>
+            {ch.sections.map((sec, idx) => (
+              <SectionItem
+                key={sec.id}
+                chapterId={ch.id}
+                section={sec}
+                index={idx}
+                isLast={idx === ch.sections.length - 1}
+                onSelect={onSectionSelect}
+              />
+            ))}
           </div>
         </div>
       ))}

@@ -73,10 +73,10 @@ test('ChapterPath renders layout correctly', async () => {
     assert.ok(btn.className.includes('h-24'));
   });
 
-  const paths = container.querySelectorAll('svg path');
-  assert.equal(paths.length, 0);
+  const svgs = container.querySelectorAll('svg');
+  assert.ok(svgs.length > 0);
 
-  const wrappers = container.querySelectorAll('div.mt-12');
+  const wrappers = container.querySelectorAll('div[data-testid="section-item"]');
   wrappers.forEach((wrap, idx) => {
     if (idx % 2 === 0) {
       assert.ok(
