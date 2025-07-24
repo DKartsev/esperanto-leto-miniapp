@@ -155,47 +155,60 @@ const ChapterPath: FC<ChapterPathProps> = ({ onSectionSelect }) => {
     return <div className="p-6 text-red-600">{error}</div>
   }
 
+  const listItems = chapters.flatMap((c, cIdx) => [
+    { type: 'chapter' as const, chapter: c, chapterIndex: cIdx },
+    ...c.sections.map((s, sIdx) => ({
+      type: 'section' as const,
+      chapter: c,
+      section: s,
+      sectionIndex: sIdx
+    }))
+  ])
+
   return (
     <div className="min-h-screen overflow-y-auto pb-safe pt-4 space-y-8 max-w-screen-sm mx-auto pl-4 pr-4">
-      {chapters.map(ch => (
-        <div key={ch.id} className="overflow-y-auto max-h-[calc(100vh-200px)]">
-          <h2 className="text-lg font-semibold text-emerald-900 text-center mb-4">
-            {`${ch.id} ${ch.title}`}
-          </h2>
-          <div className="relative flex flex-col items-center">
-            <svg
-              className="absolute inset-0 pointer-events-none w-full h-full -z-10"
-              xmlns="http://www.w3.org/2000/svg"
+      <div className="relative flex flex-col items-center">
+        <svg
+          className="absolute inset-0 pointer-events-none w-full h-full -z-10"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="route-grad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#34d399" />
+              <stop offset="100%" stopColor="#059669" />
+            </linearGradient>
+          </defs>
+          <line
+            x1="50%"
+            y1="0"
+            x2="50%"
+            y2="100%"
+            stroke="url(#route-grad)"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray="4 4"
+          />
+        </svg>
+        {listItems.map(item =>
+          item.type === 'chapter' ? (
+            <h2
+              key={`chapter-${item.chapter.id}`}
+              className="text-lg font-semibold text-emerald-900 text-center mb-4 w-full"
             >
-              <defs>
-                <linearGradient id="route-grad" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#34d399" />
-                  <stop offset="100%" stopColor="#059669" />
-                </linearGradient>
-              </defs>
-              <line
-                x1="50%"
-                y1="0"
-                x2="50%"
-                y2="100%"
-                stroke="url(#route-grad)"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
-            </svg>
-            {ch.sections.map((sec, idx) => (
-              <SectionItem
-                key={sec.id}
-                chapterId={ch.id}
-                section={sec}
-                index={idx}
-                isLast={idx === ch.sections.length - 1}
-                onSelect={onSectionSelect}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
+              {`${item.chapter.id} ${item.chapter.title}`}
+            </h2>
+          ) : (
+            <SectionItem
+              key={`section-${item.section.id}`}
+              chapterId={item.chapter.id}
+              section={item.section}
+              index={item.sectionIndex}
+              isLast={item.sectionIndex === item.chapter.sections.length - 1}
+              onSelect={onSectionSelect}
+            />
+          )
+        )}
+      </div>
     </div>
   )
 }
