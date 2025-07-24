@@ -76,18 +76,38 @@ test('ChapterPath renders layout correctly', async () => {
   const svgs = container.querySelectorAll('svg');
   assert.ok(svgs.length > 0);
 
+  let dashedFound = false;
+  svgs.forEach(svg => {
+    svg.querySelectorAll('path, line').forEach(el => {
+      if (
+        el.getAttribute('stroke-dasharray') ||
+        el.style.strokeDasharray
+      ) {
+        dashedFound = true;
+      }
+    });
+  });
+  assert.ok(dashedFound, 'expected at least one dashed svg path');
+
   const wrappers = container.querySelectorAll('div[data-testid="section-item"]');
   wrappers.forEach((wrap, idx) => {
+    const hasStart =
+      wrap.className.includes('self-start') ||
+      wrap.style.alignSelf === 'flex-start';
+    const hasEnd =
+      wrap.className.includes('self-end') ||
+      wrap.style.alignSelf === 'flex-end';
+
     if (idx % 2 === 0) {
-      assert.ok(
-        wrap.className.includes('self-start') ||
-          wrap.style.alignSelf === 'flex-start'
-      );
+      assert.ok(hasStart, `wrapper ${idx} should align self-start`);
     } else {
-      assert.ok(
-        wrap.className.includes('self-end') ||
-          wrap.style.alignSelf === 'flex-end'
-      );
+      assert.ok(hasEnd, `wrapper ${idx} should align self-end`);
+    }
+
+    if (idx === 0) {
+      assert.equal(wrap.getAttribute('initial'), 'hidden');
+      assert.equal(wrap.getAttribute('animate'), 'visible');
+      assert.ok(wrap.hasAttribute('variants'));
     }
   });
   cleanup();
