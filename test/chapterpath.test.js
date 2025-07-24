@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { JSDOM } from 'jsdom';
-import { render } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import React from 'react';
 import * as esbuild from 'esbuild';
 import path from 'path';
@@ -61,7 +61,9 @@ test('ChapterPath renders layout correctly', async () => {
   globalThis.document = dom.window.document;
   Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true });
 
-  const { container } = render(React.createElement(ChapterPath, { onSectionSelect(){} }));
+  const { container } = render(
+    React.createElement(ChapterPath, { onSectionSelect() {} })
+  );
   await new Promise(r => setTimeout(r, 0));
 
   const buttons = container.querySelectorAll('button');
@@ -78,12 +80,16 @@ test('ChapterPath renders layout correctly', async () => {
   wrappers.forEach((wrap, idx) => {
     if (idx % 2 === 0) {
       assert.ok(
-        wrap.className.includes('self-start') || wrap.style.alignSelf === 'flex-start'
+        wrap.className.includes('self-start') ||
+          wrap.style.alignSelf === 'flex-start'
       );
     } else {
       assert.ok(
-        wrap.className.includes('self-end') || wrap.style.alignSelf === 'flex-end'
+        wrap.className.includes('self-end') ||
+          wrap.style.alignSelf === 'flex-end'
       );
     }
   });
+  cleanup();
+  dom.window.close();
 });
